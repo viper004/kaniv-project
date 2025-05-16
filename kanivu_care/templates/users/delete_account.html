@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% load static %}
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Delete Account</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #ff5f6d, #ffc371);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      height: 120vh;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: white;
+      padding: 2.5rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      max-width: 420px;
+      width: 100%;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    h2 {
+      margin-bottom: 1.2rem;
+      color: #e53935;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.4rem;
+      font-weight: 500;
+      color: #444;
+    }
+
+    input[type="password"],
+    input[type="text"] {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      transition: border 0.3s;
+    }
+
+    input[type="password"]:focus,
+    input[type="text"]:focus {
+      border-color: #ff7043;
+      outline: none;
+    }
+
+    .otp-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 1.5rem;
+    }
+
+    .otp-container input {
+      width: 40px;
+      height: 50px;
+      text-align: center;
+      font-size: 1.2rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      transition: border-color 0.3s;
+    }
+
+    .otp-container input:focus {
+      border-color: #ff7043;
+      outline: none;
+    }
+
+    .btn-delete {
+      width: 100%;
+      background: #e53935;
+      color: white;
+      padding: 0.9rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .btn-delete:hover {
+      background: #d32f2f;
+    }
+
+    .info {
+      font-size: 0.9rem;
+      color: #777;
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: scale(0.95);}
+      to {opacity: 1; transform: scale(1);}
+    }
+
+    .note {
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+      font-weight: bolder;
+      color: red;
+      text-align: center;
+      text-transform: uppercase;
+    }
+    #btn:disabled{
+        background: grey;
+        cursor: not-allowed;
+    }
+
+
+    .loader {
+    display: none;
+  width: 60px;
+  height: 60px;
+  margin: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 100;
+}
+
+.loader:before {
+  content: '';
+  width: 60px;
+  height: 5px;
+  background: #f0808050;
+  position: absolute;
+  top: 60px;
+  left: 0;
+  border-radius: 50%;
+  animation: shadow324 0.5s linear infinite;
+}
+
+.loader:after {
+  content: '';
+  width: 100%;
+  height: 100%;
+  background: #f08080;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 4px;
+  animation: jump7456 0.5s linear infinite;
+}
+
+@keyframes jump7456 {
+  15% {
+    border-bottom-right-radius: 3px;
+  }
+
+  25% {
+    transform: translateY(9px) rotate(22.5deg);
+  }
+
+  50% {
+    transform: translateY(18px) scale(1, .9) rotate(45deg);
+    border-bottom-right-radius: 40px;
+  }
+
+  75% {
+    transform: translateY(9px) rotate(67.5deg);
+  }
+
+  100% {
+    transform: translateY(0) rotate(90deg);
+  }
+}
+
+@keyframes shadow324 {
+
+  0%,
+    100% {
+    transform: scale(1, 1);
+  }
+
+  50% {
+    transform: scale(1.2, 1);
+  }
+}
+
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Delete Your Account</h2>
+
+    <form action="{% url 'users:delete_account' %}" method="POST" id="delete_account">
+        {% csrf_token %}
+      <label for="password">Enter Password</label>
+      <input type="password" name="password" id="password" />
+
+      <label>Enter SMS OTP.</label>
+      <input type="hidden" name="sms_otp" id="sms_otp_collection">
+      <div class="otp-container" id="sms_otp_container">
+        <input type="text" maxlength="1" />
+        <input type="text" maxlength="1" />
+        <input type="text" maxlength="1" />
+        <input type="text" maxlength="1" />
+        <input type="text" maxlength="1" />
+        <input type="text" maxlength="1" />
+      </div>
+
+      <label>Enter Email OTP.</label>
+      <input type="hidden" name="email_otp" id="email_otp_collection">
+      <div class="otp-container" id="email_otp_container">
+        <input type="text" maxlength="1" />
+        <input type="text" maxlength="1" />
+        <input type="text" maxlength="1" />
+        <input type="text" maxlength="1" />
+        <input type="text" maxlength="1" />
+        <input type="text" maxlength="1" />
+      </div>
+
+      <div class="note">
+        <input type="checkbox" name="agree" id="agree" style="cursor: pointer;">
+      Warning: This action is irreversible.
+      If you delete your account will be delete instantly (by entering this button account)
+
+    </div>
+
+      <button type="submit" class="btn-delete" id="btn" disabled>Delete Account</button>
+    </form>
+
+    <p class="info">An OTP has been sent to your registered email or phone number.</p>
+  </div>
+
+  <div class="loader" id="loader"></div>
+
+
+
+
+
+
+  <script type="module">
+    import {showAlert} from "{% static 'scripts/alert.js' %}"
+
+    const agree=document.getElementById("agree");
+    const btn=document.getElementById("btn");
+    const smsOTPCollection=document.getElementById("sms_otp_collection");
+    const emailOTPCollection=document.getElementById("email_otp_collection");
+    const deleteAccount=document.getElementById("delete_account");
+    const loader=document.getElementById("loader")
+    
+
+
+
+    document.querySelectorAll('.otp-container input').forEach((input, index, inputs) => {
+      input.addEventListener('input', () => {
+        if (input.value && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !input.value && index > 0) {
+          inputs[index - 1].focus();
+        }
+      });
+    });
+
+
+    deleteAccount.addEventListener("submit",(e)=>{
+        e.preventDefault();
+        if (!agree.checked){
+            return showAlert("error","Not checked","You are not checked the warning note","ok")
+        }
+
+        loader.style.display="block";
+        let sms_otp_container=document.querySelectorAll("#sms_otp_container input")
+        let smsotp=Array.from(sms_otp_container).map(inp=>inp.value).join("")
+        smsOTPCollection.value=smsotp;
+
+        let email_otp_container=document.querySelectorAll("#email_otp_container input")
+        let emailotp=Array.from(email_otp_container).map(inp=>inp.value).join("")
+        emailOTPCollection.value=emailotp;
+        
+
+        let formdata=new FormData(e.target);
+        fetch(e.target.action,{
+            "method":"POST",
+            "body":formdata
+        }).then(res=>res.json()).then((data)=>{
+            console.log(data);
+
+            if (data.status=="success"){
+                showAlert(data.status,data.title,data.message,"/users/logout/")
+            }
+            else{
+                showAlert(data.status,data.title,data.message,"ok")
+            }
+            loader.style.display="none";
+        })
+
+    })
+
+    
+    agree.addEventListener("click",()=>{
+        if (agree.checked){
+            btn.disabled=false;
+        }
+        else{
+            btn.disabled=true;
+        }
+    })
+  </script>
+<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
+</body>
+</html>

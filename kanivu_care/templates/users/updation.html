@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile - Compassion Connect</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --secondary: #3f37c9;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --success: #4cc9f0;
+            --danger: #ef233c;
+        }
+        
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(to right, #141e30, #243b55);
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        .edit-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .edit-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .edit-header p {
+            font-size: 1rem;
+            color: #ccc;
+        }
+
+        .profile-pic-upload {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-pic-preview {
+            width: 140px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid #00c6ff;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease;
+        }
+
+        .profile-pic-preview:hover {
+            transform: scale(1.05);
+        }
+
+        .upload-controls {
+            margin-top: 15px;
+        }
+
+        .upload-btn, .remove-btn {
+            display: inline-block;
+            margin: 5px 10px;
+            padding: 10px 20px;
+            background: #0072ff;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .remove-btn {
+            background: #ff6e6e;
+        }
+
+        .upload-btn:hover, .remove-btn:hover {
+            opacity: 0.85;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .form-control:disabled {
+            cursor: not-allowed;
+            background: #666;
+        }
+
+        select.form-control, textarea.form-control {
+            resize: none;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: 1rem;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.3s ease;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #00c6ff;
+            color: #00c6ff;
+        }
+
+        .btn-outline:hover {
+            background: #00c6ff;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #ff4e4e;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ff1e1e;
+        }
+
+        .btn-primary {
+            background: #00c6ff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #009ee3;
+        }
+
+    select{
+        cursor: pointer;
+        color: black !important;
+    }
+        
+.custom-loader {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+  width: 70px;
+  height: 70px;
+  background: #ffa600;
+  border-radius: 50px;
+  -webkit-mask: radial-gradient(circle 31px at 50% calc(100% + 13px),#000 95%,#0000) top 4px left 50%,
+    radial-gradient(circle 31px,#000 95%,#0000) center,
+    radial-gradient(circle 31px at 50% -13px,#000 95%,#0000) bottom 4px left 50%,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  -webkit-mask-repeat: no-repeat;
+  animation: cu10 1.5s infinite;
+}
+
+@keyframes cu10 {
+  0% {
+    -webkit-mask-size: 0    18px,0    18px,0    18px,auto
+  }
+
+  16.67% {
+    -webkit-mask-size: 100% 18px,0    18px,0    18px,auto
+  }
+
+  33.33% {
+    -webkit-mask-size: 100% 18px,100% 18px,0    18px,auto
+  }
+
+  50% {
+    -webkit-mask-size: 100% 18px,100% 18px,100% 18px,auto
+  }
+
+  66.67% {
+    -webkit-mask-size: 0    18px,100% 18px,100% 18px,auto
+  }
+
+  83.33% {
+    -webkit-mask-size: 0    18px,0    18px,100% 18px,auto
+  }
+
+  100% {
+    -webkit-mask-size: 0    18px,0    18px,0    18px,auto
+  }
+}
+
+.close{
+    cursor: pointer;
+    display: flex;
+    color: #c00;
+    font-size: 24px;
+    justify-content: end;
+}
+.modal{
+    display: none;
+    position: fixed;
+    top: 25%;
+    left: 35%;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 40px 30px;
+    width: 360px;
+    backdrop-filter: blur(25px);
+    box-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
+    z-index: 2;
+    animation: fadeIn 1s ease forwards;
+    color: #fff;
+}
+
+
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .modal_form_group {
+      margin-bottom: 20px;
+    }
+
+    .modal_form_group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .modal_form_group input {
+      width: 100%;
+      padding: 12px 15px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    .modal_form_group input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .modal_form_group input:focus {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .otp-inputs {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .otp-inputs input {
+      width: 50px;
+      height: 50px;
+      font-size: 22px;
+      text-align: center;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      color: white;
+      transition: 0.3s;
+    }
+
+    .otp-inputs input:focus {
+      outline: 2px solid #fff;
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    #changeNumberModal .btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ff6a00, #ee0979);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(255, 105, 135, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    #changeNumberModal .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 25px rgba(255, 105, 135, 0.6);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media(max-width: 400px) {
+      .modal {
+        width: 90%;
+        padding: 30px 20px;
+      }
+      .otp-inputs input {
+        width: 40px;
+        height: 40px;
+      }
+    }
+
+
+    .password_change_form_container {
+        display: none;
+        position: fixed;
+        top:4%;
+        left: 35%;
+      background: rgba(0, 0, 0, 1);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 40px;
+      width: 450px;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+      color: white;
+      animation: fadeIn 0.8s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .password_change_form_container h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 24px;
+    }
+
+    .password_change_form_container .input-group {
+      position: relative;
+      margin-bottom: 25px;
+    }
+
+    .password_change_form_container .input-group input {
+      width: 100%;
+      padding: 14px 12px;
+      border-radius: 10px;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 16px;
+      outline: none;
+      transition: background 0.3s ease;
+    }
+
+    .password_change_form_container .input-group input:focus {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .password_change_form_container .input-group label {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.6);
+      pointer-events: none;
+      transition: all 0.3s ease;
+      font-size: 15px;
+    }
+
+    .password_change_form_container .input-group input:focus + label,
+    .password_change_form_container .input-group input:not(:placeholder-shown) + label {
+      top: -10px;
+      font-size: 12px;
+      color: #ff9a9e;
+      background: #1f1c2c;
+      padding: 0 6px;
+      border-radius: 5px;
+    }
+
+    .password_change_form_container button {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      color: #2b2b2b;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(255, 154, 158, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .password_change_form_container button:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 25px rgba(255, 154, 158, 0.7);
+    }
+
+    @media(max-width: 400px) {
+      .password_change_form_container {
+        width: 90%;
+        padding: 30px 20px;
+      }
+    }
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+    <div class="edit-header">
+        <h1>Edit Profile</h1>
+        <p>Update your personal information</p>
+    </div>
+
+    <form id="profileForm" class="edit-card" action="{% url 'users:update' %}" method="post">
+        {% csrf_token %}
+
+        
+        <div class="form-group">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" id="username" name="username" class="form-control" value="{{request.user.username}}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="fullName" class="form-label">Full Name</label>
+            <input type="text" id="fullName" name="first_name" class="form-control" value="{{request.user.first_name}}">
+        </div>
+
+        <div class="form-group">
+            <label for="phone" class="form-label">Phone Number</label>
+            <span id="phone" name="phone_number" class="form-control">{{request.user.userprofile.phone_number}}</span>
+            <button type="button" onclick="openModal('changeNumberModal')" class="upload-btn">Change Number</button>
+        </div>
+
+
+        <div class="form-group">
+            <label for="email" class="form-label">Email</label>
+            <span id="email" class="form-control">{{request.user.email}}</span>
+            <button type="button" onclick="openModal('changeEmailModal')" class="upload-btn">Change Email</button>
+        </div>
+
+        <div class="form-group">
+            <button type="button" onclick="openModal('change_password_form')" class="upload-btn">Change Password</button>
+        </div>
+
+        <div class="form-group">
+            <label for="address" class="form-label">Address</label>
+            <textarea id="address" name="address" class="form-control" rows="3">{{request.user.userprofile.address}}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Gender</label>
+            <select name="gender" id="gender" class="form-control">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+        </div>
+
+        <div class="action-buttons">
+            <button type="button" class="btn btn-outline" onclick="window.location.href='profile.html'">Cancel</button>
+            <div>
+                <a href="{% url 'users:delete_account' %}" type="button" class="btn btn-danger" style="text-decoration: none;" id="deleteAccount">Delete Account</a>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+    
+<div class="modal" id="changeNumberModal">
+    
+    <i class="fa-solid fa-xmark close" onclick="closeModal('changeNumberModal')"></i>
+  <h2>Number Verification</h2>
+  <div class="modal_form_group">
+    <label for="phone">Enter New Number</label>
+    <input type="text" id="newphno" placeholder="Enter your new number">
+  </div>
+  <div class="modal_form_group">
+    <button class="btn" onclick="sendOTP()">Get OTP</button>
+  </div>
+
+  <form action="{% url 'users:update_phone_number' %}" method="post" id="numOtpSubmit" class="hidden">
+    {% csrf_token %}
+    <div class="modal_form_group">
+      <label>Enter OTP</label>
+      <input type="hidden" name="otp_collection" id="otp_collection"/>
+      <div class="otp-inputs">
+        <input type="text" maxlength="1" oninput="moveNext(this)" onkeydown="movePrev(event,this)">
+        <input type="text" maxlength="1" oninput="moveNext(this)" onkeydown="movePrev(event,this)">
+        <input type="text" maxlength="1" oninput="moveNext(this)" onkeydown="movePrev(event,this)">
+        <input type="text" maxlength="1" oninput="moveNext(this)" onkeydown="movePrev(event,this)">
+      </div>
+    </div>
+    <div class="modal_form_group">
+      <button class="btn">Verify OTP</button>
+    </div>
+  </form>
+</div>
+
+
+
+    
+<div class="modal" id="changeEmailModal">
+    
+    <i class="fa-solid fa-xmark close" onclick="closeModal('changeEmailModal')"></i>
+  <h2>Email Verification</h2>
+  <div class="modal_form_group">
+    <label for="newemail">Enter New Email</label>
+    <input type="email" id="newemail" placeholder="Enter your new email">
+  </div>
+  <div class="modal_form_group">
+    <button class="btn" onclick="sendEmailOTP()">Get OTP</button>
+  </div>
+
+  <form action="{% url 'users:update_email' %}" method="post" id="emailOTPSubmit" class="hidden" onsubmit="handleEmailOTPSubmit(event)">
+    {% csrf_token %}
+    <div class="modal_form_group">
+      <label>Enter OTP</label>
+      <input type="hidden" name="email_otp_collection" id="email_otp_collection"/>
+      <div class="otp-inputs">
+        <input type="text" maxlength="1" oninput="moveNext(this)" onkeydown="movePrev(event,this)">
+        <input type="text" maxlength="1" oninput="moveNext(this)" onkeydown="movePrev(event,this)">
+        <input type="text" maxlength="1" oninput="moveNext(this)" onkeydown="movePrev(event,this)">
+        <input type="text" maxlength="1" oninput="moveNext(this)" onkeydown="movePrev(event,this)">
+      </div>
+    </div>
+    <div class="modal_form_group">
+      <button class="btn">Verify OTP</button>
+    </div>
+  </form>
+</div>
+
+
+
+
+
+
+  <form action="{% url 'users:update_password' %}" method="post" class="password_change_form_container" id="change_password_form">
+    <i class="fa-solid fa-xmark close" onclick="closeModal('change_password_form')"></i>
+
+    {% csrf_token%}
+    <h2>Change Password</h2>
+
+    <div class="input-group">
+      <input type="password" name="old_password" id="oldpwd" placeholder=" " autocomplete="off" maxlength="20" required>
+      <label for="oldpwd">Old Password</label>
+    </div>
+
+    <div class="input-group">
+      <input type="password" name="new_password1" id="newpwd1" placeholder=" " autocomplete="off" maxlength="20" required>
+      <label for="newpwd1">Old Password</label>
+    </div>
+
+    <div class="input-group">
+      <input type="password" name="new_password2" id="newpwd2" placeholder=" " autocomplete="off" maxlength="20" required>
+      <label for="newpwd2">Old Password</label>
+    </div>
+    <button type="submit">Update Password</button>
+
+    <ul id="passcred" style="margin-top: 10px;">
+        <li>Your password can't be too similar to your other personal information.</li>
+        <li>Your password must contain at least 8 characters.</li>
+        <li>Your password can't be a commonly used password.</li>
+        <li>Your password can't be entirely numeric.</li>
+    </ul>
+  </form>
+
+
+    <div class="custom-loader" id="loader"></div>
+    
+    <script type="module">
+        import {showAlert} from "{% static 'scripts/alert.js' %}";
+
+        const form=document.getElementById('profileForm');
+        const numOtpSubmit=document.getElementById("numOtpSubmit");
+        const emailOtpSubmit=document.getElementById("emailOTPSubmit");
+        const loader=document.getElementById("loader");
+        const emailOTPCollection=document.getElementById("email_otp_collection");
+        const changePasswordForm=document.getElementById("change_password_form");
+
+        const gender=document.getElementById("gender");
+
+        gender.value="{{request.user.userprofile.gender}}";
+
+
+        form.addEventListener("submit",(e)=>{
+            e.preventDefault();
+            let formdata=new FormData(e.target);
+            fetch(e.target.action,{
+                "method":"POST",
+                "body":formdata
+            }).then(res=>res.json()).then((data)=>{
+                if (data.status=="success"){
+                    showAlert(data.status,data.title,data.message,"/users/profile/");
+                }
+                else{
+                    showAlert(data.status,data.title,data.message,"ok");
+                }
+            })
+        })
+
+
+        const sendOTP=()=>{
+            const newPhoneNumber=document.getElementById("newphno").value.trim()
+            if (newPhoneNumber=="" || newPhoneNumber.length!=10){
+                alert("Invalid phone number.Only for indian number");
+                return;
+            }
+
+            
+            let url=`/users/verify_number/?phno=${encodeURIComponent(newPhoneNumber)}`;
+
+            try{
+                fetch(url).then(res=>res.json()).then((data)=>{
+                    showAlert(data.status,data.title,data.message,"ok")
+                    if (data.status == "success"){
+                        numOtpSubmit.classList.remove("hidden");
+                        document.getElementById('changeNumberModal').style.top="10%";
+                        document.querySelector("#changeNumberModal .otp-inputs input").focus();
+                    }
+                })
+            }
+            catch(error){
+                showAlert("error","An error occured",error.message,"ok")
+            }
+
+        }
+        numOtpSubmit.addEventListener("submit",(e)=>{
+            e.preventDefault();
+            loader.style.display="block";
+            const otpCollection=document.getElementById("otp_collection")
+
+            const inputs=document.querySelectorAll(".otp-inputs input");
+            const otp=Array.from(inputs).map(inp=>inp.value).join("");
+
+            if (otp.length != 4){
+                showAlert("error","Invalid OTP","Otp must be 4 digit","ok")
+            }
+
+            otpCollection.value=otp;
+
+            let formdata=new FormData(e.target);
+            
+            try{
+                fetch(e.target.action,{
+                    "method":"POST",
+                    "body":formdata
+                }).then(res=>res.json()).then((data)=>{
+                    console.log(data);
+                    if (data.status=="success"){
+                        showAlert(data.status,data.title,data.message,"/dashboard/")
+                    }
+                    else{
+                        showAlert(data.status,data.title,data.message,"ok");
+                        document.querySelectorAll(".otp-inputs input").forEach(inp=>inp.value="")
+                    }
+                })
+            }
+            catch(error){
+                showAlert("error","An error occured",error.message,"ok")
+            }
+
+            loader.style.display="none";
+            
+        })
+
+        const sendEmailOTP=()=>{
+            loader.style.display="block";
+            const newEmail=document.getElementById("newemail").value.trim()
+
+            
+            let url=`/users/verify_email/?email=${encodeURIComponent(newEmail)}`;
+
+            try{
+                fetch(url).then(res=>res.json()).then((data)=>{
+                    if (data.status=="success"){
+                        emailOtpSubmit.classList.remove("hidden");
+                        document.getElementById('changeEmailModal').style.top="10%";
+                        document.querySelector("#changeEmailModal .otp-inputs input").focus();
+                    }
+                    showAlert(data.status,data.title,data.message,"ok")
+                })
+            }
+            catch(error){
+                showAlert("error","An error occured",error.message,"ok")
+            }
+            finally{
+                loader.style.display="none"
+            }
+        }
+
+
+        const handleEmailOTPSubmit=(e)=>{
+            e.preventDefault();
+            loader.style.display="block";
+
+            const inputs=document.querySelectorAll(".otp-inputs input");
+            const otp=Array.from(inputs).map(inp=>inp.value).join("");
+
+            if (otp.length != 4){
+                showAlert("error","Invalid OTP","Otp must be 4 digit","ok")
+            }
+
+            emailOTPCollection.value=otp;
+            
+            let formdata=new FormData(e.target);
+            fetch(e.target.action,{
+                "method":"POST",
+                "body":formdata
+            }).then(res=>res.json()).then((data)=>{
+                console.log(data);
+
+                if (data.status =="success"){
+                    showAlert(data.status,data.title,data.message,"/users/profile/")
+                }
+                else{
+                    showAlert(data.status,data.title,data.message,"ok")
+                }
+            })
+        }
+
+        changePasswordForm.addEventListener("submit",(e)=>{
+            e.preventDefault();
+            loader.style.display="block";
+            
+            let formdata=new FormData(e.target);
+            fetch(e.target.action,{
+                "method":"POST",
+                "body":formdata
+            }).then(res=>res.json()).then((data)=>{
+                console.log(data);
+
+                if (data.status =="success"){
+                    showAlert(data.status,data.title,data.message,"/users/profile/")
+                }
+                else{
+                    showAlert(data.status,data.title,data.message,"ok")
+                }
+                loader.style.display="none"
+            })
+        })
+
+        const openChangePasswordModal=()=>{
+            const changePasswordForm=document.getElementById("change_password_form");
+            changePasswordForm.style.display="block";
+
+
+            changePasswordForm.addEventListener("submit",(e)=>{
+                e.preventDefault();
+                loader.style.display="block";
+                let formdata=new FormData(e.target);
+
+                fetch(e.target.action,{
+                    "method":"POST",
+                    "body":formdata
+                }).then(res=>res.json()).then((data)=>{
+                    console.log(data);
+                    if (data.status=="success"){
+                        showAlert(data.status,data.title,data.message,"/dashboard/");
+                    }
+                    else{
+                        showAlert(data.status,data.title,data.message,"ok");
+                    }
+                    loader.style.display="none";
+                })
+            })
+
+        }
+
+        
+        // Close modals when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+
+        const closeModal=(id)=>{
+            document.getElementById(id).style.display="none";
+        }
+
+
+        const moveNext=(input)=>{
+            if (input.value.length===1){
+                let next=input.nextElementSibling;
+                if (next) next.focus()
+            }
+        }
+
+        const movePrev=(event,input)=>{
+            if (event.key=="Backspace" && input.value==""){
+                let prev=input.previousElementSibling;
+                if (prev) prev.focus();
+            }
+        }
+
+        function openModal(el) {
+            document.getElementById(el).style.display="block";
+        }
+
+        
+
+
+        window.sendOTP=sendOTP;
+        window.openChangePasswordModal=openChangePasswordModal;
+        window.openModal=openModal;
+        window.moveNext=moveNext;
+        window.movePrev=movePrev;
+        window.closeModal=closeModal;
+        window.sendEmailOTP=sendEmailOTP;
+        window.handleEmailOTPSubmit=handleEmailOTPSubmit;
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    
+
+</body>
+</html>

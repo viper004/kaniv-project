@@ -2,7 +2,6 @@ import os
 
 from pathlib import Path
 
-from College.ELearning.webLearn.webLearn.settings import STATICFILES_DIRS
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,8 +31,7 @@ INSTALLED_APPS = [
     'convenier',
     'web',
     'users',
-    'members',
-    'student_coordinator'
+    'members'
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helping Hands | Charity Foundation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hero-gradient {
+            background: linear-gradient(135deg, rgba(56, 182, 255, 0.8) 0%, rgba(104, 224, 184, 0.8) 100%);
+        }
+        .donation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .impact-counter {
+            transition: all 0.3s ease;
+        }
+        .impact-counter:hover {
+            transform: scale(1.05);
+        }
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+        .nav-link {
+            position: relative;
+        }
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: #3b82f6;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover:after {
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <i class="fas fa-hands-helping text-blue-500 text-3xl mr-2"></i>
+                    <span class="text-xl font-bold text-gray-800">Kanivu</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#" class="nav-link text-gray-700 hover:text-blue-500">Home</a>
+                    <a href="#" class="nav-link text-gray-700 hover:text-blue-500">About</a>
+                    <a href="#" class="nav-link text-gray-700 hover:text-blue-500">Causes</a>
+                    <a href="{% url 'convenier:convenier' %}" class="nav-link text-gray-700 hover:text-blue-500">Convenier</a>
+                    <a href="{% url 'dashboard:dashboard' %}" class="nav-link text-gray-700 hover:text-blue-500">Dashboard</a>
+                </div>
+                <button class="md:hidden text-gray-700 focus:outline-none">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+                <div class="hidden md:block">
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'users:profile' %}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full font-medium transition duration-300">
+                            Profile
+                        </a>
+                    {% else %}
+                        <a href="{% url 'users:login' %}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full font-medium transition duration-300">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient text-white">
+        <div class="container mx-auto px-6 py-20 md:py-32">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-6">Together We Can Make a Difference</h1>
+                    <p class="text-xl mb-8">Join us in our mission to provide food, shelter, and education to those in need around the world.</p>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <button class="bg-white text-blue-500 hover:bg-gray-100 px-6 py-3 rounded-full font-bold transition duration-300">
+                            Donate Now
+                        </button>
+                        <button class="border-2 border-white text-white hover:bg-white hover:text-blue-500 px-6 py-3 rounded-full font-bold transition duration-300">
+                            Learn More
+                        </button>
+                    </div>
+                </div>
+                <div class="md:w-1/2 flex justify-center">
+                    <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80" alt="Volunteers helping" class="rounded-lg shadow-xl w-full max-w-md">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Impact Stats -->
+    <section class="bg-white py-16">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-16">Our Impact</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="impact-counter bg-blue-50 p-8 rounded-xl text-center">
+                    <i class="fas fa-utensils text-blue-500 text-4xl mb-4"></i>
+                    <h3 class="text-4xl font-bold text-blue-500 mb-2">1.2M+</h3>
+                    <p class="text-gray-600">Meals Provided</p>
+                </div>
+                <div class="impact-counter bg-green-50 p-8 rounded-xl text-center">
+                    <i class="fas fa-home text-green-500 text-4xl mb-4"></i>
+                    <h3 class="text-4xl font-bold text-green-500 mb-2">25K+</h3>
+                    <p class="text-gray-600">Shelters Built</p>
+                </div>
+                <div class="impact-counter bg-yellow-50 p-8 rounded-xl text-center">
+                    <i class="fas fa-book-open text-yellow-500 text-4xl mb-4"></i>
+                    <h3 class="text-4xl font-bold text-yellow-500 mb-2">75K+</h3>
+                    <p class="text-gray-600">Children Educated</p>
+                </div>
+                <div class="impact-counter bg-purple-50 p-8 rounded-xl text-center">
+                    <i class="fas fa-hand-holding-heart text-purple-500 text-4xl mb-4"></i>
+                    <h3 class="text-4xl font-bold text-purple-500 mb-2">50K+</h3>
+                    <p class="text-gray-600">Volunteers</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Causes -->
+    <section class="bg-gray-50 py-16">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Featured Causes</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">We're working on multiple projects to help people in need. Your support can make a difference.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Cause 1 -->
+                <div class="donation-card bg-white rounded-xl overflow-hidden shadow-md transition duration-300">
+                    <img src="https://images.unsplash.com/photo-1529310399831-ed472b81d589?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Food donation" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-medium">Food</span>
+                            <div class="text-gray-600">
+                                <span class="font-bold text-blue-500">$25,000</span> raised of $50,000
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Feed Hungry Children</h3>
+                        <p class="text-gray-600 mb-4">Providing nutritious meals to children in underprivileged communities across Africa.</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+                            <div class="bg-blue-500 h-2 rounded-full" style="width: 50%"></div>
+                        </div>
+                        <button class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-full font-medium transition duration-300">
+                            Donate Now
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Cause 2 -->
+                <div class="donation-card bg-white rounded-xl overflow-hidden shadow-md transition duration-300">
+                    <img src="https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Education" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm font-medium">Education</span>
+                            <div class="text-gray-600">
+                                <span class="font-bold text-blue-500">$18,750</span> raised of $40,000
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Build a School</h3>
+                        <p class="text-gray-600 mb-4">Constructing a new school facility in rural India to provide quality education.</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+                            <div class="bg-blue-500 h-2 rounded-full" style="width: 47%"></div>
+                        </div>
+                        <button class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-full font-medium transition duration-300">
+                            Donate Now
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Cause 3 -->
+                <div class="donation-card bg-white rounded-xl overflow-hidden shadow-md transition duration-300">
+                    <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Medical help" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm font-medium">Health</span>
+                            <div class="text-gray-600">
+                                <span class="font-bold text-blue-500">$32,000</span> raised of $60,000
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Medical Aid</h3>
+                        <p class="text-gray-600 mb-4">Providing essential medical supplies and treatment to disaster-affected areas.</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+                            <div class="bg-blue-500 h-2 rounded-full" style="width: 53%"></div>
+                        </div>
+                        <button class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-full font-medium transition duration-300">
+                            Donate Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-12">
+                <button class="border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white px-6 py-3 rounded-full font-bold transition duration-300">
+                    View All Causes
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="bg-white py-16">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">How You Can Help</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Your contribution can change lives. Here's how you can make an impact.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center p-6">
+                    <div class="bg-blue-100 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-hand-holding-usd text-blue-500 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Donate Money</h3>
+                    <p class="text-gray-600">Your financial contributions help us fund our programs and reach more people in need.</p>
+                </div>
+                <div class="text-center p-6">
+                    <div class="bg-green-100 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-tshirt text-green-500 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Donate Goods</h3>
+                    <p class="text-gray-600">Clothing, food, and other essentials can directly help those in need in your community.</p>
+                </div>
+                <div class="text-center p-6">
+                    <div class="bg-purple-100 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-hands-helping text-purple-500 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Volunteer</h3>
+                    <p class="text-gray-600">Give your time and skills to help us organize events and distribute aid to those in need.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="bg-blue-500 py-16">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-white mb-4">Stories of Hope</h2>
+                <p class="text-blue-100 max-w-2xl mx-auto">Hear from people whose lives have been changed through our programs.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="testimonial-card p-8 rounded-xl">
+                    <div class="flex items-center mb-4">
+                        <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Sarah J." class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-bold text-gray-800">Sarah J.</h4>
+                            <p class="text-blue-500 text-sm">Donor</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"Seeing the impact of my donations through the photos and reports from Helping Hands makes me feel like I'm truly making a difference. I'll continue supporting their work."</p>
+                    <div class="flex mt-4 text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <div class="testimonial-card p-8 rounded-xl">
+                    <div class="flex items-center mb-4">
+                        <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Michael T." class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-bold text-gray-800">Michael T.</h4>
+                            <p class="text-blue-500 text-sm">Volunteer</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"Volunteering with Helping Hands has been one of the most rewarding experiences of my life. The organization is well-run and truly focused on helping people."</p>
+                    <div class="flex mt-4 text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <div class="testimonial-card p-8 rounded-xl">
+                    <div class="flex items-center mb-4">
+                        <img src="https://randomuser.me/api/portraits/women/63.jpg" alt="Amina K." class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-bold text-gray-800">Amina K.</h4>
+                            <p class="text-blue-500 text-sm">Beneficiary</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"Thanks to Helping Hands, my children now have access to education and proper nutrition. Our lives have changed completely because of their support."</p>
+                    <div class="flex mt-4 text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="bg-gray-100 py-16">
+        <div class="container mx-auto px-6 max-w-4xl">
+            <div class="bg-white rounded-xl shadow-md p-8 md:p-12 text-center">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Stay Updated</h2>
+                <p class="text-gray-600 mb-8">Subscribe to our newsletter to receive updates on our projects, success stories, and upcoming events.</p>
+                <form class="flex flex-col sm:flex-row gap-4">
+                    <input type="email" placeholder="Your email address" class="flex-grow px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-bold transition duration-300">
+                        Subscribe
+                    </button>
+                </form>
+                <p class="text-sm text-gray-500 mt-4">We respect your privacy. Unsubscribe at any time.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white pt-16 pb-8">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-hands-helping text-blue-400 text-2xl mr-2"></i>
+                        <span class="text-xl font-bold">Helping Hands</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">Committed to making the world a better place through acts of kindness and generosity.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Home</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Causes</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Events</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Blog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Causes</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Education</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Poverty</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Health</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Human Rights</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Environment</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Contact Us</h3>
+                    <ul class="space-y-3 text-gray-400">
+                        <li class="flex items-start">
+                            <i class="fas fa-map-marker-alt mt-1 mr-3 text-blue-400"></i>
+                            <span>123 Charity Ave, Helping City, HC 12345</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone-alt mr-3 text-blue-400"></i>
+                            <span>+1 (555) 123-4567</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-3 text-blue-400"></i>
+                            <span>info@helpinghands.org</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 mb-4 md:mb-0">© 2023 Helping Hands Charity. All rights reserved.</p>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white transition duration-300">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition duration-300">Terms of Service</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition duration-300">FAQ</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="fixed bottom-6 right-6 bg-blue-500 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition duration-300 opacity-0 invisible">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // Back to Top Button
+        const backToTopButton = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.remove('opacity-0', 'invisible');
+                backToTopButton.classList.add('opacity-100', 'visible');
+            } else {
+                backToTopButton.classList.remove('opacity-100', 'visible');
+                backToTopButton.classList.add('opacity-0', 'invisible');
+            }
+        });
+        
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Mobile Menu Toggle (would need more implementation)
+        const mobileMenuButton = document.querySelector('.md\\:hidden');
+        mobileMenuButton.addEventListener('click', () => {
+            // This would toggle a mobile menu in a real implementation
+            alert('Mobile menu would open here in a complete implementation');
+        });
+
+        // Simple donation counter animation for impact stats
+        const counters = document.querySelectorAll('.impact-counter h3');
+        const speed = 200;
+        
+        function animateCounters() {
+            counters.forEach(counter => {
+                const target = +counter.innerText.replace(/\D/g, '');
+                const count = +counter.innerText.replace(/\D/g, '');
+                const increment = target / speed;
+                
+                if (count < target) {
+                    counter.innerText = Math.ceil(count + increment).toLocaleString() + '+';
+                    setTimeout(animateCounters, 1);
+                } else {
+                    counter.innerText = target.toLocaleString() + '+';
+                }
+            });
+        }
+        
+        // Start animation when section is in view
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounters();
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+        
+        const impactSection = document.querySelector('.bg-white.py-16');
+        if (impactSection) {
+            observer.observe(impactSection);
+        }
+    </script>
+</body>
+</html>
