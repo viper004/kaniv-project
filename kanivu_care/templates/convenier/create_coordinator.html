@@ -180,7 +180,8 @@
     <h1>Coordinator Login by Convenier</h1>
     <form action="{% url 'convenier:create_coordinator' %}" method="post" id="form">
       {% csrf_token %}
-      {{ form.as_p }}
+      {{ coordinator_form.as_p }}
+
       <button type="submit">Submit</button>
     </form>
   </div>

@@ -11,7 +11,7 @@ from django.contrib.auth.hashers import make_password
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
-from members.models import memberRegistration
+from members.models import MCRegistration
 
 from users.functions import form_errors
 from users.forms import *
@@ -246,8 +246,8 @@ def Profile(req):
     if req.user.is_superuser:
         return redirect("/admin/")
     
-    members=memberRegistration.objects.filter(user__userprofile__role="member")
-    coordinators=memberRegistration.objects.filter(user__userprofile__role="coordinator")
+    members=MCRegistration.objects.filter(user__userprofile__role="member")
+    coordinators=MCRegistration.objects.filter(user__userprofile__role="coordinator")
 
     cntx={
         "members":members,
@@ -605,7 +605,7 @@ def editAcademic(req):
     if not (req.user.userprofile.role == "member" or req.user.userprofile.role == "coordinator"):
         return HttpResponseRedirect("/")
     if (req.method=="POST"):
-        member,state=memberRegistration.objects.get_or_create(user=req.user)
+        member,state=MCRegistration.objects.get_or_create(user=req.user)
         form=MCUpdateForm(req.POST,instance=member)
         if form.is_valid():
             form.save()

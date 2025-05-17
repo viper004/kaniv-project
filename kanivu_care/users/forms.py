@@ -8,7 +8,7 @@ from django import forms
 from django.contrib.auth.models import User
 from .models import UserProfile
 
-from members.models import memberRegistration
+from members.models import MCRegistration
 
 class UserRegistrationForm(forms.ModelForm):
     username = forms.CharField(
@@ -154,11 +154,11 @@ class MCUpdateForm(UserChangeForm):
         "id":"batch"
     }))
 
-    department=forms.ChoiceField(label="Department",choices=memberRegistration.DEPARTMENT_CHOICES,widget=forms.Select(attrs={
+    department=forms.ChoiceField(label="Department",choices=MCRegistration.DEPARTMENT_CHOICES,widget=forms.Select(attrs={
         "id":"department"
     }))
 
-    current_year=forms.ChoiceField(label="Current Year",choices=memberRegistration.YEAR_CHOICES,widget=forms.Select(attrs={
+    current_year=forms.ChoiceField(label="Current Year",choices=MCRegistration.YEAR_CHOICES,widget=forms.Select(attrs={
         "id":"year"
     }))
     

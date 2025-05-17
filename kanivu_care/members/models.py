@@ -1,41 +1,50 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-# Create your models here.
+class MCRegistration(models.Model):
 
-class memberRegistration(models.Model):
-
-    DEPARTMENT_CHOICES=(
-        ("bba","BBA"),
-        ("bca","BCA"),
-        ("bsc_cs","BSC CS"),
-        ("bcom_tax","bcom tax"),
-        ("ttm","ttm"),
-        ("bcom_ca_and_finance","bcom ca and finance"),
-        ("bcom_co-operation","bcom co-operation"),
-        ("ba_literature","ba literature"),
-        ("ba_communicative_english","ba_communicative_english"),
-        ("ba_journalism","ba_journalism"),
-        ("electronics","electronics"),
-        ("bsw","bsw"),
-
+    DEPARTMENT_CHOICES = (
+        ("bba", "BBA"),
+        ("bca", "BCA"),
+        ("bsc_cs", "BSc CS"),
+        ("bcom_tax", "BCom Tax"),
+        ("ttm", "TTM"),
+        ("bcom_ca_and_finance", "BCom CA and Finance"),
+        ("bcom_co_operation", "BCom Co-operation"),
+        ("ba_literature", "BA Literature"),
+        ("ba_communicative_english", "BA Communicative English"),
+        ("ba_journalism", "BA Journalism"),
+        ("electronics", "Electronics"),
+        ("bsw", "BSW"),
     )
 
-    YEAR_CHOICES=(
-        ("1","1"),
-        ("2","2"),
-        ("3","3"),
-        ("4","4"),
-
+    YEAR_CHOICES = (
+        ("1", "1st Year"),
+        ("2", "2nd Year"),
+        ("3", "3rd Year"),
+        ("4", "4th Year"),
     )
 
+    
 
-    user=models.OneToOneField(User,on_delete=models.CASCADE)
-    adno=models.CharField(max_length=255)
-    department=models.CharField(choices=DEPARTMENT_CHOICES)
-    batch=models.CharField(max_length=10)
-    current_year=models.CharField(choices=YEAR_CHOICES,max_length=5)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    adno = models.CharField(max_length=255)
+    department = models.CharField(max_length=50, choices=DEPARTMENT_CHOICES)
+    batch = models.CharField(max_length=10)
+    current_year = models.CharField(max_length=5, choices=YEAR_CHOICES)
 
     def __str__(self):
         return self.user.username
-    
+
+
+class memberRegistration(models.Model):
+    user=models.ForeignKey(MCRegistration,on_delete=models.CASCADE)
+    DUTY_CHOICES = (
+        ("No Duty", "No Duty"),
+        ("Finance", "Finance"),
+        ("Collection Team", "Collection Team"),
+        ("Event Organizers", "Event Organizers"),  # Fixed typo
+        ("Mini Coordination", "Mini Coordination"),
+    )
+
+    duty = models.CharField(max_length=50, choices=DUTY_CHOICES, default="No Duty")

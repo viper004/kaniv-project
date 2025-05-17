@@ -266,7 +266,10 @@
                 <div class="user-name">{{request.user.first_name}}</div>
                 <div class="user-role">@{{request.user.username}}</div><br>
 
-                <strong style="text-transform: capitalize;">Role: {{request.user.userprofile.role}}</strong>
+                {% if not request.user.userprofile.role == "public_user" %}
+                    <strong style="text-transform: capitalize;">Role: {{request.user.userprofile.role}}</strong>
+                {% endif %}
+
 
                 {% if request.user.userprofile.role == "member" or request.user.userprofile.role == "coordinator" %}
                 
@@ -296,14 +299,6 @@
                         </div>
                     </div>
                 {% endif %}
-
-
-
-                <br>
-
-                
-                
-                
                 <a href="{% url 'users:logout' %}" class="logout-btn">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </a>
@@ -388,7 +383,12 @@
 
                             
                         </div>
+
+                        
                     </div>
+                {% endif %}
+                {% if request.user.userprofile.role == "coordinator" %}
+                    <a href="{% url 'coordinator:request_member' %}" class="edit-btn">Send request for adding member</a>
                 {% endif %}
             </div>
         </div>
