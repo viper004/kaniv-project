@@ -167,7 +167,7 @@
 
         <div class="form-group">
             <label for="batch">Batch</label>
-            <input type="text" name="batch" id="batch" value="{{request.user.memberregistration.batch}}" placeholder="e.g., 2022-2025" required>
+            <input type="text" name="batch" maxlength="9" id="batch" value="{{request.user.memberregistration.batch}}" placeholder="e.g., 2022-2025" required>
         </div>
 
         <div class="form-group">
@@ -212,7 +212,21 @@
     const department=document.getElementById("department");
     const year=document.getElementById("year");
     const form=document.getElementById("form");
-    const loader=document.getElementById("loader")
+    const loader=document.getElementById("loader");
+    const batch=document.getElementById("batch");
+
+    batch.addEventListener("keydown",(e)=>{
+        if(e.key=="Backspace") return;
+
+        if (e.target.value.length===4){
+            e.target.value+="-"
+        }
+    })
+
+    window.addEventListener("contextmenu",(e)=>{
+        e.preventDefault();
+        showAlert("error","Not allowed!","Context menu is not allowed","ok")
+    })
 
     department.value="{{request.user.memberregistration.department}}";
     year.value="{{request.user.memberregistration.current_year}}";

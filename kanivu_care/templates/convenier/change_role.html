@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+    {% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,6 +26,7 @@
             background: var(--body-bg); color: var(--dark);
             line-height: 1.7; min-height: 100vh;
             padding: 2rem 4rem;
+            height: 100vh auto;
         }
         aside {
         position: fixed;
@@ -127,6 +129,12 @@
         .user-grid {
             display: grid; gap: 2rem;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            max-height: 850px;
+            overflow-y: scroll;
+        }
+
+        .user-grid::-webkit-scrollbar{
+            display: none;
         }
         
         .user-card {
@@ -247,6 +255,7 @@
             text-align: center; padding: 4rem;
             background: white; border-radius: var(--radius);
             box-shadow: var(--shadow); grid-column: 1 / -1;
+            margin-top: 20px;
         }
         
         .empty-icon {
@@ -282,59 +291,7 @@
         <aside>
             <a href="{% url 'convenier:create_coordinator' %}">Create Member/Coordinator</a>
         </aside>
-        
-        {% if members %}
-        <div class="section-header">
-            <h2 class="section-title">Members</h2>
-        </div>
-        <div class="user-grid">
-            {% for i in members %}
-            <div class="user-card">
-                <div class="user-header">
-                    <div class="user-avatar">{{ i.user.first_name|first }}{{ i.user.last_name|first|default:"" }}</div>
-                    <div class="user-info">
-                        <div class="user-name">{{ i.user.first_name }} {{ i.user.last_name|default:"" }}</div>
-                        <span class="user-role role-member">Member</span>
-                    </div>
-                </div>
-                <div class="user-details">
-                    <div class="detail-row">
-                        <span class="detail-label">Admission No:</span>
-                        <span class="detail-value">{{ i.adno }}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Department:</span>
-                        <span class="detail-value dept">{{ i.department }}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Batch:</span>
-                        <span class="detail-value">{{ i.batch }}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Year:</span>
-                        <span class="detail-value">{{ i.current_year }}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Email:</span>
-                        <span class="detail-value">{{ i.user.email }}</span>
-                    </div>
-                </div>
-                <div class="action-buttons">
-                    <button class="btn btn-primary">Promote to Coordinator</button>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="user-grid">
-            <div class="empty-state">
-                <div class="empty-icon">👤</div>
-                <h3 class="empty-text">No members found</h3>
-                <button class="btn btn-primary" style="max-width: 250px; margin: 0 auto;">Add New Member</button>
-            </div>
-        </div>
-        {% endif %}
-        
+
         {% if coordinators %}
         <div class="section-header">
             <h2 class="section-title">Coordinators</h2>
@@ -343,7 +300,7 @@
             {% for i in coordinators %}
             <div class="user-card">
                 <div class="user-header">
-                    <div class="user-avatar">{{ i.user.first_name }}</div>
+                    <div class="user-avatar"></div>
                     <div class="user-info">
                         <div class="user-name">{{ i.user.username }}</div>
                         <span class="user-role role-coordinator">Coordinator</span>
@@ -372,7 +329,7 @@
                     </div>
                 </div>
                 <div class="action-buttons">
-                    <button class="btn btn-danger">Demote to Member</button>
+                    <button data-id="{{i.user.id}}" class="demote btn btn-danger">Demote to Member</button>
                 </div>
             </div>
             {% endfor %}
@@ -382,16 +339,115 @@
             <div class="empty-state">
                 <div class="empty-icon">👥</div>
                 <h3 class="empty-text">No coordinators found</h3>
-                <button class="btn btn-primary" style="max-width: 250px; margin: 0 auto;">Promote Members</button>
             </div>
         </div>
         {% endif %}
+        
+        {% if members %}
+        <div class="section-header">
+            <h2 class="section-title">Members</h2>
+        </div>
+        <div class="user-grid">
+            {% for i in members %}
+            <div class="user-card">
+                <div class="user-header">
+                    <div class="user-avatar"></div>
+                    <div class="user-info">
+                        <div class="user-name">{{ i.user.username }}</div>
+                        <span class="user-role role-member">Member</span>
+                    </div>
+                </div>
+                <div class="user-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Admission No:</span>
+                        <span class="detail-value">{{ i.adno }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Department:</span>
+                        <span class="detail-value dept">{{ i.department }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Batch:</span>
+                        <span class="detail-value">{{ i.batch }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Year:</span>
+                        <span class="detail-value">{{ i.current_year }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Email:</span>
+                        <span class="detail-value">{{ i.user.email }}</span>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button data-id="{{i.user.id}}" class="promote btn btn-primary">Promote to Coordinator</button>
+                </div>
+            </div>
+            {% endfor %}
+            
+        </div>
+        {% else %}
+        <div class="user-grid">
+            <div class="empty-state">
+                <div class="empty-icon">👤</div>
+                <h3 class="empty-text">No members found</h3>
+            </div>
+        </div>
+        {% endif %}
+        
+        
     </div>
 </body>
-<script>
+<script type="module">
+    import {showAlert} from "{% static 'scripts/alert.js' %}"
+
     const dept=document.querySelectorAll(".dept");
+    const demote=document.querySelectorAll(".demote");
+    const promote=document.querySelectorAll(".promote");
+
+
+
+    demote.forEach((d)=>{
+        d.addEventListener("click",()=>{
+            let userid=d.dataset.id
+            let url=`/convenier/change_role/demote/${userid}`;
+            fetch(url).then(res=>res.json()).then((data)=>{
+                if (data.status=="success"){
+                    showAlert(data.status,data.title,data.message,"/convenier/change_role");
+                }
+                else{
+                    showAlert(data.status,data.title,data.message,"ok");
+
+                }
+            })
+        })
+    })
+
+    promote.forEach((p)=>{
+        p.addEventListener("click",()=>{
+            let userid=p.dataset.id
+            let url=`/convenier/change_role/promote/${userid}`;
+            fetch(url).then(res=>res.json()).then((data)=>{
+                if (data.status=="success"){
+                    showAlert(data.status,data.title,data.message,"/convenier/change_role");
+                }
+                else{
+                    showAlert(data.status,data.title,data.message,"ok");
+
+                }
+            })
+        })
+    })
+
+
+
+
     dept.forEach((d)=>{
         d.textContent=d.textContent.replaceAll("_"," ");
-    })
+    });
+
+
 </script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
 </html>

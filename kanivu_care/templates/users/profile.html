@@ -201,6 +201,7 @@
         .info-value {
             font-size: 1rem;
             font-weight: 500;
+            text-transform: capitalize;
         }
         
         .about-section {
@@ -242,6 +243,14 @@
         .interests {
             margin-top: 1rem;
         }
+
+
+        #academic_edit .info-grid .info-item{
+            background: #4361ee;
+        }
+        #academic_edit .info-grid .info-item .info-label{
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -257,21 +266,43 @@
                 <div class="user-name">{{request.user.first_name}}</div>
                 <div class="user-role">@{{request.user.username}}</div><br>
 
+                <strong style="text-transform: capitalize;">Role: {{request.user.userprofile.role}}</strong>
+
+                {% if request.user.userprofile.role == "member" or request.user.userprofile.role == "coordinator" %}
+                
+                    <div class="preferences-section" style="margin-top: 2rem;" id="academic_edit">
+                        <h2 class="section-title" style="color:#fff;">
+                            Academic Details
+                            
+                        </h2>
+                        
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">Admission Number</div>
+                                <div class="info-value">{{request.user.memberregistration.adno}}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Batch</div>
+                                <div class="info-value">{{request.user.memberregistration.batch}}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Department</div>
+                                <div class="info-value" id="dept">{{request.user.memberregistration.department}}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Current Year</div>
+                                <div class="info-value">{{request.user.memberregistration.current_year}}</div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+
 
                 <br>
 
                 
-                <div class="user-stats">
-                    <div class="stat-item">
-                        <div class="stat-value">$4,820</div>
-                        <div class="stat-label">Total Donated</div>
-                    </div>
-                    
-                    <div class="stat-item">
-                        <div class="stat-value">23</div>
-                        <div class="stat-label">Causes</div>
-                    </div>
-                </div>
+                
                 
                 <a href="{% url 'users:logout' %}" class="logout-btn">
                     <i class="fas fa-sign-out-alt"></i> Logout
@@ -314,52 +345,8 @@
                         </div>
                     </div>
                 </div>
-                
-                <div class="about-section">
-                    <h2 class="section-title">About Me</h2>
-                    <div class="about-text">
-                        <p>I've been passionate about charitable giving since my college days. My focus areas are education for underprivileged children and environmental conservation. I believe every small contribution makes a difference in building a better world for future generations.</p>
-                        
-                        <div class="interests">
-                            <span class="badge badge-primary">Education</span>
-                            <span class="badge badge-success">Environment</span>
-                            <span class="badge badge-warning">Healthcare</span>
-                            <span class="badge badge-primary">Children</span>
-                        </div>
-                    </div>
-                </div>
 
-                {% if request.user.userprofile.role == "member" or request.user.userprofile.role == "coordinator" %}
                 
-                    <div class="preferences-section" style="margin-top: 2rem;">
-                        <h2 class="section-title">
-                            Academic Details
-                            <a href="{% url 'users:academic_edit' %}" class="edit-btn">
-                                <i class="fas fa-edit"></i> Edit Academic Details
-                            </a>
-                        </h2>
-                        
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <div class="info-label">Admission Number</div>
-                                <div class="info-value">{{request.user.memberregistration.adno}}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Batch</div>
-                                <div class="info-value">{{request.user.memberregistration.batch}}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Department</div>
-                                <div class="info-value">{{request.user.memberregistration.department}}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Current Year</div>
-                                <div class="info-value">{{request.user.memberregistration.current_year}}</div>
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
-
                 {% if request.user.userprofile.role == "convenier" %}
                 
                     <div class="preferences-section" style="margin-top: 2rem;">
@@ -409,6 +396,10 @@
     
     <script type="module">
         import {showAlert} from "{% static 'scripts/alert.js' %}";
+
+        const dept=document.getElementById("dept");
+
+        dept.textContent=dept.textContent.replaceAll("_"," ")
 
         function logout() {
             if (confirm('Are you sure you want to logout?')) {

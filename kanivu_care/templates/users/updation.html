@@ -103,7 +103,13 @@
         }
 
         .form-group {
+
             margin-bottom: 20px;
+        }
+
+        #academic_edit{
+            display: flex;
+            justify-content: center;
         }
 
         .form-label {
@@ -454,6 +460,13 @@
       }
     }
 
+    #gender{
+      color: #fff !important;
+    }
+
+    #gender option{
+      color: black !important;
+    }
 
     </style>
 </head>
@@ -508,8 +521,17 @@
             </select>
         </div>
 
+        <div class="form-group" id="academic_edit">
+            {% if request.user.userprofile.role == "member" or request.user.userprofile.role == "coordinator" %}
+                <a href="{% url 'users:academic_edit' %}" class="btn btn-outline" style="text-decoration: none;">
+                    <i class="fas fa-edit"></i> Edit Academic Details
+                </a>
+            {% endif %}
+        </div>
+
         <div class="action-buttons">
             <button type="button" class="btn btn-outline" onclick="window.location.href='profile.html'">Cancel</button>
+            
             <div>
                 <a href="{% url 'users:delete_account' %}" type="button" class="btn btn-danger" style="text-decoration: none;" id="deleteAccount">Delete Account</a>
                 <button type="submit" class="btn btn-primary">Save Changes</button>

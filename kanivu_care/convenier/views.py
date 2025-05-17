@@ -73,3 +73,26 @@ def changeRole(req):
         "coordinators":coordinators
     }
     return render(req,"convenier/change_role.html",context=cntx)
+
+def promoteUser(req,id):
+    user=User.objects.get(id=id)
+    userp=UserProfile.objects.get(user=user)
+    userp.role="coordinator"
+    userp.save()
+    return JsonResponse({
+        "status":"success",
+        "title":"Promoted",
+        "message":"Member is promoted as coordinator!",
+    })
+
+
+def demoteUser(req,id):
+    user=User.objects.get(id=id)
+    userp=UserProfile.objects.get(user=user)
+    userp.role="member"
+    userp.save()
+    return JsonResponse({
+        "status":"success",
+        "title":"Demoted",
+        "message":"Coordinator is demoted as member!",
+    })
