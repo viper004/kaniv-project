@@ -289,7 +289,7 @@
             <p class="subtitle">Easily manage member roles and permissions across your organization</p>
         </header>
         <aside>
-            <a href="{% url 'convenier:create_coordinator' %}">Create Member/Coordinator</a>
+            <a href="{% url 'convenier:create_member' %}">Create Member</a>
         </aside>
 
         {% if coordinators %}
@@ -375,8 +375,8 @@
                         <span class="detail-value">{{ i.current_year }}</span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">Email:</span>
-                        <span class="detail-value">{{ i.user.email }}</span>
+                        <span class="detail-label">Duty:</span>
+                        <span class="detail-value">{{ i.user.memberregistration.duty }}</span>
                     </div>
                 </div>
                 <div class="action-buttons">

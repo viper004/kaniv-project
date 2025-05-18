@@ -11,7 +11,10 @@ from django.contrib.auth.hashers import make_password
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
-from members.models import MCRegistration
+from members.models import memberRegistration
+
+from coordinator.models import coordinateRegistration
+
 
 from users.functions import form_errors
 from users.forms import *
@@ -107,6 +110,12 @@ def numVerify(req):
             )
             user.save()
 
+            userp,_=UserProfile.objects.get_or_create(user=user)
+
+            userp.role="public_user"
+
+
+
             print("user name ",username)
             print("password ",password)
             
@@ -157,9 +166,25 @@ def Login(req):
     if (req.method=="POST"):
         username=req.POST.get('username')
         password=req.POST.get('password')
-        user=authenticate(username=username,password=password)
+        user=authenticate(req,username=username,password=password)
+
+        
+        
 
         if user is not None:
+
+            print(user.userprofile.role)
+            
+            if user.userprofile.role == "member":
+                member,_=memberRegistration.objects.get_or_create(user=user)
+                if (member.isApproved==False):
+                    return JsonResponse({
+                        "status":"error",
+                        "title":"Login failed",
+                        "message":"Your login request is pending.wait or inform your coordinator"
+                    })
+        
+
             login(req,user)
             return JsonResponse({
                 "status": "success",
@@ -246,8 +271,8 @@ def Profile(req):
     if req.user.is_superuser:
         return redirect("/admin/")
     
-    members=MCRegistration.objects.filter(user__userprofile__role="member")
-    coordinators=MCRegistration.objects.filter(user__userprofile__role="coordinator")
+    members=UserProfile.objects.filter(role="member")
+    coordinators=UserProfile.objects.filter(role="coordinator")
 
     cntx={
         "members":members,
@@ -426,11 +451,11 @@ def updateEmail(req):
                 "message":"Redirect to verify number."
             })
         
-        if not enteredOTP.isdigit() or len(enteredOTP)!=4:
+        if len(enteredOTP)!=4:
             return JsonResponse({
                 "status": "error",
                 "title":"Invalid verification code",
-                "message":"Your OTP must be 4 digit and only allowed digits."
+                "message":"Your OTP must be 4 digits."
             })
         
         if (enteredOTP==storedOTP):
@@ -605,7 +630,7 @@ def editAcademic(req):
     if not (req.user.userprofile.role == "member" or req.user.userprofile.role == "coordinator"):
         return HttpResponseRedirect("/")
     if (req.method=="POST"):
-        member,state=MCRegistration.objects.get_or_create(user=req.user)
+        member,state=memberRegistration.objects.get_or_create(user=req.user)
         form=MCUpdateForm(req.POST,instance=member)
         if form.is_valid():
             form.save()

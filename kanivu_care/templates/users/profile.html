@@ -266,6 +266,7 @@
                 <div class="user-name">{{request.user.first_name}}</div>
                 <div class="user-role">@{{request.user.username}}</div><br>
 
+
                 {% if not request.user.userprofile.role == "public_user" %}
                     <strong style="text-transform: capitalize;">Role: {{request.user.userprofile.role}}</strong>
                 {% endif %}
@@ -332,7 +333,7 @@
                         </div>
                         <div class="info-item">
                             <div class="info-label">Member Since</div>
-                            <div class="info-value">{{request.user.userprofile.created_at}}</div>
+                            <div class="info-value">{{request.user.userprofile.created_at|date:"d M Y"}}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">Gender</div>

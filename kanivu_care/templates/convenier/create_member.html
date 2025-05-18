@@ -214,7 +214,7 @@
           showAlert(data.status, data.title, data.message, "ok");
         })
         .catch(err => {
-          showAlert("error", "Submission Failed", "Something went wrong.", "ok");
+          showAlert("error", "Submission Failed", err.message, "ok");
         });
 
         loader.style.display="none";

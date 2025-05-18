@@ -1,15 +1,17 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.contrib.auth.password_validation import validate_password
 
-from users.models import UserProfile
 from members.models import memberRegistration
 
-from coordinator.models import coordinateRegistration
+from convenier.models import pendingMemberAddRequest
 
-    
-class convenierMemberLoginForm(UserCreationForm):
+from users.models import UserProfile
+
+
+
+
+class coordinatorMemberRequestForm(UserCreationForm):
     
     username=forms.CharField(max_length=20,required=True,
         error_messages={'required':"Username is required"},widget=forms.TextInput(attrs={
@@ -48,12 +50,17 @@ class convenierMemberLoginForm(UserCreationForm):
             profile.save()
 
 
+            request=pendingMemberAddRequest.objects.create(user=user)
+            request.isApproved=False
+            request.save()
+
+
             # memberRegistration requires MCRegistration (which may not exist yet)
             # So skip this if not available
             
             member, _ = memberRegistration.objects.get_or_create(user=user)
             member.duty = duty
-            member.isApproved=True
+            member.isApproved=False
             member.save()
               # Handle later when MCRegistration is created
 

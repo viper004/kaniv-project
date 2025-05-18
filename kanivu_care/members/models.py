@@ -1,8 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-class MCRegistration(models.Model):
 
+class memberRegistration(models.Model):
     DEPARTMENT_CHOICES = (
         ("bba", "BBA"),
         ("bca", "BCA"),
@@ -25,20 +25,6 @@ class MCRegistration(models.Model):
         ("4", "4th Year"),
     )
 
-    
-
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    adno = models.CharField(max_length=255)
-    department = models.CharField(max_length=50, choices=DEPARTMENT_CHOICES)
-    batch = models.CharField(max_length=10)
-    current_year = models.CharField(max_length=5, choices=YEAR_CHOICES)
-
-    def __str__(self):
-        return self.user.username
-
-
-class memberRegistration(models.Model):
-    user=models.ForeignKey(MCRegistration,on_delete=models.CASCADE)
     DUTY_CHOICES = (
         ("No Duty", "No Duty"),
         ("Finance", "Finance"),
@@ -47,4 +33,17 @@ class memberRegistration(models.Model):
         ("Mini Coordination", "Mini Coordination"),
     )
 
+    
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    adno = models.CharField(max_length=255)
+    department = models.CharField(max_length=50, choices=DEPARTMENT_CHOICES)
+    batch = models.CharField(max_length=10)
+    current_year = models.CharField(max_length=5, choices=YEAR_CHOICES)
     duty = models.CharField(max_length=50, choices=DUTY_CHOICES, default="No Duty")
+    isApproved=models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.user.username
+    
+

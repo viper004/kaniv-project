@@ -8,7 +8,6 @@ from django import forms
 from django.contrib.auth.models import User
 from .models import UserProfile
 
-from members.models import MCRegistration
 
 class UserRegistrationForm(forms.ModelForm):
     username = forms.CharField(
@@ -146,6 +145,29 @@ class resetPasswordForm(SetPasswordForm):
 
 
 class MCUpdateForm(UserChangeForm):
+
+    DEPARTMENT_CHOICES = (
+        ("bba", "BBA"),
+        ("bca", "BCA"),
+        ("bsc_cs", "BSc CS"),
+        ("bcom_tax", "BCom Tax"),
+        ("ttm", "TTM"),
+        ("bcom_ca_and_finance", "BCom CA and Finance"),
+        ("bcom_co_operation", "BCom Co-operation"),
+        ("ba_literature", "BA Literature"),
+        ("ba_communicative_english", "BA Communicative English"),
+        ("ba_journalism", "BA Journalism"),
+        ("electronics", "Electronics"),
+        ("bsw", "BSW"),
+    )
+
+    YEAR_CHOICES = (
+        ("1", "1st Year"),
+        ("2", "2nd Year"),
+        ("3", "3rd Year"),
+        ("4", "4th Year"),
+    )
+
     adno=forms.CharField(label="Admission number",max_length=150,widget=forms.NumberInput(attrs={
         "id":"adno"
     }))
@@ -154,11 +176,11 @@ class MCUpdateForm(UserChangeForm):
         "id":"batch"
     }))
 
-    department=forms.ChoiceField(label="Department",choices=MCRegistration.DEPARTMENT_CHOICES,widget=forms.Select(attrs={
+    department=forms.ChoiceField(label="Department",choices=DEPARTMENT_CHOICES,widget=forms.Select(attrs={
         "id":"department"
     }))
 
-    current_year=forms.ChoiceField(label="Current Year",choices=MCRegistration.YEAR_CHOICES,widget=forms.Select(attrs={
+    current_year=forms.ChoiceField(label="Current Year",choices=YEAR_CHOICES,widget=forms.Select(attrs={
         "id":"year"
     }))
     

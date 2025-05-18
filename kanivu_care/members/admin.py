@@ -1,6 +1,8 @@
 from django.contrib import admin
 
-from members.models import MCRegistration
+from members.models import memberRegistration
 
-admin.site.register(MCRegistration)
+
+admin.site.register(memberRegistration)
+
 # Register your models here.

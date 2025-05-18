@@ -1,11 +1,224 @@
 <!DOCTYPE html>
 <html lang="en">
+{% load static %}
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Coordinator Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to right top, #6a11cb, #2575fc);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .form-container {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(15px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      border-radius: 20px;
+      padding: 40px;
+      width: 100%;
+      max-width: 450px;
+      color: #fff;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    .form-container h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: 600;
+    }
+
+    form p {
+      margin-bottom: 20px;
+    }
+
+    form label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    form input,
+    form select {
+      width: 100%;
+      padding: 12px 15px;
+      border: none;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 16px;
+      transition: 0.3s ease;
+    }
+    select{
+        cursor: pointer;
+    }
+
+    form input:focus,
+    form select:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    select option {
+      color: #000;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 14px;
+      background-color: #ffffff;
+      color: #2575fc;
+      font-weight: bold;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #e0e0e0;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      } to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+
+    .loader {
+    display: none;
+  width: 60px;
+  height: 60px;
+  margin: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  z-index: 100;
+}
+
+.loader:before {
+  content: '';
+  width: 60px;
+  height: 5px;
+  background: #f0808050;
+  position: absolute;
+  top: 60px;
+  left: 0;
+  border-radius: 50%;
+  animation: shadow324 0.5s linear infinite;
+}
+
+.loader:after {
+  content: '';
+  width: 100%;
+  height: 100%;
+  background: #f08080;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 4px;
+  animation: jump7456 0.5s linear infinite;
+}
+
+@keyframes jump7456 {
+  15% {
+    border-bottom-right-radius: 3px;
+  }
+
+  25% {
+    transform: translateY(9px) rotate(22.5deg);
+  }
+
+  50% {
+    transform: translateY(18px) scale(1, .9) rotate(45deg);
+    border-bottom-right-radius: 40px;
+  }
+
+  75% {
+    transform: translateY(9px) rotate(67.5deg);
+  }
+
+  100% {
+    transform: translateY(0) rotate(90deg);
+  }
+}
+
+@keyframes shadow324 {
+
+  0%,
+    100% {
+    transform: scale(1, 1);
+  }
+
+  50% {
+    transform: scale(1.2, 1);
+  }
+}
+  </style>
 </head>
 <body>
-    request for member registration
+  <div class="form-container">
+    <h1>Member Login by Convenier</h1>
+    <form action="{% url 'coordinator:request_member' %}" method="post" id="form">
+      {% csrf_token %}
+      {{ form.as_p }}
+
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+
+  <div class="loader" id="loader"></div>
+
+  <!-- Feather icons (optional) -->
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
+  <!-- Alert handler -->
+  <script type="module">
+    import { showAlert } from "{% static 'scripts/alert.js' %}";
+    const loader=document.getElementById("loader");
+
+    const form = document.getElementById("form");
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      loader.style.display="block";
+      const formData = new FormData(form);
+      fetch(form.action, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      })
+        .then(res => res.json())
+        .then(data => {
+          console.log(data);
+          showAlert(data.status, data.title, data.message, "ok");
+        })
+        .catch(err => {
+          showAlert("error", "Submission Failed", err.message, "ok");
+        });
+
+        loader.style.display="none";
+    });
+  </script>
 </body>
 </html>

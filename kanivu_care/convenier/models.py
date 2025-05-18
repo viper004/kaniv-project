@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 from users.models import UserProfile
 # Create your models here.
@@ -9,3 +10,10 @@ class convinierModel(models.Model):
 
     def __str__(self):
         return self.convenier.user.username
+
+class pendingMemberAddRequest(models.Model):
+    user=models.OneToOneField(User,on_delete=models.CASCADE)
+    isApproved=models.BooleanField(default=False)
+    
+    def __str__(self):
+        return self.user.username
