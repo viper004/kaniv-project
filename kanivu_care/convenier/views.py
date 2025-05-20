@@ -64,6 +64,8 @@ def changeRole(req):
     }
     return render(req,"convenier/change_role.html",context=cntx)
 
+
+@login_required(login_url="/users/login")
 def promoteUser(req,id):
     if not req.user.userprofile.role == "convenier":
         return HttpResponseRedirect("/")
@@ -72,13 +74,9 @@ def promoteUser(req,id):
     userp.role="coordinator"
     userp.save()
 
-    muser=memberRegistration.objects.get(user=user)
-    muser.delete()
-    muser.save()
+    memberRegistration.objects.get(user=user).delete()
 
-    cuser=coordinateRegistration.objects.create(user=user)
-    cuser.save()
-
+    coordinateRegistration.objects.get_or_create(user=user)
     
     return JsonResponse({
         "status":"success",
@@ -87,6 +85,7 @@ def promoteUser(req,id):
     })
 
 
+@login_required(login_url="/users/login")
 def demoteUser(req,id):
     if not req.user.userprofile.role == "convenier":
         return HttpResponseRedirect("/")
@@ -95,13 +94,9 @@ def demoteUser(req,id):
     userp.role="member"
     userp.save()
 
-    cuser=coordinateRegistration.objects.get(user=user)
-    cuser.delete()
-    cuser.save()
+    coordinateRegistration.objects.get(user=user).delete()
 
-    muser=memberRegistration.objects.create(user=user)
-    muser.save()
-
+    memberRegistration.objects.get_or_create(user=user)
     return JsonResponse({
         "status":"success",
         "title":"Demoted",
@@ -109,10 +104,77 @@ def demoteUser(req,id):
     })
 
 
-
+@login_required(login_url="/users/login")
 def pendingRequests(req):
-    r=pendingMemberAddRequest.objects.all()
+    if not req.user.userprofile.role == "convenier":
+        return HttpResponseRedirect("/")
+    r=pendingMemberAddRequest.objects.filter(isPending=True)
     cntx={
         "pending_requests":r
     }
     return render(req,"convenier/pending_requests.html",context=cntx)
+
+
+@login_required(login_url="/users/login")
+def requestApproved(req,id):
+    if not req.user.userprofile.role == "convenier":
+        return HttpResponseRedirect("/")
+    user=User.objects.get(id=id)
+    muser=pendingMemberAddRequest.objects.get(user=user)
+    if not muser:
+        return JsonResponse({
+            "status":"error",
+            "title":"Request submitted failed",
+            "message":"This user is not available"
+        })
+    muser.isApproved=True
+    muser.isPending=False
+    muser.save()
+
+    return JsonResponse({
+        "status":"success",
+        "title":"Request is approved",
+        "message":f"The requested member {user.username} can login and update their member account"
+    })
+
+    
+
+
+
+
+@login_required(login_url="/users/login")
+def requestRejected(req,id):
+    if not req.user.userprofile.role == "convenier":
+        return HttpResponseRedirect("/")
+    reason=req.GET.get("reason")
+
+    if not reason:
+        return JsonResponse({
+            "status":"success",
+            "title":"No Reason Found!",
+            "message":"Reason is required for rejection"
+        })
+
+    user=User.objects.get(id=id)
+    muser=pendingMemberAddRequest.objects.get(user=user)
+    if not muser:
+        return JsonResponse({
+            "status":"error",
+            "title":"Request submitted failed",
+            "message":"This user is ot avia"
+        })
+    
+    muser.isApproved=False
+    muser.isPending=False
+    muser.reason=reason
+    muser.save()
+
+    return JsonResponse({
+        "status":"success",
+        "title":"Request is rejected",
+        "message":f"The requested member {user.username}'s Request permission was rejected due to {reason}"
+    })
+    
+
+    
+        

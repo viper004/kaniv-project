@@ -41,7 +41,6 @@ class memberRegistration(models.Model):
     batch = models.CharField(max_length=10)
     current_year = models.CharField(max_length=5, choices=YEAR_CHOICES)
     duty = models.CharField(max_length=50, choices=DUTY_CHOICES, default="No Duty")
-    isApproved=models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username

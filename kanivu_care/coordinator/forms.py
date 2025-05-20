@@ -52,6 +52,7 @@ class coordinatorMemberRequestForm(UserCreationForm):
 
             request=pendingMemberAddRequest.objects.create(user=user)
             request.isApproved=False
+            request.isPending=True
             request.save()
 
 

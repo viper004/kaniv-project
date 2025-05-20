@@ -410,7 +410,7 @@
     demote.forEach((d)=>{
         d.addEventListener("click",()=>{
             let userid=d.dataset.id
-            let url=`/convenier/change_role/demote/${userid}`;
+            let url=`/convenier/change_role/demote/${userid}/`;
             fetch(url).then(res=>res.json()).then((data)=>{
                 if (data.status=="success"){
                     showAlert(data.status,data.title,data.message,"/convenier/change_role");
@@ -426,7 +426,7 @@
     promote.forEach((p)=>{
         p.addEventListener("click",()=>{
             let userid=p.dataset.id
-            let url=`/convenier/change_role/promote/${userid}`;
+            let url=`/convenier/change_role/promote/${userid}/`;
             fetch(url).then(res=>res.json()).then((data)=>{
                 if (data.status=="success"){
                     showAlert(data.status,data.title,data.message,"/convenier/change_role");

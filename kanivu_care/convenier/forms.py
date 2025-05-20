@@ -6,6 +6,8 @@ from django.contrib.auth.password_validation import validate_password
 from users.models import UserProfile
 from members.models import memberRegistration
 
+from convenier.models import pendingMemberAddRequest
+
 from coordinator.models import coordinateRegistration
 
     
@@ -47,14 +49,15 @@ class convenierMemberLoginForm(UserCreationForm):
             profile.role = "member"
             profile.save()
 
-
-            # memberRegistration requires MCRegistration (which may not exist yet)
-            # So skip this if not available
             
             member, _ = memberRegistration.objects.get_or_create(user=user)
             member.duty = duty
-            member.isApproved=True
             member.save()
+
+            reqmember,_=pendingMemberAddRequest.objects.get_or_create(user=member)
+            reqmember.isApproved=True
+            reqmember.isPending=False
+            reqmember.save()
               # Handle later when MCRegistration is created
 
         return user

@@ -16,7 +16,7 @@
 
     body {
       background: linear-gradient(to right top, #6a11cb, #2575fc);
-      min-height: 100vh;
+      min-height: 120vh;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -108,7 +108,7 @@
   width: 60px;
   height: 60px;
   margin: auto;
-  position: absolute;
+  position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%,-50%);
@@ -186,6 +186,8 @@
     </form>
   </div>
 
+  <a href="{% url 'coordinator:track_member' %}">Track member requests</a>
+
   <div class="loader" id="loader"></div>
 
   <!-- Feather icons (optional) -->
@@ -195,6 +197,7 @@
   <script type="module">
     import { showAlert } from "{% static 'scripts/alert.js' %}";
     const loader=document.getElementById("loader");
+
 
     const form = document.getElementById("form");
     form.addEventListener("submit", (e) => {

@@ -15,6 +15,8 @@ from members.models import memberRegistration
 
 from coordinator.models import coordinateRegistration
 
+from convenier.models import pendingMemberAddRequest
+
 
 from users.functions import form_errors
 from users.forms import *
@@ -168,15 +170,30 @@ def Login(req):
         password=req.POST.get('password')
         user=authenticate(req,username=username,password=password)
 
-        
-        
+        try:
+            isUserNameExist=User.objects.get(username=username)
+        except User.DoesNotExist:
+            return JsonResponse({
+                "status": "error",
+                "title":"Invalid username",
+                "message":"Make sure that your username are correct."
+            })
 
+
+            
+        
+        if not isUserNameExist.check_password(password):
+            return JsonResponse({
+                "status": "error",
+                "title":"Invalid password",
+                "message":"Make sure that your password is correct.if you couldn't find it you can forgot your password by username"
+            })
+        
         if user is not None:
-
             print(user.userprofile.role)
             
             if user.userprofile.role == "member":
-                member,_=memberRegistration.objects.get_or_create(user=user)
+                member=pendingMemberAddRequest.objects.get(user=user)
                 if (member.isApproved==False):
                     return JsonResponse({
                         "status":"error",
@@ -271,7 +288,7 @@ def Profile(req):
     if req.user.is_superuser:
         return redirect("/admin/")
     
-    members=UserProfile.objects.filter(role="member")
+    members=UserProfile.objects.filter(role="member")[:2]
     coordinators=UserProfile.objects.filter(role="coordinator")
 
     cntx={

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% load static %}
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Status Cards</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: linear-gradient(135deg, #1f1f2e, #2c3e50);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1000px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .status-card {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      color: #fff;
+      transition: transform 0.3s ease;
+    }
+
+    .status-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #fce38a;
+    }
+
+    .value {
+      font-size: 14px;
+      color: #ffffff;
+    }
+
+    .state{
+        font-size: 18px;
+        font-weight: bolder;
+    }
+
+    .card-title {
+      text-align: center;
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #fce38a;
+    }
+
+    #resubmit {
+  display: inline-block;
+  padding: 12px 24px;
+  border: 1px solid #4f4f4f;
+  border-radius: 4px;
+  transition: all 0.2s ease-in;
+  position: relative;
+  overflow: hidden;
+  font-size: 19px;
+  cursor: pointer;
+  color: black;
+  z-index: 1;
+}
+
+#resubmit:before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%) scaleY(1) scaleX(1.25);
+  top: 100%;
+  width: 140%;
+  height: 180%;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 50%;
+  display: block;
+  transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+  z-index: -1;
+}
+
+#resubmit:after {
+  content: "";
+  position: absolute;
+  left: 55%;
+  transform: translateX(-50%) scaleY(1) scaleX(1.45);
+  top: 180%;
+  width: 160%;
+  height: 190%;
+  background-color: #39bda7;
+  border-radius: 50%;
+  display: block;
+  transition: all 0.5s 0.1s cubic-bezier(0.55, 0, 0.1, 1);
+  z-index: -1;
+}
+
+#resubmit:hover {
+  color: #ffffff;
+  border: 1px solid #39bda7;
+}
+
+#resubmit:hover:before {
+  top: -35%;
+  background-color: #39bda7;
+  transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+}
+
+#resubmit:hover:after {
+  top: -45%;
+  background-color: #39bda7;
+  transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
+}
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <div class="card-title">Member Info</div>
+    {% if pending_members %}
+        {% for i in pending_members %}
+            <div class="status-card">
+                <div class="info-row">
+                    <span class="label">Username:</span>
+                    <span class="value">{{ i.user.username }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Duty:</span>
+                    <span class="value">{{ i.user.memberregistration.duty }}</span>
+                </div>
+
+                
+               
+
+                {% if i.isApproved and not i.isPending %}
+                    <div class="info-row">
+                        <span class="label">Status:</span>
+                        <span class="value state" style="color: #0f0;">Approved</span>
+                    </div>
+                {% elif i.isPending and not i.isApproved %}
+
+                    <div class="info-row">
+                        <span class="label">Status:</span>
+                        <span class="value state" style="color: orange;">Pending</span>
+                    </div>
+                {% elif not i.isPending and not i.isApproved %}
+                    <div class="info-row">
+                        <span class="label">Status:</span>
+                        <span class="value state" style="color: #f00;">Rejected</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="label">Reason:</span>
+                        <span class="value state" style="color: #f00;">{{i.reason}}</span>
+                    </div>
+
+                    <button type="button" id="resubmit" data-userid="{{i.user.id}}">Resubmit</button>
+
+                {% else %}
+                    <div class="info-row">
+                        <span class="label">Status:</span>
+                        <span class="value state" style="color: #f00;">None</span>
+                    </div>
+                {% endif %}
+                
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="status-card">
+            <h2>No requests was sended</h2>
+        </div>
+    {% endif %}
+
+    <!-- Duplicate this card block for more members -->
+
+  </div>
+
+</body>
+<script type="module">
+    import {showAlert} from "{% static 'scripts/alert.js' %}"
+
+    const resubmit=document.getElementById("resubmit");
+
+    resubmit.addEventListener("click",()=>{
+        let url=`/coordinator/request/resubmit/member/${resubmit.dataset.userid}/`;
+        fetch(url).then(res=>res.json()).then((data)=>{
+            if (data.status=="success"){
+                showAlert(data.status,data.title,data.message,"/coordinator/request/track/member/");
+            }
+            else{
+                showAlert(data.status,data.title,data.message,"ok");
+            }
+        })
+    })
+</script>
+<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
+</html>

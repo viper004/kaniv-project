@@ -11,6 +11,9 @@ urlpatterns=[
     path("change_role/promote/<int:id>/",views.promoteUser,name="promote"),
     path("change_role/demote/<int:id>/",views.demoteUser,name="demote"),
     path("pending_requests/",views.pendingRequests,name="pending_requests"),
+    path("request_response/approve/<int:id>/",views.requestApproved,name="approved"),
+    path("request_response/reject/<int:id>/",views.requestRejected,name="rejected"),
+
 
 
 

@@ -45,26 +45,24 @@
 <body class="font-sans bg-gray-50">
     <!-- Navigation -->
     <nav class="bg-white shadow-md sticky top-0 z-50">
-        <div class="container mx-auto px-6 py-3">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center">
-                    <i class="fas fa-hands-helping text-blue-500 text-3xl mr-2"></i>
-                    <span class="text-xl font-bold text-gray-800">Kanivu</span>
-                </div>
-                <div class="hidden md:flex space-x-8">
-                    <a href="#" class="nav-link text-gray-700 hover:text-blue-500">Home</a>
-                    <a href="#" class="nav-link text-gray-700 hover:text-blue-500">About</a>
-                    <a href="#" class="nav-link text-gray-700 hover:text-blue-500">Causes</a>
-                    <a href="{% url 'convenier:convenier' %}" class="nav-link text-gray-700 hover:text-blue-500">Convenier</a>
-                    {% if not request.user.userprofile.role == "public_user" %}
-                        <a href="{% url 'dashboard:dashboard' %}" class="nav-link text-gray-700 hover:text-blue-500">Dashboard</a>
-                    {% endif %}
-
-                </div>
-                <button class="md:hidden text-gray-700 focus:outline-none">
-                    <i class="fas fa-bars text-2xl"></i>
-                </button>
-                <div class="hidden md:block">
+    <div class="container mx-auto px-6 py-3">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center">
+                <i class="fas fa-hands-helping text-blue-500 text-3xl mr-2"></i>
+                <span class="text-xl font-bold text-gray-800">Kanivu</span>
+            </div>
+            
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#" class="nav-link text-gray-700 hover:text-blue-500">Home</a>
+                <a href="#" class="nav-link text-gray-700 hover:text-blue-500">About</a>
+                <a href="#" class="nav-link text-gray-700 hover:text-blue-500">Causes</a>
+                <a href="{% url 'convenier:convenier' %}" class="nav-link text-gray-700 hover:text-blue-500">Convenier</a>
+                {% if not request.user.userprofile.role == "public_user" %}
+                    <a href="{% url 'dashboard:dashboard' %}" class="nav-link text-gray-700 hover:text-blue-500">Dashboard</a>
+                {% endif %}
+                
+                <div class="ml-4">
                     {% if request.user.is_authenticated %}
                         <a href="{% url 'users:profile' %}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full font-medium transition duration-300">
                             Profile
@@ -74,8 +72,41 @@
                     {% endif %}
                 </div>
             </div>
+            
+            <!-- Mobile menu button -->
+            <div class="md:hidden flex items-center">
+                <button id="mobile-menu-button" class="text-gray-700 focus:outline-none">
+                    <i id="menu-icon" class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
         </div>
-    </nav>
+        
+        <!-- Mobile Navigation (hidden by default) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">Home</a>
+                <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">About</a>
+                <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">Causes</a>
+                <a href="{% url 'convenier:convenier' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">Convenier</a>
+                {% if not request.user.userprofile.role == "public_user" %}
+                    <a href="{% url 'dashboard:dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">Dashboard</a>
+                {% endif %}
+                
+                <div class="pt-4 border-t border-gray-200">
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'users:profile' %}" class="block w-full px-4 py-2 text-left text-base font-medium rounded-full bg-blue-500 text-white hover:bg-blue-600">
+                            Profile
+                        </a>
+                    {% else %}
+                        <a href="{% url 'users:login' %}" class="block w-full px-4 py-2 text-left text-base font-medium rounded-full bg-blue-500 text-white hover:bg-blue-600">
+                            Login
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
 
     <!-- Hero Section -->
     <section class="hero-gradient text-white">
@@ -399,36 +430,68 @@
     <button id="backToTop" class="fixed bottom-6 right-6 bg-blue-500 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition duration-300 opacity-0 invisible">
         <i class="fas fa-arrow-up"></i>
     </button>
-
-    <script>
-        // Back to Top Button
-        const backToTopButton = document.getElementById('backToTop');
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mobile menu functionality
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIcon = document.getElementById('menu-icon');
         
-        window.addEventListener('scroll', () => {
-            if (window.pageYOffset > 300) {
-                backToTopButton.classList.remove('opacity-0', 'invisible');
-                backToTopButton.classList.add('opacity-100', 'visible');
-            } else {
-                backToTopButton.classList.remove('opacity-100', 'visible');
-                backToTopButton.classList.add('opacity-0', 'invisible');
-            }
-        });
-        
-        backToTopButton.addEventListener('click', () => {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
+        if (mobileMenuButton && mobileMenu && menuIcon) {
+            mobileMenuButton.addEventListener('click', function() {
+                const isHidden = mobileMenu.classList.contains('hidden');
+                
+                if (isHidden) {
+                    // Open menu
+                    mobileMenu.classList.remove('hidden');
+                    menuIcon.classList.remove('fa-bars');
+                    menuIcon.classList.add('fa-times');
+                    document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
+                } else {
+                    // Close menu
+                    mobileMenu.classList.add('hidden');
+                    menuIcon.classList.remove('fa-times');
+                    menuIcon.classList.add('fa-bars');
+                    document.body.style.overflow = ''; // Restore scrolling
+                }
             });
-        });
+            
+            // Close menu when clicking outside or on a link
+            document.addEventListener('click', function(event) {
+                const isClickInsideMenu = mobileMenu.contains(event.target);
+                const isClickOnButton = mobileMenuButton.contains(event.target);
+                
+                if (!isClickInsideMenu && !isClickOnButton && !mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                    menuIcon.classList.remove('fa-times');
+                    menuIcon.classList.add('fa-bars');
+                    document.body.style.overflow = ''; // Restore scrolling
+                }
+            });
+        }
 
-        // Mobile Menu Toggle (would need more implementation)
-        const mobileMenuButton = document.querySelector('.md\\:hidden');
-        mobileMenuButton.addEventListener('click', () => {
-            // This would toggle a mobile menu in a real implementation
-            alert('Mobile menu would open here in a complete implementation');
-        });
+        // Back to top button
+        const backToTopButton = document.getElementById('backToTop');
+        if (backToTopButton) {
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    backToTopButton.classList.remove('opacity-0', 'invisible');
+                    backToTopButton.classList.add('opacity-100', 'visible');
+                } else {
+                    backToTopButton.classList.remove('opacity-100', 'visible');
+                    backToTopButton.classList.add('opacity-0', 'invisible');
+                }
+            });
+            
+            backToTopButton.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        }
 
-        // Simple donation counter animation for impact stats
+        // Impact counter animation
         const counters = document.querySelectorAll('.impact-counter h3');
         const speed = 200;
         
@@ -447,7 +510,6 @@
             });
         }
         
-        // Start animation when section is in view
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -461,6 +523,7 @@
         if (impactSection) {
             observer.observe(impactSection);
         }
-    </script>
+    });
+</script>
 </body>
 </html>

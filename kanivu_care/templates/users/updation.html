@@ -683,7 +683,7 @@
             }
 
             
-            let url=`/users/verify_number/?phno=${encodeURIComponent(newPhoneNumber)}`;
+            let url=`/users/verify_number/?phno=${encodeURIComponent(newPhoneNumber)}/`;
 
             try{
                 fetch(url).then(res=>res.json()).then((data)=>{
@@ -744,7 +744,7 @@
             const newEmail=document.getElementById("newemail").value.trim()
 
             
-            let url=`/users/verify_email/?email=${encodeURIComponent(newEmail)}`;
+            let url=`/users/verify_email/?email=${encodeURIComponent(newEmail)}/`;
 
             try{
                 fetch(url).then(res=>res.json()).then((data)=>{
