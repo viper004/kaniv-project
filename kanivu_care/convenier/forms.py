@@ -54,7 +54,7 @@ class convenierMemberLoginForm(UserCreationForm):
             member.duty = duty
             member.save()
 
-            reqmember,_=pendingMemberAddRequest.objects.get_or_create(user=member)
+            reqmember,_=pendingMemberAddRequest.objects.get_or_create(user=user)
             reqmember.isApproved=True
             reqmember.isPending=False
             reqmember.save()

@@ -280,6 +280,85 @@
             .user-avatar { margin-right: 0; margin-bottom: 1rem; }
             .action-buttons { flex-direction: column; }
         }
+
+
+        .form-container {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%,-50%);
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(15px);
+        border-radius: 20px;
+        padding: 30px 25px;
+        max-width: 400px;
+        margin: auto;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        font-family: 'Outfit', sans-serif;
+        color: #fff;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .form-container select {
+        cursor: pointer;
+        width: 100%;
+        padding: 12px 18px;
+        border: none;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        font-size: 16px;
+        appearance: none;
+        outline: none;
+        transition: 0.2s;
+        backdrop-filter: blur(10px);
+        box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.05);
+    }
+
+    .form-container select:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .form-container select:focus {
+        border: 1px solid #00c6ff;
+        background: rgba(0, 198, 255, 0.15);
+    }
+
+    .form-container option {
+        background: #111;
+        color: #fff;
+    }
+
+    .form-container button {
+        margin-top: 20px;
+        background: linear-gradient(to right, #00c6ff, #0072ff);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 30px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+        width: 100%;
+    }
+
+    .form-container button:hover {
+        transform: scale(1.05);
+    }
+    #change_duty_modal_btn{
+        color: #0a18;
+        cursor: pointer;
+        font-weight: bolder;
+        font-size: 18px;
+    }
+    #exit{
+        width: 200%;
+        justify-content: flex-end;
+        cursor: pointer;
+        color: red;
+    }
     </style>
 </head>
 <body>
@@ -356,6 +435,7 @@
                         <div class="user-name">{{ i.user.username }}</div>
                         <span class="user-role role-member">Member</span>
                     </div>
+                    <button type="button" onclick="kick(this)" data-delid="{{i.user.id}}">Kick {{i.user.username}}</button>
                 </div>
                 <div class="user-details">
                     <div class="detail-row">
@@ -378,11 +458,15 @@
                         <span class="detail-label">Duty:</span>
                         <span class="detail-value">{{ i.user.memberregistration.duty }}</span>
                     </div>
+                        <span class="detail-label" id="change_duty_modal_btn" data-userid="{{i.user.id}}" data-duty="{{ i.user.memberregistration.duty }}" onclick="selectedUser(this)">Change Duty</span>
                 </div>
                 <div class="action-buttons">
                     <button data-id="{{i.user.id}}" class="promote btn btn-primary">Promote to Coordinator</button>
                 </div>
             </div>
+            
+
+
             {% endfor %}
             
         </div>
@@ -397,14 +481,41 @@
         
         
     </div>
+    <div class="form-container" id="form_container">
+        <i data-feather="x" id="exit"></i>
+        <form action="{% url 'convenier:change_duty' %}" id="change_duty" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="id" id="userid"/>
+
+
+            <label for="duty" style="display:block; margin-bottom:10px; font-weight:600;">Change Duty:</label>
+            <select name="duty" id="duty">
+                <option value="No Duty">No Duty</option>
+                <option value="Finance">Finance</option>
+                <option value="Collection Team">Collection Team</option>
+                <option value="Event Organizers">Event Organizers</option>
+                <option value="Team Controller">Team Controller</option>
+            </select>
+
+            <button type="submit">Update Duty</button>
+        </form>
+    </div>
+    
 </body>
 <script type="module">
-    import {showAlert} from "{% static 'scripts/alert.js' %}"
+    import {showAlert} from "{% static 'scripts/alert.js' %}";
+
+    feather.replace()
 
     const dept=document.querySelectorAll(".dept");
     const demote=document.querySelectorAll(".demote");
     const promote=document.querySelectorAll(".promote");
+    const formContainer=document.getElementById("form_container");
+    const changeDuty=document.getElementById("change_duty");
+    const exit=document.getElementById("exit");
 
+    const userId=document.getElementById("userid");
+    const duty=document.getElementById("duty");
 
 
     demote.forEach((d)=>{
@@ -429,22 +540,68 @@
             let url=`/convenier/change_role/promote/${userid}/`;
             fetch(url).then(res=>res.json()).then((data)=>{
                 if (data.status=="success"){
-                    showAlert(data.status,data.title,data.message,"/convenier/change_role");
+                    showAlert(data.status,data.title,data.message,"/convenier/change_role/");
                 }
                 else{
                     showAlert(data.status,data.title,data.message,"ok");
-
                 }
             })
         })
+    });
+
+    const selectedUser=(e)=>{
+        
+        formContainer.style.display="block";
+        userId.value=e.dataset.userid;
+        duty.value=e.dataset.duty;
+    }
+
+    const kick=(e)=>{
+        if (confirm("Are you sure that you wanted to kick this user from member.")){
+            let url=`/convenier/kick_member/?id=${e.dataset.delid}`;
+
+            fetch(url).then(res=>res.json()).then((data)=>{
+                if (data.status=="success"){
+                    showAlert(data.status,data.title,data.message,"/convenier/change_role/");
+                }
+                else{
+                    showAlert(data.status,data.title,data.message,"ok");
+                }
+            })
+            
+        }
+        
+    }
+
+    exit.addEventListener("click",()=>{
+        formContainer.style.display="none";
+
     })
 
-
+    changeDuty.addEventListener("submit",(e)=>{
+        e.preventDefault();
+        let formdata=new FormData(e.target);
+        fetch(e.target.action,{
+            "method":"POST",
+            "body":formdata
+        }).then(res=>res.json()).then((data)=>{
+            if (data.status=="success"){
+                showAlert(data.status,data.title,data.message,"/convenier/change_role/");
+            }
+            else{
+                showAlert(data.status,data.title,data.message,"ok");
+            }
+        })
+    })
 
 
     dept.forEach((d)=>{
         d.textContent=d.textContent.replaceAll("_"," ");
     });
+
+    window.selectedUser=selectedUser;
+    window.kick=kick;
+
 
 
 </script>

@@ -21,10 +21,10 @@ class coordinateRegistration(models.Model):
     )
 
     YEAR_CHOICES = (
-        ("1", "1st Year"),
-        ("2", "2nd Year"),
-        ("3", "3rd Year"),
-        ("4", "4th Year"),
+        ("1", "First Year"),
+        ("2", "Second Year"),
+        ("3", "Third Year"),
+        ("4", "Fourth Year"),
     )
 
     

@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from users.models import UserProfile
 from django import forms
 from django.contrib.auth.models import User
-from .models import UserProfile
+
 
 
 class UserRegistrationForm(forms.ModelForm):
@@ -162,10 +162,10 @@ class MCUpdateForm(UserChangeForm):
     )
 
     YEAR_CHOICES = (
-        ("1", "1st Year"),
-        ("2", "2nd Year"),
-        ("3", "3rd Year"),
-        ("4", "4th Year"),
+        ("1", "First Year"),
+        ("2", "Second Year"),
+        ("3", "Third Year"),
+        ("4", "Fourth Year"),
     )
 
     adno=forms.CharField(label="Admission number",max_length=150,widget=forms.NumberInput(attrs={

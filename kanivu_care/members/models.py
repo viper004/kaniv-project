@@ -30,7 +30,7 @@ class memberRegistration(models.Model):
         ("Finance", "Finance"),
         ("Collection Team", "Collection Team"),
         ("Event Organizers", "Event Organizers"),  # Fixed typo
-        ("Mini Coordination", "Mini Coordination"),
+        ("Team Controller", "Team Controller"),
     )
 
     

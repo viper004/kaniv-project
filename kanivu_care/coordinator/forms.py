@@ -61,7 +61,6 @@ class coordinatorMemberRequestForm(UserCreationForm):
             
             member, _ = memberRegistration.objects.get_or_create(user=user)
             member.duty = duty
-            member.isApproved=False
             member.save()
               # Handle later when MCRegistration is created
 

@@ -144,6 +144,73 @@
   transform: translateX(-50%) scaleY(1.3) scaleX(0.8);
 }
 
+.form-container {
+    display: none;
+    position: fixed;
+    top:50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    background-color: white;
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .form-container h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #333;
+    }
+
+    .form-container label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #555;
+    }
+
+    .form-container input[type="text"], select {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: 0.3s ease;
+    }
+
+    .form-container input[type="text"]:focus, select:focus {
+      border-color: #5b9bd5;
+      outline: none;
+      box-shadow: 0 0 5px rgba(91, 155, 213, 0.5);
+    }
+
+    .form-container button {
+      width: 100%;
+      padding: 12px;
+      background-color: #5b9bd5;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .form-container button:hover {
+      background-color: #4a8bc2;
+    }
+
+    #exit{
+        width: 200%;
+        justify-content: flex-end;
+        cursor: pointer;
+        color: red;
+    }
+
   </style>
 </head>
 <body>
@@ -171,6 +238,13 @@
                         <span class="label">Status:</span>
                         <span class="value state" style="color: #0f0;">Approved</span>
                     </div>
+
+                    <div class="info-row">
+                        <span class="label">Delet this record:</span>
+                        <span class="value">
+                            <i data-id="{{i.user.id}}" onclick="deleteRecord(this)" data-feather="trash" style="color: red; cursor: pointer;"></i>
+                        </span>
+                    </div>
                 {% elif i.isPending and not i.isApproved %}
 
                     <div class="info-row">
@@ -188,7 +262,7 @@
                         <span class="value state" style="color: #f00;">{{i.reason}}</span>
                     </div>
 
-                    <button type="button" id="resubmit" data-userid="{{i.user.id}}">Resubmit</button>
+                    <button type="button" onclick="resubmitBtn(this)" data-userid="{{i.user.id}}" data-username="{{i.user.username}}" data-duty="{{ i.user.memberregistration.duty }}">Resubmit</button>
 
                 {% else %}
                     <div class="info-row">
@@ -207,25 +281,102 @@
 
     <!-- Duplicate this card block for more members -->
 
-  </div>
+    </div>
+
+    <div class="form-container" id="form_container">
+        <i data-feather="x" id="exit"></i>
+        <h2>User Form</h2>
+        <form action="{% url 'coordinator:resubmit_member' %}" method="post" id="resubmit_form">
+            {% csrf_token %}
+            <input type="hidden" name="userid" id="userid">
+            <label for="username">Enter Username</label>
+            <input type="text" id="username" name="username" placeholder="Your username..." required>
+
+            <label for="duty">Select Duty</label>
+            <select name="duty" id="duty">
+                <option value="No Duty">No Duty</option>
+                <option value="Finance">Finance</option>
+                <option value="Collection Team">Collection Team</option>
+                <option value="Event Organizers">Event Organizers</option>
+                <option value="Team Controller">Team Controller</option>
+            </select>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
 
 </body>
 <script type="module">
-    import {showAlert} from "{% static 'scripts/alert.js' %}"
+    import {showAlert} from "{% static 'scripts/alert.js' %}";
 
-    const resubmit=document.getElementById("resubmit");
+    feather.replace();
 
-    resubmit.addEventListener("click",()=>{
-        let url=`/coordinator/request/resubmit/member/${resubmit.dataset.userid}/`;
-        fetch(url).then(res=>res.json()).then((data)=>{
-            if (data.status=="success"){
-                showAlert(data.status,data.title,data.message,"/coordinator/request/track/member/");
-            }
-            else{
-                showAlert(data.status,data.title,data.message,"ok");
-            }
-        })
+    const formContainer=document.getElementById("form_container");
+    const username=document.getElementById("username");
+    const duty=document.getElementById("duty");
+    const exit=document.getElementById("exit");
+    const resubmitForm=document.getElementById("resubmit_form");
+    const userid=document.getElementById("userid");
+
+
+
+    exit.addEventListener("click",()=>{
+        formContainer.style.display="none";
     })
+    const resubmitBtn=(e)=>{
+        formContainer.style.display="block";
+
+        username.value=e.dataset.username;
+        duty.value=e.dataset.duty;
+        userid.value=e.dataset.userid
+    }
+
+    const deleteRecord=(e)=>{
+        let url=`/coordinator/delete/record/member/${e.dataset.id}/`;
+
+        try{
+            fetch(url).then(res=>res.json()).then((data)=>{
+                if (data.status=="success"){
+                    showAlert(data.status,data.title,data.message,"/coordinator/request/track/member/");
+                }
+                else{
+                    showAlert(data.status,data.title,data.message,"ok");
+                }
+            })
+        }
+        catch(error){
+            showAlert("error","An error occured",error.message,"ok");
+        }
+    }
+
+    resubmitForm.addEventListener("submit",(e)=>{
+        e.preventDefault();
+        let formdata=new FormData(e.target);
+        try{
+            fetch(e.target.action,{
+                "method":"POST",
+                "body":formdata
+            }).then(res=>res.json()).then((data)=>{
+                if (data.status=="success"){
+                    showAlert(data.status,data.title,data.message,"/coordinator/request/track/member/");
+                }
+                else{
+                    showAlert(data.status,data.title,data.message,"ok");
+                }
+            })
+        }
+        catch(error){
+            showAlert("error","An error occured",error.message,"ok");
+        }
+    })
+
+    window.resubmitBtn=resubmitBtn;
+    window.deleteRecord=deleteRecord;
+
+
+
+
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 

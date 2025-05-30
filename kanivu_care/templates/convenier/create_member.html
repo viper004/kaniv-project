@@ -200,6 +200,7 @@
     form.addEventListener("submit", (e) => {
       e.preventDefault();
       loader.style.display="block";
+
       const formData = new FormData(form);
       fetch(form.action, {
         method: "POST",
@@ -211,7 +212,7 @@
         .then(res => res.json())
         .then(data => {
           console.log(data);
-          showAlert(data.status, data.title, data.message, "ok");
+          showAlert(data.status, data.title, data.message, "/convenier/create/member/");
         })
         .catch(err => {
           showAlert("error", "Submission Failed", err.message, "ok");

@@ -52,10 +52,12 @@ def createMember(req):
 def changeRole(req):
     if not (req.user.userprofile.role == "convenier"):
         return HttpResponseRedirect("/")
-    
-    members=UserProfile.objects.filter(user__userprofile__role="member")
-    coordinators=UserProfile.objects.filter(role="coordinator")
 
+
+    pending_users = pendingMemberAddRequest.objects.filter(isApproved=False).values_list('user', flat=True)
+
+    members = memberRegistration.objects.exclude(user__in=pending_users)
+    coordinators=UserProfile.objects.filter(role="coordinator")
 
 
     cntx={
@@ -161,7 +163,7 @@ def requestRejected(req,id):
         return JsonResponse({
             "status":"error",
             "title":"Request submitted failed",
-            "message":"This user is ot avia"
+            "message":"This user is not available"
         })
     
     muser.isApproved=False
@@ -176,5 +178,98 @@ def requestRejected(req,id):
     })
     
 
-    
+@login_required(login_url="users:login")
+def changeDuty(req):
+    if not req.user.userprofile.role == "convenier" or not req.user.userprofile.role == "coordinator" :
+        return HttpResponseRedirect("/")
+    if (req.method=="POST"):
+        id=req.POST.get("id")
+        duty=req.POST.get("duty")
+        try:
+            user=User.objects.get(id=id)
+            member=memberRegistration.objects.get(user=user)
+            currentDuty=member.duty
+            member.duty=duty
+            member.save()
+            return JsonResponse({
+                "status":"success",
+                "title":"Duty Changed Successfully",
+                "message":f"{user.username}'s Duty has been changed from {currentDuty} to {member.duty}"
+            })
+        except User.DoesNotExist:
+            return JsonResponse({
+                "status":"error",
+                "title":"Duty Change Failed",
+                "message":"This user is not available"
+            })
+        except memberRegistration.DoesNotExist:
+            return JsonResponse({
+                "status":"error",
+                "title":"Duty Change Failed",
+                "message":"This user is not a member"
+            })
         
+        except Exception as e:
+            return JsonResponse({
+                    "status":"error",
+                    "title":"Unexpected Error!",
+                    "message":str(e)
+                })
+
+    return render(req,"convenier/change_duty.html")
+
+@login_required(login_url="users:login")
+def kickMember(req):
+    print("User:", req.user.userprofile)
+
+    if req.user.userprofile.role not in ["coordinator", "convenier"]:
+        return JsonResponse({
+            "status": "error",
+            "title": "Permission Denied",
+            "message": "You are not authorized to perform this action!"
+        })
+
+    try:
+        entered_id = req.GET.get("id")
+
+        if not entered_id:
+            return JsonResponse({
+                "status": "error",
+                "title": "Missing ID",
+                "message": "No user ID was provided."
+            })
+        user = User.objects.get(id=entered_id)
+        member = memberRegistration.objects.get(user=user)
+        user_profile=UserProfile.objects.get(user=user)
+
+        member.delete()
+        user_profile.role="public_user"
+        user_profile.save()
+
+        return JsonResponse({
+            "status": "success",
+            "title": "Kicked Successfully",
+            "message": f"{user.username} has been kicked from members,from now {user.username} is a public user!"
+        })
+
+    except User.DoesNotExist:
+        return JsonResponse({
+            "status": "error",
+            "title": "User Not Found",
+            "message": "This user does not exist."
+        })
+
+    except memberRegistration.DoesNotExist:
+        return JsonResponse({
+            "status": "error",
+            "title": "Not a Member",
+            "message": "This user is not a registered member."
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            "status": "error",
+            "title": "Unexpected Error",
+            "message": str(e)
+        })
+

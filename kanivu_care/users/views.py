@@ -193,8 +193,8 @@ def Login(req):
             print(user.userprofile.role)
             
             if user.userprofile.role == "member":
-                member=pendingMemberAddRequest.objects.get(user=user)
-                if (member.isApproved==False):
+                member=pendingMemberAddRequest.objects.filter(user=user).exists()
+                if (member and member.isApproved==False):
                     return JsonResponse({
                         "status":"error",
                         "title":"Login failed",
