@@ -21,11 +21,12 @@ class coordinateRegistration(models.Model):
     )
 
     YEAR_CHOICES = (
-        ("1", "First Year"),
-        ("2", "Second Year"),
-        ("3", "Third Year"),
-        ("4", "Fourth Year"),
+        ("First Year", "First Year"),
+        ("Second Year", "Second Year"),
+        ("Third Year", "Third Year"),
+        ("Fourth Year", "Fourth Year"),
     )
+
 
     
 
@@ -33,7 +34,7 @@ class coordinateRegistration(models.Model):
     adno = models.CharField(max_length=255)
     department = models.CharField(max_length=50, choices=DEPARTMENT_CHOICES)
     batch = models.CharField(max_length=10)
-    current_year = models.CharField(max_length=5, choices=YEAR_CHOICES)
+    current_year = models.CharField(max_length=15, choices=YEAR_CHOICES)
 
     def __str__(self):
         return self.user.username

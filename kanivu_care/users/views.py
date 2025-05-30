@@ -166,8 +166,9 @@ def Login(req):
     if req.user.is_authenticated:
         return HttpResponseRedirect("/")
     if (req.method=="POST"):
-        username=req.POST.get('username')
+        username=str(req.POST.get('username')).lower()
         password=req.POST.get('password')
+        
         user=authenticate(req,username=username,password=password)
 
         try:

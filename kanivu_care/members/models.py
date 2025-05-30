@@ -19,10 +19,10 @@ class memberRegistration(models.Model):
     )
 
     YEAR_CHOICES = (
-        ("1", "1st Year"),
-        ("2", "2nd Year"),
-        ("3", "3rd Year"),
-        ("4", "4th Year"),
+        ("First Year", "First Year"),
+        ("Second Year", "Second Year"),
+        ("Third Year", "Third Year"),
+        ("Fourth Year", "Fourth Year"),
     )
 
     DUTY_CHOICES = (
@@ -39,7 +39,7 @@ class memberRegistration(models.Model):
     adno = models.CharField(max_length=255)
     department = models.CharField(max_length=50, choices=DEPARTMENT_CHOICES)
     batch = models.CharField(max_length=10)
-    current_year = models.CharField(max_length=5, choices=YEAR_CHOICES)
+    current_year = models.CharField(max_length=15, choices=YEAR_CHOICES)
     duty = models.CharField(max_length=50, choices=DUTY_CHOICES, default="No Duty")
 
     def __str__(self):

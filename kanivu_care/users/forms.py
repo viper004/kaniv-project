@@ -162,11 +162,12 @@ class MCUpdateForm(UserChangeForm):
     )
 
     YEAR_CHOICES = (
-        ("1", "First Year"),
-        ("2", "Second Year"),
-        ("3", "Third Year"),
-        ("4", "Fourth Year"),
+        ("First Year", "First Year"),
+        ("Second Year", "Second Year"),
+        ("Third Year", "Third Year"),
+        ("Fourth Year", "Fourth Year"),
     )
+
 
     adno=forms.CharField(label="Admission number",max_length=150,widget=forms.NumberInput(attrs={
         "id":"adno"

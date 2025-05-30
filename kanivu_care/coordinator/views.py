@@ -65,15 +65,17 @@ def resubmitRequestMember(req):
             })
     
         try:
-            if User.objects.filter(username=username).exists():
+            user=User.objects.get(id=userid)
+            pending_user=pendingMemberAddRequest.objects.get(user=user)
+            member=memberRegistration.objects.get(user=user)
+
+            if User.objects.filter(username=username).exclude(username=pending_user.user.username).exists():
                 return JsonResponse({
                     "status":"error",
                     "title":"Request resubmission failed",
                     "message":"This username is already taken.Try another!"
                 })
-            user=User.objects.get(id=userid)
-            pending_user=pendingMemberAddRequest.objects.get(user=user)
-            member=memberRegistration.objects.get(user=user)
+            
 
             if (not pending_user.isApproved and not pending_user.isPending):
                 user.username=username
