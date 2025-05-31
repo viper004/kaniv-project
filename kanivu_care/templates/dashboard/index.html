@@ -5,8 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+<style>
+    body{
+        font-family: 'Poppins', sans-serif;
+        
+    }
+    :root {
+            --primary: #7c4dff; --primary-light: #b47cff;
+            --secondary: #00e5ff; --secondary-light: #6effff;
+            --accent: #ff4081; --accent-light: #ff79b0;
+            --dark: #263238; --light: #f5f7fa;
+            --card-bg: #ffffff; --body-bg: #f0f2f5;
+            --success: #00c853; --warning: #ffab00;
+            --shadow: 0 15px 35px rgba(0,0,0,0.1); --radius: 16px;
+        }
+        header{
+            display: flex;
+            justify-content: center;
+        }
+     h1 {
+            font-size: 5rem; font-weight: 700;
+            color: var(--primary); margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bolder;
+            text-transform: uppercase;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem; color: #607d8b;
+            max-width: 700px; margin: 0 auto 2rem;
+        }
+        .hidden{
+            display: none;
+        }
+        .item{
+            width: 300px;
+            height: 200px;
+            background: coral;
+            border-radius: 10px;
+            margin: 10px;
+        }
+        .item a{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            color: green;
+            text-align: center;
+            text-decoration: none;
+            font-size: 24px;
+            font-weight: bolder;
+        }
+</style>
 <body>
-    <h1>Dashboard</h1>
-    <h2>Role: {{request.user.userprofile.role}}</h2>
+    <header>
+        <h1>Dashboard</h1>
+        <p class="subtitle hidden">Easily manage member roles and permissions across your organization</p>
+    </header>
+
+    <section id="items">
+        <div class="item">
+            <a href="{% url 'convenier:change_role' %}">Member lists</a>
+        </div>
+    </section>
 </body>
 </html>

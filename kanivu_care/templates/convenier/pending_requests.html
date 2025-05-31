@@ -208,17 +208,18 @@
                 </div>
             </div>
 
+
             <!-- Modal -->
             <div class="modal" id="rejectModal">
                 <div class="modal-content">
-                <h3>Reason for Rejection</h3>
-                <div>
-                    <textarea id="reason" placeholder="Enter reason..." required></textarea>
-                    <div class="modal-actions">
-                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
-                    <button type="button" class="btn-confirm" id="reject" data-id="{{i.user.id}}">Reject</button>
+                    <h3>Reason for Rejection</h3>
+                    <div>
+                        <textarea id="reason" placeholder="Enter reason..." required></textarea>
+                        <div class="modal-actions">
+                        <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                        <button type="button" class="btn-confirm" id="reject" data-id="{{i.user.id}}">Reject</button>
+                        </div>
                     </div>
-                </div>
                 </div>
             </div>
         {% endfor %}

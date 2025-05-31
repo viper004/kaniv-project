@@ -58,11 +58,15 @@ def changeRole(req):
 
     members = memberRegistration.objects.exclude(user__in=pending_users)
     coordinators=UserProfile.objects.filter(role="coordinator")
+    pending_requests=pendingMemberAddRequest.objects.filter(isPending=True)
+
 
 
     cntx={
         "members":members,
-        "coordinators":coordinators
+        "coordinators":coordinators,
+        "pending_requests":pending_requests,
+        "pending_requests_count":pending_requests.count()
     }
     return render(req,"convenier/change_role.html",context=cntx)
 
@@ -111,10 +115,12 @@ def pendingRequests(req):
     if not req.user.userprofile.role == "convenier":
         return HttpResponseRedirect("/")
     r=pendingMemberAddRequest.objects.filter(isPending=True)
+
     cntx={
-        "pending_requests":r
+        "pending_requests":r,
+        "pending_request_count":r.count()
     }
-    return render(req,"convenier/pending_requests.html",context=cntx)
+    return render(req,"convenier/change_role.html",context=cntx)
 
 
 @login_required(login_url="/users/login")

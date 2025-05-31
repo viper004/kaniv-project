@@ -28,14 +28,14 @@
             padding: 2rem 4rem;
             height: 100vh auto;
         }
-        aside {
+        aside #create_member {
         position: fixed;
         bottom: 2rem;
         right: 2rem;
         z-index: 100;
     }
     
-    aside a {
+    aside a,strong {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -63,10 +63,17 @@
     }
     
     /* Optional: Add a plus icon */
-    aside a::before {
+    aside #create_member::before {
         content: '+';
         margin-right: 8px;
         font-size: 1.2rem;
+    }
+
+    aside #pending_lists{
+        position: absolute;
+        background: linear-gradient(135deg, #61E786, #EDCCEC);
+        top:10%;
+        right: 2%;
     }
     
     /* Responsive adjustments */
@@ -359,6 +366,164 @@
         cursor: pointer;
         color: red;
     }
+/* Layout */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.main-modal, .nested-modal-content {
+  background: #1a202c;
+  padding: 2rem;
+  border-radius: 20px;
+  width: 50%;
+  box-shadow: 0 0 30px rgba(0,0,0,0.3);
+  color: white;
+  overflow-y: scroll;
+}
+
+.main-modal div{
+    max-width: 500px;
+}
+
+.modal-title {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.info-grid {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Cards */
+.glass-card {
+  background: rgba(255,255,255,0.05);
+  padding: 1.5rem;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  backdrop-filter: blur(8px);
+}
+
+/* Button Groups */
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 0.7rem 1.4rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 12px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+.btn-approve {
+  background: linear-gradient(to right, #00c896, #00a87e);
+  color: white;
+}
+
+.btn-reject {
+  background: linear-gradient(to right, #ff4e4e, #cc3131);
+  color: white;
+}
+
+.btn-approve:hover, .btn-reject:hover {
+  transform: scale(1.05);
+}
+
+/* Modal Buttons (centered) */
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.btn-cancel {
+  padding: 0.6rem 1.6rem;
+  background-color: #e2e8f0;
+  color: #2d3748;
+  border-radius: 50px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: 0.3s ease;
+}
+
+.btn-cancel:hover {
+  background-color: #cbd5e0;
+  transform: scale(1.05);
+}
+
+.btn-confirm {
+  padding: 0.6rem 1.6rem;
+  background: linear-gradient(to right, #f56565, #c53030);
+  color: white;
+  border-radius: 50px;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+  transition: 0.3s ease;
+}
+
+.btn-confirm:hover {
+  transform: scale(1.05);
+}
+
+.btn-close-main {
+  margin-top: 2rem;
+  padding: 0.6rem 1.6rem;
+  background: #4a5568;
+  color: #f7fafc;
+  border-radius: 50px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  transition: 0.3s ease;
+}
+
+.btn-close-main:hover {
+  background: #2d3748;
+  transform: scale(1.05);
+}
+
+/* Textarea */
+.modal-textarea {
+  width: 100%;
+  height: 120px;
+  padding: 1rem;
+  font-size: 1rem;
+  border-radius: 12px;
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: white;
+  resize: none;
+}
+
     </style>
 </head>
 <body>
@@ -366,10 +531,15 @@
         <header>
             <h1>Role Management Dashboard</h1>
             <p class="subtitle">Easily manage member roles and permissions across your organization</p>
+            <aside>
+                <strong id="pending_lists" onclick="openPendingModal()">Pending Mem-List</strong>
+            </aside>
         </header>
         <aside>
-            <a href="{% url 'convenier:create_member' %}">Create Member</a>
+            <a href="{% url 'convenier:create_member' %}" id="create_member">Create Member</a>
         </aside>
+
+        
 
         {% if coordinators %}
         <div class="section-header">
@@ -500,7 +670,61 @@
             <button type="submit">Update Duty</button>
         </form>
     </div>
-    
+   <section>
+  <div class="modal-overlay" id="pendingModal">
+    <div class="main-modal">
+      <h1 class="modal-title">Pending Requests</h1>
+      {% if pending_requests %}
+        {% for i in pending_requests %}
+        <div class="pending-card">
+          <div class="glass-card">
+            <div class="info-grid">
+              <div class="info-row">
+                <div class="label">Username</div>
+                <div class="value">{{ i.user.username }}</div>
+              </div>
+              <div class="info-row">
+                <div class="label">Duty</div>
+                <div class="value">{{ i.user.memberregistration.duty }}</div>
+              </div>
+              <div class="info-row">
+                <div class="label">Email</div>
+                <div class="value">{{ i.user.email }}</div>
+              </div>
+              <!-- Add more fields here if needed -->
+            </div>
+            <div class="button-group">
+              <button class="btn btn-approve" data-userid="{{ i.user.id }}">✅ Approve</button>
+              <button class="btn btn-reject" onclick="openNestedModal('{{ i.user.id }}')">❌ Reject</button>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="glass-card">
+          <h2 class="no-requests">No pending requests</h2>
+        </div>
+      {% endif %}
+      <button class="btn-close-main" onclick="closePendingModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- Nested Modal for Rejection Reason -->
+  <div class="modal-overlay" id="nestedModal">
+    <div class="nested-modal-content">
+      <h3 class="modal-title">Reason for Rejection</h3>
+      <textarea class="modal-textarea" id="reason" placeholder="Enter reason..." required></textarea>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeNestedModal()">Cancel</button>
+        <button class="btn-confirm" id="rejectBtn">Reject</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
 </body>
 <script type="module">
     import {showAlert} from "{% static 'scripts/alert.js' %}";
@@ -513,6 +737,7 @@
     const formContainer=document.getElementById("form_container");
     const changeDuty=document.getElementById("change_duty");
     const exit=document.getElementById("exit");
+    const pendingListBtn=document.getElementById("pending_lists");
 
     const userId=document.getElementById("userid");
     const duty=document.getElementById("duty");
@@ -577,6 +802,7 @@
         formContainer.style.display="none";
 
     })
+    
 
     changeDuty.addEventListener("submit",(e)=>{
         e.preventDefault();
@@ -594,6 +820,30 @@
         })
     })
 
+    function openPendingModal() {
+        document.getElementById('pendingModal').style.display = 'flex';
+    }
+
+    function closePendingModal() {
+        document.getElementById('pendingModal').style.display = 'none';
+    }
+
+    function openNestedModal(userId) {
+        document.getElementById('nestedModal').style.display = 'flex';
+        document.getElementById('rejectBtn').setAttribute('data-id', userId);
+    }
+
+    function closeNestedModal() {
+        document.getElementById('nestedModal').style.display = 'none';
+    }
+
+    document.addEventListener("keydown",(e)=>{
+        if (e.key=="Escape"){
+            closePendingModal();
+            closeNestedModal();
+        }
+    })
+
 
     dept.forEach((d)=>{
         d.textContent=d.textContent.replaceAll("_"," ");
@@ -601,6 +851,10 @@
 
     window.selectedUser=selectedUser;
     window.kick=kick;
+    window.openPendingModal=openPendingModal;
+    window.closePendingModal=closePendingModal;
+    window.openNestedModal=openNestedModal;
+    window.closeNestedModal=closeNestedModal;
 
 
 
