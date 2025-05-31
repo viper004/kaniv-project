@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collection</title>
+</head>
+<style>
+    :root {
+            --primary: #7c4dff; --primary-light: #b47cff;
+            --secondary: #00e5ff; --secondary-light: #6effff;
+            --accent: #ff4081; --accent-light: #ff79b0;
+            --dark: #263238; --light: #f5f7fa;
+            --card-bg: #ffffff; --body-bg: #f0f2f5;
+            --success: #00c853; --warning: #ffab00;
+            --shadow: 0 15px 35px rgba(0,0,0,0.1); --radius: 16px;
+        }
+        
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+        
+        body {
+            display: flex;
+            height: 100%;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+            background: var(--body-bg); color: var(--dark);
+            line-height: 1.7; min-height: 100vh;
+            padding: 2rem 4rem;
+            height: 100vh auto;
+        }
+    aside #create_member {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        z-index: 100;
+    }
+    
+    aside a,strong {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem 1.5rem;
+        background: linear-gradient(135deg, #7c4dff, #b47cff);
+        color: white;
+        font-weight: 600;
+        border-radius: 50px;
+        box-shadow: 0 10px 25px rgba(124, 77, 255, 0.3);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        border: none;
+        cursor: pointer;
+    }
+    
+    aside a:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(124, 77, 255, 0.4);
+        background: linear-gradient(135deg, #b47cff, #7c4dff);
+    }
+    
+    aside a:active {
+        transform: translateY(1px);
+    }
+    h1 {
+            font-size: 5rem;
+            font-weight: 700;
+            color: var(--primary); margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+</style>
+<body>
+    
+    <header>
+        <h1>Collection Team</h1>
+    </header>
+    <aside>
+        <a href="{% url 'convenier:create_member' %}" id="create_member">Create Member</a>
+    </aside>
+</body>
+</html>

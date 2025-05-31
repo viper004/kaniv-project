@@ -41,6 +41,9 @@
         .hidden{
             display: none;
         }
+        #items{
+            display: flex;
+        }
         .item{
             width: 300px;
             height: 200px;
@@ -71,6 +74,16 @@
     <section id="items">
         <div class="item">
             <a href="{% url 'convenier:change_role' %}">Member lists</a>
+        </div>
+        <div class="item">
+            <a href="{% url 'convenier:change_role' %}">Notify</a>
+        </div>
+        <div class="item">
+            <a href="{% url 'convenier:collection_team' %}">Collection Team</a>
+        </div><div class="item">
+            <a href="{% url 'convenier:change_role' %}">Finance section</a>
+        </div><div class="item">
+            <a href="{% url 'convenier:change_role' %}">Event Team</a>
         </div>
     </section>
 </body>

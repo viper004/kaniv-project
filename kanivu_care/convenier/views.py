@@ -279,3 +279,6 @@ def kickMember(req):
             "message": str(e)
         })
 
+
+def collectionTeam(req):
+    return render(req,"convenier/collection_team.html")
