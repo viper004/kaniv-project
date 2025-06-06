@@ -32,7 +32,8 @@ INSTALLED_APPS = [
     'web',
     'users',
     'coordinator',
-    'members'
+    'members',
+    'dashboard'
 ]
 
 MIDDLEWARE = [
@@ -105,7 +106,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# settings.py
+USE_TZ = True  # (default and recommended)
+TIME_ZONE = 'Asia/Kolkata'  # or your correct time zone
+
 
 USE_I18N = True
 

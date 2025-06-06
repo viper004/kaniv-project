@@ -5,5 +5,10 @@ from dashboard import views
 app_name="dashboard"
 
 urlpatterns=[
-    path("",views.Dashboard,name="dashboard")
+    path("",views.Dashboard,name="dashboard"),
+    path("notification",views.Notification,name="notification"),
+    path("notification/delete/<int:id>/",views.deleteNotification,name="delete_notification"),
+    path("notification/end/<int:id>/",views.endNotify,name="end_notification"),
+
+
 ]

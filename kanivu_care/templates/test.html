@@ -1,94 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Styled Form</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stylish Modal</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #74ebd5, #ACB6E5);
-      display: flex;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://source.unsplash.com/random/1600x900') no-repeat center center/cover;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
+      display: none;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      margin: 0;
+      z-index: 999;
     }
 
-    .form-container {
-      background-color: white;
-      padding: 30px 40px;
+    .modal {
+      background: #ffffff;
       border-radius: 15px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-      width: 100%;
-      max-width: 400px;
+      padding: 30px 35px;
+      width: 420px;
+      max-width: 95%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+      animation: fadeInScale 0.35s ease;
+      position: relative;
     }
 
-    .form-container h2 {
-      text-align: center;
-      margin-bottom: 25px;
-      color: #333;
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
     }
 
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
+    .modal h2 {
+      margin-top: 0;
+      font-size: 24px;
+      color: #2c3e50;
+    }
+
+    .modal p {
+      font-size: 14px;
       color: #555;
+      margin-bottom: 20px;
     }
 
-    input[type="text"], select {
+    .modal label {
+      font-weight: 600;
+      margin: 10px 0 5px;
+      display: block;
+      color: #444;
+    }
+
+    .modal input[type="text"],
+    .modal textarea {
       width: 100%;
-      padding: 12px;
-      margin-bottom: 20px;
+      padding: 12px 14px;
       border: 1px solid #ccc;
       border-radius: 8px;
-      font-size: 16px;
-      transition: 0.3s ease;
+      font-size: 15px;
+      background: #f9f9f9;
+      transition: all 0.2s ease;
     }
 
-    input[type="text"]:focus, select:focus {
-      border-color: #5b9bd5;
+    .modal input[type="text"]:focus,
+    .modal textarea:focus {
+      border-color: #4a90e2;
+      background: #fff;
       outline: none;
-      box-shadow: 0 0 5px rgba(91, 155, 213, 0.5);
     }
 
-    button {
+    .modal textarea {
+      min-height: 100px;
+      max-height: 400px;
+      resize: vertical;
+    }
+
+    .submit-btn {
       width: 100%;
+      margin-top: 20px;
       padding: 12px;
-      background-color: #5b9bd5;
-      color: white;
+      background: linear-gradient(to right, #4a90e2, #357abd);
+      color: #fff;
       font-size: 16px;
       font-weight: bold;
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: background 0.3s ease;
     }
 
-    button:hover {
-      background-color: #4a8bc2;
+    .submit-btn:hover {
+      background: linear-gradient(to right, #357abd, #2d6bb3);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 12px;
+      right: 15px;
+      font-size: 24px;
+      color: #aaa;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    .close-btn:hover {
+      color: #111;
+    }
+
+    .open-modal-btn {
+      margin: 100px auto;
+      display: block;
+      padding: 14px 30px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      background-color: #4a90e2;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      transition: background 0.3s ease;
+    }
+
+    .open-modal-btn:hover {
+      background-color: #357abd;
     }
   </style>
 </head>
 <body>
 
-  <div class="form-container">
-    <h2>User Form</h2>
-    <form action="#" method="post">
-      <label for="username">Enter Username</label>
-      <input type="text" id="username" name="username" placeholder="Your username..." required>
+  <button class="open-modal-btn" onclick="openModal()">Open Modal</button>
 
-      <label for="role">Select Role</label>
-      <select id="role" name="role" required>
-        <option value="" disabled selected>Select your role</option>
-        <option value="student">Student</option>
-        <option value="teacher">Teacher</option>
-        <option value="parent">Parent</option>
-      </select>
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+      <h2>Create New Entry</h2>
+      <p>Fill out the details below to add a new entry.</p>
+      <form id="modalForm">
+        <label for="title">Title</label>
+        <input type="text" id="title" name="title" placeholder="Enter title..." required />
 
-      <button type="submit">Submit</button>
-    </form>
+        <label for="description">Description</label>
+        <textarea id="description" name="description" placeholder="Write a description..." required></textarea>
+
+        <button type="submit" class="submit-btn">Submit</button>
+      </form>
+    </div>
   </div>
+
+  <script>
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalForm = document.getElementById('modalForm');
+
+    function openModal() {
+      modalOverlay.style.display = 'flex';
+    }
+
+    function closeModal() {
+      modalOverlay.style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+      if (event.target === modalOverlay) {
+        closeModal();
+      }
+    }
+
+    modalForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const title = document.getElementById('title').value;
+      const description = document.getElementById('description').value;
+
+      alert(`Submitted:\nTitle: ${title}\nDescription: ${description}`);
+
+      modalForm.reset();
+      closeModal();
+    });
+  </script>
 
 </body>
 </html>

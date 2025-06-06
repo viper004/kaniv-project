@@ -117,7 +117,10 @@ export function showAlert(type, title, message, action = null) {
   // Button behavior
   document.getElementById("popupActionBtn").onclick = () => {
     document.getElementById("popupOverlay").remove();
-    if (action != "ok"){
+    if (action=="reload"){
+      return window.location.reload();
+    }
+    else if (action != "ok" && action != "reload"){
         return window.location.href=action;
     }
   };
