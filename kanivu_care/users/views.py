@@ -3,7 +3,7 @@ import secrets
 import base64
 
 from django.http import HttpResponseRedirect, JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import  redirect, render
 from django.core.files.base import ContentFile
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
@@ -13,7 +13,6 @@ from django.core.exceptions import ValidationError
 
 from members.models import memberRegistration
 
-from coordinator.models import coordinateRegistration
 
 from convenier.models import pendingMemberAddRequest
 

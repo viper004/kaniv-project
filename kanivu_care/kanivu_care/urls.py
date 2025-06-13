@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.urls import path,include
 
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 
 urlpatterns = [
@@ -10,4 +13,4 @@ urlpatterns = [
     path("convenier/",include("convenier.urls",namespace="convenier")),
     path("coordinator/",include("coordinator.urls",namespace="coordinator")),
     path("dashboard/",include("dashboard.urls",namespace="dashboard")),
-]
+]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

@@ -6,10 +6,12 @@ from django.utils import timezone
 
 from datetime import datetime
 
-from dashboard.models import NotifyModel
+from dashboard.models import NotifyModel,FinanceModel
+from dashboard.forms import financeModelForm
+
+from users.functions import form_errors
 
 
-# Create your views here.
 
 @login_required(login_url="users:login")
 def Dashboard(req):
@@ -132,4 +134,63 @@ def endNotify(req,id):
             "status":"error",
             "title":"This notification doesn't exist",
             "message":"This notification is no longer available on our database"
+        })
+    
+@login_required(login_url="users:login")
+def Finance(req):
+    if (req.method=="POST"):
+        form=financeModelForm(req.POST,req.FILES)
+        if form.is_valid():
+            finance=form.save(commit=False)
+            finance.user=req.user
+            finance.save()
+            ft=form.cleaned_data.get("collection_type")
+            return JsonResponse({
+                "status":"success",
+                "title":"Finance updated.",
+                "message":f"Your {ft} collection is successfully submitted"
+            })
+        else:
+            errors=form_errors(form)
+            return JsonResponse({
+                "status":"error",
+                "title":"An error occured",
+                "message":errors
+            })
+    else:
+        form=financeModelForm()
+        finance=FinanceModel.objects.all()
+
+        cntx={
+            "form":form,
+            "finance":finance
+        }
+    
+        return render(req,"dashboard/finance.html",context=cntx)
+
+
+
+
+def deleteFinance(req,id):
+    finance=FinanceModel.objects.filter(id=id)
+
+    if finance.exists():
+        if (req.user==finance.first().user):
+            finance.first().delete()
+            return JsonResponse({
+                "status":"success",
+                "title":"Finance record Deleted.",
+                "message":"Your finance record is successfully deleted!"
+            })
+        else:
+            return JsonResponse({
+                "status":"error",
+                "title":"Not the same user",
+                "message":"You can only delete finance record of yours."
+            })
+    else:
+        return JsonResponse({
+            "status":"error",
+            "title":"This finance is does not exist",
+            "message":"This finance record is no longer available on our database"
         })

@@ -14,3 +14,20 @@ class NotifyModel(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s {self.title}"
+    
+class FinanceModel(models.Model):
+
+    COLLECTION_TYPE_CHOICES=(
+        ("Weekly Collection","Weekly Collection"),
+        ("Monthly Collection","Monthly Collection"),
+        ("Special Collection","Special Collection"),
+    )
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    collection_type=models.CharField(choices=COLLECTION_TYPE_CHOICES)
+    description=models.TextField()
+    collection_date=models.DateField(auto_now_add=False)
+    image=models.ImageField(upload_to="media/finance/")
+
+    def __str__(self):
+        return self.user.username
+    

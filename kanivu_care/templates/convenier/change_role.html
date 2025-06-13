@@ -531,9 +531,16 @@
         <header>
             <h1>Role Management Dashboard</h1>
             <p class="subtitle">Easily manage member roles and permissions across your organization</p>
-            <aside>
-                <strong id="pending_lists" onclick="openPendingModal()">Pending Mem-List</strong>
-            </aside>
+            {% if request.user.userprofile.role == "convenier" %}
+                <aside>
+                    <strong id="pending_lists" onclick="openPendingModal()">Pending Mem-List</strong>
+                </aside>
+            {% endif %}
+
+            {% if request.user.userprofile.role == "coordinator" %}
+                <a href="{% url 'coordinator:request_member' %}" id="pending_lists">Track mem</a>
+            {% endif %}
+            
         </header>
         <aside>
             <a href="{% url 'convenier:create_member' %}" id="create_member">Create Member</a>
@@ -577,9 +584,13 @@
                         <span class="detail-value">{{ i.user.email }}</span>
                     </div>
                 </div>
-                <div class="action-buttons">
-                    <button data-id="{{i.user.id}}" class="demote btn btn-danger">Demote to Member</button>
-                </div>
+
+                {% if request.user.userprofile.role == "convenier" %}
+                    <div class="action-buttons">
+                        <button data-id="{{i.user.id}}" class="demote btn btn-danger">Demote to Member</button>
+                    </div>
+                {% endif %}
+                
             </div>
             {% endfor %}
         </div>
@@ -671,43 +682,45 @@
         </form>
     </div>
    <section>
-  <div class="modal-overlay" id="pendingModal">
-    <div class="main-modal">
-      <h1 class="modal-title">Pending Requests</h1>
-      {% if pending_requests %}
-        {% for i in pending_requests %}
-        <div class="pending-card">
-          <div class="glass-card">
-            <div class="info-grid">
-              <div class="info-row">
-                <div class="label">Username</div>
-                <div class="value">{{ i.user.username }}</div>
-              </div>
-              <div class="info-row">
-                <div class="label">Duty</div>
-                <div class="value">{{ i.user.memberregistration.duty }}</div>
-              </div>
-              <div class="info-row">
-                <div class="label">Email</div>
-                <div class="value">{{ i.user.email }}</div>
-              </div>
-              <!-- Add more fields here if needed -->
+  {% if request.user.userprofile.role == "convenier" %}
+        <div class="modal-overlay" id="pendingModal">
+            <div class="main-modal">
+            <h1 class="modal-title">Pending Requests</h1>
+            {% if pending_requests %}
+                {% for i in pending_requests %}
+                <div class="pending-card">
+                <div class="glass-card">
+                    <div class="info-grid">
+                    <div class="info-row">
+                        <div class="label">Username</div>
+                        <div class="value">{{ i.user.username }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="label">Duty</div>
+                        <div class="value">{{ i.user.memberregistration.duty }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="label">Email</div>
+                        <div class="value">{{ i.user.email }}</div>
+                    </div>
+                    <!-- Add more fields here if needed -->
+                    </div>
+                    <div class="button-group">
+                    <button class="btn btn-approve" data-userid="{{ i.user.id }}">✅ Approve</button>
+                    <button class="btn btn-reject" onclick="openNestedModal('{{ i.user.id }}')">❌ Reject</button>
+                    </div>
+                </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="glass-card">
+                <h2 class="no-requests">No pending requests</h2>
+                </div>
+            {% endif %}
+            <button class="btn-close-main" onclick="closePendingModal()">Close</button>
             </div>
-            <div class="button-group">
-              <button class="btn btn-approve" data-userid="{{ i.user.id }}">✅ Approve</button>
-              <button class="btn btn-reject" onclick="openNestedModal('{{ i.user.id }}')">❌ Reject</button>
-            </div>
-          </div>
         </div>
-        {% endfor %}
-      {% else %}
-        <div class="glass-card">
-          <h2 class="no-requests">No pending requests</h2>
-        </div>
-      {% endif %}
-      <button class="btn-close-main" onclick="closePendingModal()">Close</button>
-    </div>
-  </div>
+    {% endif %}
 
   <!-- Nested Modal for Rejection Reason -->
   <div class="modal-overlay" id="nestedModal">

@@ -343,54 +343,6 @@
                 </div>
 
                 
-                {% if request.user.userprofile.role == "convenier" %}
-                
-                    <div class="preferences-section" style="margin-top: 2rem;">
-                        <h2 class="section-title">
-                            List of members/coordinators
-                            <a href="{% url 'convenier:change_role' %}" class="edit-btn">
-                                <i class="fas fa-edit"></i> Change Role
-                            </a>
-                        </h2>
-                        
-                        <div class="info-grid">
-                            {% if members %}
-                                {% for i in members %}
-                                    <div class="info-item">
-                                        <div class="info-value">{{i.user.username}}</div>
-                                        <div class="info-label">{{i.user.userprofile.role}}</div>
-                                    </div>
-                                {% endfor %}
-                            {% else %}
-                                <div class="info-item">
-                                    <div class="info-value">No one is promoted as member</div>
-                                </div>
-                            {% endif %}
-
-                            {% if coordinators %}
-                                {% for i in coordinators %}
-                                    <div class="info-item">
-                                        <div class="info-value">{{i.user.username}}</div>
-                                        <div class="info-label">{{i.user.userprofile.role}}</div>
-                                    </div>
-                                {% endfor %}
-                            {% else %}
-                                <div class="info-item">
-                                    <div class="info-value">No one is promoted as coordinator</div>
-                                </div>
-                            {% endif %}
-
-                            
-
-                            
-                        </div>
-
-                        
-                    </div>
-                {% endif %}
-                {% if request.user.userprofile.role == "coordinator" %}
-                    <a href="{% url 'coordinator:request_member' %}" class="edit-btn">Send request for adding member</a>
-                {% endif %}
             </div>
         </div>
     </div>

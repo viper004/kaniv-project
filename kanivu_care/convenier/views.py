@@ -50,7 +50,7 @@ def createMember(req):
     
 @login_required(login_url="/users/login")
 def changeRole(req):
-    if not (req.user.userprofile.role == "convenier"):
+    if not (req.user.userprofile.role in ["convenier","coordinator"]):
         return HttpResponseRedirect("/")
 
 
@@ -73,7 +73,7 @@ def changeRole(req):
 
 @login_required(login_url="/users/login")
 def promoteUser(req,id):
-    if not req.user.userprofile.role == "convenier":
+    if not (req.user.userprofile.role in ["convenier","coordinator"]):
         return HttpResponseRedirect("/")
     user=User.objects.get(id=id)
     userp=UserProfile.objects.get(user=user)
