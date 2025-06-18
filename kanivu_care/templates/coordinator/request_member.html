@@ -18,20 +18,24 @@
       background: linear-gradient(to right top, #6a11cb, #2575fc);
       min-height: 120vh;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
+      padding: 20px;
     }
 
     .form-container {
       background: rgba(255, 255, 255, 0.15);
       backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
       border-radius: 20px;
       padding: 40px;
       width: 100%;
-      max-width: 450px;
+      max-width: 650px;
       color: #fff;
       animation: fadeIn 1s ease-in-out;
+      margin-bottom: 30px;
     }
 
     .form-container h1 {
@@ -61,14 +65,26 @@
       font-size: 16px;
       transition: 0.3s ease;
     }
-    select{
-        cursor: pointer;
+    
+    select {
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 15px center;
+      background-size: 18px;
     }
 
     form input:focus,
     form select:focus {
       outline: none;
       background: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+    }
+
+    form input::placeholder {
+      color: rgba(255, 255, 255, 0.7);
     }
 
     select option {
@@ -82,14 +98,16 @@
       color: #2575fc;
       font-weight: bold;
       border: none;
-      border-radius: 14px;
+      border-radius: 12px;
       font-size: 16px;
       cursor: pointer;
       transition: 0.3s ease;
+      margin-top: 10px;
     }
 
     button[type="submit"]:hover {
       background-color: #e0e0e0;
+      transform: translateY(-2px);
     }
 
     @keyframes fadeIn {
@@ -102,126 +120,146 @@
       }
     }
 
-
     .loader {
-    display: none;
-  width: 60px;
-  height: 60px;
-  margin: auto;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%);
-  z-index: 100;
-}
+      display: none;
+      width: 60px;
+      height: 60px;
+      margin: auto;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      z-index: 100;
+    }
 
-.loader:before {
-  content: '';
-  width: 60px;
-  height: 5px;
-  background: #f0808050;
-  position: absolute;
-  top: 60px;
-  left: 0;
-  border-radius: 50%;
-  animation: shadow324 0.5s linear infinite;
-}
+    .loader:before {
+      content: '';
+      width: 60px;
+      height: 5px;
+      background: #f0808050;
+      position: absolute;
+      top: 60px;
+      left: 0;
+      border-radius: 50%;
+      animation: shadow324 0.5s linear infinite;
+    }
 
-.loader:after {
-  content: '';
-  width: 100%;
-  height: 100%;
-  background: #f08080;
-  position: absolute;
-  top: 0;
-  left: 0;
-  border-radius: 4px;
-  animation: jump7456 0.5s linear infinite;
-}
+    .loader:after {
+      content: '';
+      width: 100%;
+      height: 100%;
+      background: #f08080;
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-radius: 4px;
+      animation: jump7456 0.5s linear infinite;
+    }
 
-@keyframes jump7456 {
-  15% {
-    border-bottom-right-radius: 3px;
-  }
+    @keyframes jump7456 {
+      15% {
+        border-bottom-right-radius: 3px;
+      }
+      25% {
+        transform: translateY(9px) rotate(22.5deg);
+      }
+      50% {
+        transform: translateY(18px) scale(1, .9) rotate(45deg);
+        border-bottom-right-radius: 40px;
+      }
+      75% {
+        transform: translateY(9px) rotate(67.5deg);
+      }
+      100% {
+        transform: translateY(0) rotate(90deg);
+      }
+    }
 
-  25% {
-    transform: translateY(9px) rotate(22.5deg);
-  }
+    @keyframes shadow324 {
+      0%, 100% {
+        transform: scale(1, 1);
+      }
+      50% {
+        transform: scale(1.2, 1);
+      }
+    }
 
-  50% {
-    transform: translateY(18px) scale(1, .9) rotate(45deg);
-    border-bottom-right-radius: 40px;
-  }
+    .track-link {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+      display: inline-block;
+      padding: 14px 28px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
 
-  75% {
-    transform: translateY(9px) rotate(67.5deg);
-  }
-
-  100% {
-    transform: translateY(0) rotate(90deg);
-  }
-}
-
-@keyframes shadow324 {
-
-  0%,
-    100% {
-    transform: scale(1, 1);
-  }
-
-  50% {
-    transform: scale(1.2, 1);
-  }
-}
+    .track-link:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+    }
   </style>
 </head>
 <body>
   <div class="form-container">
-    <h1>Member Login by Convenier</h1>
+    <h1>Member Login by Coordinator</h1>
     <form action="{% url 'coordinator:request_member' %}" method="post" id="form">
       {% csrf_token %}
       {{ form.as_p }}
-
       <button type="submit">Submit</button>
     </form>
   </div>
 
-  <a href="{% url 'coordinator:track_member' %}">Track member requests</a>
+  <a href="{% url 'coordinator:track_member' %}" class="track-link">Track member requests</a>
 
   <div class="loader" id="loader"></div>
 
   <!-- Feather icons (optional) -->
   <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-
-  <!-- Alert handler -->
-  <script type="module">
+<script type="module">
     import { showAlert } from "{% static 'scripts/alert.js' %}";
     const loader=document.getElementById("loader");
 
+const form = document.getElementById("form");
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  loader.style.display = "block"; // Show loader
 
-    const form = document.getElementById("form");
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      loader.style.display="block";
-      const formData = new FormData(form);
-      fetch(form.action, {
-        method: "POST",
-        body: formData,
-        headers: {
-          "X-Requested-With": "XMLHttpRequest",
-        },
-      })
-        .then(res => res.json())
-        .then(data => {
-          console.log(data);
-          showAlert(data.status, data.title, data.message, "ok");
-        })
-        .catch(err => {
-          showAlert("error", "Submission Failed", err.message, "ok");
-        });
+  const formData = new FormData(form);
 
-        loader.style.display="none";
+  fetch(form.action, {
+    method: "POST",
+    body: formData,
+    headers: {
+      "X-Requested-With": "XMLHttpRequest",
+    },
+  })
+    .then(res => res.json())
+    .then(data => {
+
+      if (data.status=="success"){
+        showAlert(data.status, data.title, data.message, "reload");
+      }
+      else{
+        showAlert(data.status, data.title, data.message, "ok");
+      }
+      
+      loader.style.display = "none"; // Hide loader after success
+    })
+    .catch(err => {
+      showAlert("error", "Submission Failed", err.message, "ok");
+      loader.style.display = "none"; // Hide loader after error
     });
+});
+
   </script>
 </body>
 </html>

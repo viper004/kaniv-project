@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Role Management Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
         :root {
             --primary: #7c4dff; --primary-light: #b47cff;
@@ -69,7 +70,7 @@
         font-size: 1.2rem;
     }
 
-    aside #pending_lists{
+    aside .pending_lists{
         position: absolute;
         background: linear-gradient(135deg, #61E786, #EDCCEC);
         top:10%;
@@ -221,6 +222,7 @@
         
         .action-buttons {
             display: flex; gap: 1rem;
+            flex-direction: column;
             margin-top: 1.5rem;
         }
         
@@ -524,6 +526,36 @@
   resize: none;
 }
 
+aside .pending_lists{
+        position: absolute;
+        background: linear-gradient(135deg, #61E786, #EDCCEC);
+        top:10%;
+        right: 2%;
+    }
+
+
+    .kick-btn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #ff6b6b, #d63031);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s ease;
+  box-shadow: 0 4px 10px rgba(255, 107, 107, 0.4);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kick-btn:hover {
+  background: linear-gradient(135deg, #d63031, #c0392b);
+  transform: scale(1.05);
+  box-shadow: 0 6px 14px rgba(255, 107, 107, 0.6);
+}
+
     </style>
 </head>
 <body>
@@ -533,21 +565,23 @@
             <p class="subtitle">Easily manage member roles and permissions across your organization</p>
             {% if request.user.userprofile.role == "convenier" %}
                 <aside>
-                    <strong id="pending_lists" onclick="openPendingModal()">Pending Mem-List</strong>
+                    <a href="{% url 'convenier:pending_requests' %}" class="pending_lists">Pending Mem-List</a>
                 </aside>
             {% endif %}
 
             {% if request.user.userprofile.role == "coordinator" %}
-                <a href="{% url 'coordinator:request_member' %}" id="pending_lists">Track mem</a>
+            <aside>
+                <a href="{% url 'coordinator:request_member' %}" class="pending_lists">Create/Track member</a>
+            </aside>
             {% endif %}
-            
+
         </header>
-        <aside>
-            <a href="{% url 'convenier:create_member' %}" id="create_member">Create Member</a>
-        </aside>
-
+        {% if request.user.userprofile.role == "convenier" %}
+            <aside>
+                <a href="{% url 'convenier:create_member' %}" id="create_member">Create Member</a>
+            </aside>
+        {% endif %}
         
-
         {% if coordinators %}
         <div class="section-header">
             <h2 class="section-title">Coordinators</h2>
@@ -576,8 +610,8 @@
                         <span class="detail-value">{{ i.batch }}</span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">Year:</span>
-                        <span class="detail-value">{{ i.current_year }}</span>
+                        <span class="detail-label">Number:</span>
+                        <span class="detail-value">{{ i.user.userprofile.phone_number }}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Email:</span>
@@ -616,7 +650,6 @@
                         <div class="user-name">{{ i.user.username }}</div>
                         <span class="user-role role-member">Member</span>
                     </div>
-                    <button type="button" onclick="kick(this)" data-delid="{{i.user.id}}">Kick {{i.user.username}}</button>
                 </div>
                 <div class="user-details">
                     <div class="detail-row">
@@ -632,8 +665,8 @@
                         <span class="detail-value">{{ i.batch }}</span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">Year:</span>
-                        <span class="detail-value">{{ i.current_year }}</span>
+                        <span class="detail-label">Number:</span>
+                        <span class="detail-value">{{ i.user.userprofile.phone_number }}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Duty:</span>
@@ -642,6 +675,7 @@
                         <span class="detail-label" id="change_duty_modal_btn" data-userid="{{i.user.id}}" data-duty="{{ i.user.memberregistration.duty }}" onclick="selectedUser(this)">Change Duty</span>
                 </div>
                 <div class="action-buttons">
+                    <button class="kick-btn" type="button" onclick="kick(this)" data-delid="{{i.user.id}}"><i class="fas fa-user-slash"></i> Kick {{i.user.username}}</button>
                     <button data-id="{{i.user.id}}" class="promote btn btn-primary">Promote to Coordinator</button>
                 </div>
             </div>
@@ -664,7 +698,7 @@
     </div>
     <div class="form-container" id="form_container">
         <i data-feather="x" id="exit"></i>
-        <form action="{% url 'convenier:change_duty' %}" id="change_duty" method="post">
+        <form action="{% url 'dashboard:change_duty' %}" id="change_duty" method="post">
             {% csrf_token %}
             <input type="hidden" name="id" id="userid"/>
 
@@ -682,57 +716,7 @@
         </form>
     </div>
    <section>
-  {% if request.user.userprofile.role == "convenier" %}
-        <div class="modal-overlay" id="pendingModal">
-            <div class="main-modal">
-            <h1 class="modal-title">Pending Requests</h1>
-            {% if pending_requests %}
-                {% for i in pending_requests %}
-                <div class="pending-card">
-                <div class="glass-card">
-                    <div class="info-grid">
-                    <div class="info-row">
-                        <div class="label">Username</div>
-                        <div class="value">{{ i.user.username }}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="label">Duty</div>
-                        <div class="value">{{ i.user.memberregistration.duty }}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="label">Email</div>
-                        <div class="value">{{ i.user.email }}</div>
-                    </div>
-                    <!-- Add more fields here if needed -->
-                    </div>
-                    <div class="button-group">
-                    <button class="btn btn-approve" data-userid="{{ i.user.id }}">✅ Approve</button>
-                    <button class="btn btn-reject" onclick="openNestedModal('{{ i.user.id }}')">❌ Reject</button>
-                    </div>
-                </div>
-                </div>
-                {% endfor %}
-            {% else %}
-                <div class="glass-card">
-                <h2 class="no-requests">No pending requests</h2>
-                </div>
-            {% endif %}
-            <button class="btn-close-main" onclick="closePendingModal()">Close</button>
-            </div>
-        </div>
-    {% endif %}
-
-  <!-- Nested Modal for Rejection Reason -->
-  <div class="modal-overlay" id="nestedModal">
-    <div class="nested-modal-content">
-      <h3 class="modal-title">Reason for Rejection</h3>
-      <textarea class="modal-textarea" id="reason" placeholder="Enter reason..." required></textarea>
-      <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeNestedModal()">Cancel</button>
-        <button class="btn-confirm" id="rejectBtn">Reject</button>
-      </div>
-    </div>
-  </div>
+  
 </section>
 
 
@@ -750,7 +734,6 @@
     const formContainer=document.getElementById("form_container");
     const changeDuty=document.getElementById("change_duty");
     const exit=document.getElementById("exit");
-    const pendingListBtn=document.getElementById("pending_lists");
 
     const userId=document.getElementById("userid");
     const duty=document.getElementById("duty");
@@ -759,10 +742,10 @@
     demote.forEach((d)=>{
         d.addEventListener("click",()=>{
             let userid=d.dataset.id
-            let url=`/convenier/change_role/demote/${userid}/`;
+            let url=`/dashboard/manage_members/demote/${userid}/`;
             fetch(url).then(res=>res.json()).then((data)=>{
                 if (data.status=="success"){
-                    showAlert(data.status,data.title,data.message,"/convenier/change_role");
+                    showAlert(data.status,data.title,data.message,"/dashboard/manage_members");
                 }
                 else{
                     showAlert(data.status,data.title,data.message,"ok");
@@ -775,10 +758,10 @@
     promote.forEach((p)=>{
         p.addEventListener("click",()=>{
             let userid=p.dataset.id
-            let url=`/convenier/change_role/promote/${userid}/`;
+            let url=`/dashboard/manage_members/promote/${userid}/`;
             fetch(url).then(res=>res.json()).then((data)=>{
                 if (data.status=="success"){
-                    showAlert(data.status,data.title,data.message,"/convenier/change_role/");
+                    showAlert(data.status,data.title,data.message,"/dashboard/manage_members/");
                 }
                 else{
                     showAlert(data.status,data.title,data.message,"ok");
@@ -800,7 +783,7 @@
 
             fetch(url).then(res=>res.json()).then((data)=>{
                 if (data.status=="success"){
-                    showAlert(data.status,data.title,data.message,"/convenier/change_role/");
+                    showAlert(data.status,data.title,data.message,"reload");
                 }
                 else{
                     showAlert(data.status,data.title,data.message,"ok");
@@ -825,36 +808,14 @@
             "body":formdata
         }).then(res=>res.json()).then((data)=>{
             if (data.status=="success"){
-                showAlert(data.status,data.title,data.message,"/convenier/change_role/");
+                showAlert(data.status,data.title,data.message,"reload");
             }
             else{
                 showAlert(data.status,data.title,data.message,"ok");
             }
+        }).catch(error=>{
+            showAlert("error","Duty changed failed",error.message,"ok")
         })
-    })
-
-    function openPendingModal() {
-        document.getElementById('pendingModal').style.display = 'flex';
-    }
-
-    function closePendingModal() {
-        document.getElementById('pendingModal').style.display = 'none';
-    }
-
-    function openNestedModal(userId) {
-        document.getElementById('nestedModal').style.display = 'flex';
-        document.getElementById('rejectBtn').setAttribute('data-id', userId);
-    }
-
-    function closeNestedModal() {
-        document.getElementById('nestedModal').style.display = 'none';
-    }
-
-    document.addEventListener("keydown",(e)=>{
-        if (e.key=="Escape"){
-            closePendingModal();
-            closeNestedModal();
-        }
     })
 
 
@@ -864,10 +825,6 @@
 
     window.selectedUser=selectedUser;
     window.kick=kick;
-    window.openPendingModal=openPendingModal;
-    window.closePendingModal=closePendingModal;
-    window.openNestedModal=openNestedModal;
-    window.closeNestedModal=closeNestedModal;
 
 
 

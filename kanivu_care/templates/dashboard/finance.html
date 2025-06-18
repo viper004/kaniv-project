@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finance</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         :root {
             --primary: #7c4dff; --primary-light: #b47cff;
@@ -350,8 +351,9 @@
       background: #ffffff;
       border-radius: 15px;
       padding: 30px 35px;
-      width: 420px;
-      max-width: 95%;
+      width: 650px;
+      height: 90vh;
+      overflow-y: scroll;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
       animation: fadeInScale 0.35s ease;
       position: relative;
@@ -471,13 +473,7 @@
         bottom: 10px;
         font-size: 13px;
     }
-    .end{
-        position: absolute;
-        right: 10px;
-        top: 10px;
-
-    }
-
+    
     #image_view{
         display: none;
         background-image: url("{% static 'images/download.jpeg' %}");
@@ -490,7 +486,7 @@
         padding: 2rem;
         top: 50%;
         transform: translate(-50%,-50%);
-        height: 1000px;
+        height: 80vh;
         width: 1000px;
         border-radius: 10%;
         object-fit: contain;
@@ -502,6 +498,49 @@
         color: red;
         cursor: pointer;
         left: 90%;
+    }
+
+
+     .custom-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 18px;
+      margin: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .btn-view-img {
+      background-color: #0078D4;
+      color: #fff;
+      padding: 10px;
+      position: absolute;
+        right: 0px;
+        top: 20px;
+    }
+
+    .btn-view-img:hover {
+      background-color: #005fa3;
+      transform: scale(1.05);
+    }
+
+    .btn-delete-rec {
+      background-color: #d63031;
+      color: #fff;
+    }
+
+    .btn-delete-rec:hover {
+      background-color: #b12020;
+      transform: scale(1.05);
+    }
+
+    .custom-btn i {
+      margin-right: 8px;
     }
 
     </style>
@@ -537,13 +576,22 @@
                     <div class="user-details">
                         <b>{{i.collection_type}}</b>
                         <p>{{i.description}}</p>
-                        <i class="time">{{i.collection_date}}</i>
+                        <p>Collection Date: {{i.collection_date}}</p>
+                        <i class="time">{{i.announced_date}}</i>
                     </div>
-                    {% if i.user == request.user %}
+
+
                     
-                        <button class="end" data-img="{{i.image.url}}" type="button" onclick="viewImage(this)">View Image</button>
+
+
+                    <button class="custom-btn btn-view-img" data-img="{{i.image.url}}" type="button" onclick="viewImage(this)">
+                        <i class="fas fa-image"></i> View Image
+                    </button>
+                    {% if i.user == request.user %}
                         <div class="action-buttons">
-                            <button data-userid="{{i.id}}" onclick="deleteFinance(this)">Delete Record</button>
+                            <button class="custom-btn btn-delete-rec" data-userid="{{i.id}}" onclick="deleteFinance(this)">
+                                <i class="fas fa-trash"></i> Delete Record
+                            </button>
                         </div>
                     {% endif %}
                 </div>

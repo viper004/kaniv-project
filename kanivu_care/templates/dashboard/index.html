@@ -3,68 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<style>
-    body{
-        font-family: 'Poppins', sans-serif;
-        
-    }
-    :root {
-            --primary: #7c4dff; --primary-light: #b47cff;
-            --secondary: #00e5ff; --secondary-light: #6effff;
-            --accent: #ff4081; --accent-light: #ff79b0;
-            --dark: #263238; --light: #f5f7fa;
-            --card-bg: #ffffff; --body-bg: #f0f2f5;
-            --success: #00c853; --warning: #ffab00;
-            --shadow: 0 15px 35px rgba(0,0,0,0.1); --radius: 16px;
+    <title>Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --primary-light: #a29bfe;
+            --secondary: #fd79a8;
+            --accent: #00cec9;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
         }
-        header{
-            display: flex;
-            justify-content: center;
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
         }
-     h1 {
-            font-size: 5rem; font-weight: 700;
-            color: var(--primary); margin-bottom: 1rem;
-            letter-spacing: -0.5px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            -webkit-background-clip: text; background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: bolder;
-            text-transform: uppercase;
+
+        body {
+            background: linear-gradient(-45deg, #f5f7fa, #dfe6e9, #f5f6fa, #dfe6e9);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            padding: 2rem;
+            color: var(--dark);
         }
-        
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+
         .subtitle {
-            font-size: 1.2rem; color: #607d8b;
-            max-width: 700px; margin: 0 auto 2rem;
+            font-size: 1.2rem;
+            color: #636e72;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: var(--transition);
         }
-        .hidden{
-            display: none;
+
+        .subtitle.show {
+            opacity: 1;
+            transform: translateY(0);
         }
-        #items{
+
+        #items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .item {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+        }
+
+        .item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: var(--transition);
+        }
+
+        .item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .item:hover::before {
+            height: 10px;
+        }
+
+        .item-content {
+            padding: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .item-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(45deg, var(--primary), var(--primary-light));
+            border-radius: 18px;
             display: flex;
-        }
-        .item{
-            width: 300px;
-            height: 200px;
-            background: coral;
-            border-radius: 10px;
-            margin: 10px;
-        }
-        .item a{
-            display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100%;
-            width: 100%;
-            color: green;
-            text-align: center;
-            text-decoration: none;
-            font-size: 24px;
-            font-weight: bolder;
+            margin-bottom: 1.5rem;
+            color: white;
+            font-size: 1.8rem;
+            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.3);
+            transition: var(--transition);
         }
-</style>
+
+        .item:hover .item-icon {
+            transform: rotate(15deg) scale(1.1);
+            background: linear-gradient(45deg, var(--secondary), var(--accent));
+        }
+
+        .item-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: var(--dark);
+        }
+
+        .item-desc {
+            font-size: 1rem;
+            color: #636e72;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Floating animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: 1.5rem;
+            }
+
+            header h1 {
+                font-size: 2.2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            #items {
+                grid-template-columns: 1fr;
+            }
+
+            .item-content {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Hover effect for the entire page */
+        body:hover .item:nth-child(1) {
+            transition-delay: 0.1s;
+        }
+        body:hover .item:nth-child(2) {
+            transition-delay: 0.2s;
+        }
+        body:hover .item:nth-child(3) {
+            transition-delay: 0.3s;
+        }
+    </style>
+</head>
 <body>
     <header>
         <h1>Dashboard</h1>
@@ -72,17 +203,100 @@
     </header>
 
     <section id="items">
-        <div class="item">
-            <a href="{% url 'convenier:change_role' %}">Member lists</a>
-        </div>
+        {% if request.user.userprofile.role == "convenier" or request.user.userprofile.role == "coordinator" %}
+            <div class="item" onclick="window.location.href='/dashboard/manage_members/'">
+                <div class="item-content">
+                    <div class="item-icon">
+                        <i class="fas fa-users-cog"></i>
+                    </div>
+                    <h3 class="item-title">Member Management</h3>
+                    <p class="item-desc">Manage roles, permissions, and access levels for all organization members</p>
+                    
+                </div>
+            </div>
+        {% endif %}
       
-        <div class="item">
-            <a href="{% url 'dashboard:notification' %}">Notify</a>
-        </div>
-        <div class="item">
-            <a href="{% url 'dashboard:finance' %}">Finance</a>
+        <div class="item" onclick="window.location.href='/dashboard/notification/'">
+            <div class="item-content">
+                <div class="item-icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <h3 class="item-title">Notifications</h3>
+                <p class="item-desc">Send important alerts and announcements to selected members or groups</p>
+                
+            </div>
         </div>
         
+        <div class="item" onclick="window.location.href='/dashboard/finance/'">
+            <div class="item-content">
+                <div class="item-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="item-title">Financial Reports</h3>
+                <p class="item-desc">View and analyze financial data with interactive charts and exports</p>
+                
+            </div>
+        </div>
     </section>
+
+    <script>
+        // Show subtitle with delay
+        setTimeout(() => {
+            document.querySelector('.subtitle').classList.add('show');
+        }, 500);
+
+        // Add hover effects to items
+        document.querySelectorAll('.item').forEach((item, index) => {
+            // Add delay to hover transitions
+            item.style.transitionDelay = `${index * 0.1}s`;
+            
+            // Add slight floating animation
+            item.style.animation = `float ${6 + index}s ease-in-out infinite`;
+            
+            // Add tilt effect on mouse move
+            item.addEventListener('mousemove', (e) => {
+                const rect = item.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const angleX = (y - centerY) / 20;
+                const angleY = (centerX - x) / 20;
+                
+                item.style.transform = `perspective(1000px) rotateX(${angleX}deg) rotateY(${angleY}deg) translateY(-10px)`;
+            });
+            
+            item.addEventListener('mouseleave', () => {
+                item.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+            });
+        });
+
+        // Add ripple effect to links
+        document.querySelectorAll('.item-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Create ripple element
+                const ripple = document.createElement('span');
+                ripple.className = 'ripple-effect';
+                
+                // Position ripple
+                const rect = link.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                ripple.style.width = ripple.style.height = `${size}px`;
+                ripple.style.left = `${e.clientX - rect.left - size/2}px`;
+                ripple.style.top = `${e.clientY - rect.top - size/2}px`;
+                
+                // Add ripple to link
+                link.appendChild(ripple);
+                
+                // Remove ripple after animation
+                setTimeout(() => {
+                    ripple.remove();
+                    window.location.href = link.href;
+                }, 600);
+            });
+        });
+    </script>
 </body>
 </html>

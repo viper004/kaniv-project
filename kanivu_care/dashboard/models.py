@@ -9,7 +9,7 @@ class NotifyModel(models.Model):
     title=models.CharField(max_length=255)
     description=models.TextField()
     is_completed=models.BooleanField(default=False)
-    program_date=models.DateField(auto_now_add=False)
+    program_date=models.DateField()
     announced_time=models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -25,7 +25,8 @@ class FinanceModel(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     collection_type=models.CharField(choices=COLLECTION_TYPE_CHOICES)
     description=models.TextField()
-    collection_date=models.DateField(auto_now_add=False)
+    collection_date=models.DateField()
+    announced_date=models.DateField(auto_now_add=True)
     image=models.ImageField(upload_to="media/finance/")
 
     def __str__(self):

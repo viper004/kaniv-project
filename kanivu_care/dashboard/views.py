@@ -10,6 +10,13 @@ from dashboard.models import NotifyModel,FinanceModel
 from dashboard.forms import financeModelForm
 
 from users.functions import form_errors
+from users.models import UserProfile
+
+from members.models import memberRegistration
+
+from coordinator.models import coordinateRegistration
+
+from convenier.models import pendingMemberAddRequest
 
 
 
@@ -74,13 +81,10 @@ def Notification(req):
                 "message":str(e)
             })
     else:
-        pendingNotifications=NotifyModel.objects.filter(is_completed=False)
         today=timezone.localdate()
-        for i in pendingNotifications:
-            if (i.program_date<today):
-                i.is_completed=True
-                i.save()
+        NotifyModel.objects.filter(is_completed=False,program_date__lt=today).update(is_completed=True)
         
+        pendingNotifications=NotifyModel.objects.filter(is_completed=False)
         completedNotification=NotifyModel.objects.filter(is_completed=True)
     return render(req,"dashboard/notification.html",context={"pending_notifications":pendingNotifications,"completed_notifications":completedNotification,"today":today.isoformat()})
 
@@ -194,3 +198,174 @@ def deleteFinance(req,id):
             "title":"This finance is does not exist",
             "message":"This finance record is no longer available on our database"
         })
+
+
+
+
+@login_required(login_url="users:login")
+def changeDuty(req):
+    print(req.user.userprofile.role)
+    if req.user.userprofile.role not in ["convenier","coordinator"]:
+        print("not")
+        return HttpResponseRedirect("/")
+    if (req.method=="POST"):
+        id=req.POST.get("id")
+        duty=req.POST.get("duty")
+        if not duty:
+            return JsonResponse({
+                "status":"error",
+                "title":"Duty Change Failed",
+                "message":"Duty is not found!"
+            })
+        try:
+            user=User.objects.get(id=id)
+            member=memberRegistration.objects.get(user=user)
+            currentDuty=member.duty
+            member.duty=duty
+            member.save()
+            return JsonResponse({
+                "status":"success",
+                "title":"Duty Changed Successfully",
+                "message":f"{user.username}'s Duty has been changed from {currentDuty} to {member.duty}"
+            })
+        except User.DoesNotExist:
+            return JsonResponse({
+                "status":"error",
+                "title":"Duty Change Failed",
+                "message":"This user is not available"
+            })
+        except memberRegistration.DoesNotExist:
+            return JsonResponse({
+                "status":"error",
+                "title":"Duty Change Failed",
+                "message":"This user is not a member"
+            })
+        
+        except Exception as e:
+            return JsonResponse({
+                    "status":"error",
+                    "title":"Unexpected Error!",
+                    "message":str(e)
+                })
+
+    return render(req,"convenier/change_duty.html")
+
+@login_required(login_url="users:login")
+def kickMember(req):
+    print("User:", req.user.userprofile)
+
+    if req.user.userprofile.role not in ["coordinator", "convenier"]:
+        return JsonResponse({
+            "status": "error",
+            "title": "Permission Denied",
+            "message": "You are not authorized to perform this action!"
+        })
+
+    try:
+        entered_id = req.GET.get("id")
+
+        if not entered_id:
+            return JsonResponse({
+                "status": "error",
+                "title": "Missing ID",
+                "message": "No user ID was provided."
+            })
+        user = User.objects.get(id=entered_id)
+        member = memberRegistration.objects.get(user=user)
+        user_profile=UserProfile.objects.get(user=user)
+
+        member.delete()
+        user_profile.role="public_user"
+        user_profile.save()
+
+        return JsonResponse({
+            "status": "success",
+            "title": "Kicked Successfully",
+            "message": f"{user.username} has been kicked from members,from now {user.username} is a public user!"
+        })
+
+    except User.DoesNotExist:
+        return JsonResponse({
+            "status": "error",
+            "title": "User Not Found",
+            "message": "This user does not exist."
+        })
+
+    except memberRegistration.DoesNotExist:
+        return JsonResponse({
+            "status": "error",
+            "title": "Not a Member",
+            "message": "This user is not a registered member."
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            "status": "error",
+            "title": "Unexpected Error",
+            "message": str(e)
+        })
+
+
+
+    
+@login_required(login_url="users:login")
+def manageMembers(req):
+    if not (req.user.userprofile.role in ["convenier","coordinator"]):
+        return HttpResponseRedirect("/")
+
+
+    pending_users = pendingMemberAddRequest.objects.filter(isApproved=False).values_list('user', flat=True)
+
+    members = memberRegistration.objects.exclude(user__in=pending_users)
+    coordinators=UserProfile.objects.filter(role="coordinator")
+    pending_requests=pendingMemberAddRequest.objects.filter(isPending=True)
+
+
+
+    cntx={
+        "members":members,
+        "coordinators":coordinators,
+        "pending_requests":pending_requests,
+        "pending_requests_count":pending_requests.count()
+    }
+    return render(req,"dashboard/manage_members.html",context=cntx)
+
+
+@login_required(login_url="/users/login")
+def promoteUser(req,id):
+    if not (req.user.userprofile.role in ["convenier","coordinator"]):
+        return HttpResponseRedirect("/")
+    user=User.objects.get(id=id)
+    userp=UserProfile.objects.get(user=user)
+    userp.role="coordinator"
+    userp.save()
+
+    memberRegistration.objects.get(user=user).delete()
+
+    coordinateRegistration.objects.get_or_create(user=user)
+    
+    return JsonResponse({
+        "status":"success",
+        "title":"Promoted",
+        "message":"Member is promoted as coordinator!",
+    })
+
+
+@login_required(login_url="/users/login")
+def demoteUser(req,id):
+    if not req.user.userprofile.role == "convenier":
+        return HttpResponseRedirect("/")
+    user=User.objects.get(id=id)
+    userp=UserProfile.objects.get(user=user)
+    userp.role="member"
+    userp.save()
+
+    coordinateRegistration.objects.get(user=user).delete()
+
+    memberRegistration.objects.get_or_create(user=user)
+    return JsonResponse({
+        "status":"success",
+        "title":"Demoted",
+        "message":"Coordinator is demoted as member!",
+    })
+

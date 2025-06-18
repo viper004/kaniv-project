@@ -476,6 +476,103 @@
 
     }
 
+    
+    .loader {
+      display: none;
+      width: 60px;
+      height: 60px;
+      margin: auto;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      z-index: 100;
+    }
+
+    .loader:before {
+      content: '';
+      width: 60px;
+      height: 5px;
+      background: #f0808050;
+      position: absolute;
+      top: 60px;
+      left: 0;
+      border-radius: 50%;
+      animation: shadow324 0.5s linear infinite;
+    }
+
+    .loader:after {
+      content: '';
+      width: 100%;
+      height: 100%;
+      background: #f08080;
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-radius: 4px;
+      animation: jump7456 0.5s linear infinite;
+    }
+
+    @keyframes jump7456 {
+      15% {
+        border-bottom-right-radius: 3px;
+      }
+      25% {
+        transform: translateY(9px) rotate(22.5deg);
+      }
+      50% {
+        transform: translateY(18px) scale(1, .9) rotate(45deg);
+        border-bottom-right-radius: 40px;
+      }
+      75% {
+        transform: translateY(9px) rotate(67.5deg);
+      }
+      100% {
+        transform: translateY(0) rotate(90deg);
+      }
+    }
+
+    @keyframes shadow324 {
+      0%, 100% {
+        transform: scale(1, 1);
+      }
+      50% {
+        transform: scale(1.2, 1);
+      }
+    }
+
+
+
+
+    .notify-btn {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: 0.3s ease;
+}
+
+.complete-btn {
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  color: white;
+}
+
+.complete-btn:hover {
+  background: linear-gradient(135deg, #27ae60, #1e8449);
+}
+
+.delete-btn {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+}
+
+.delete-btn:hover {
+  background: linear-gradient(135deg, #c0392b, #922b21);
+}
+
     </style>
 </head>
 <body>
@@ -509,12 +606,13 @@
                     <div class="user-details">
                         <b>{{i.title}}</b>
                         <p>{{i.description}}</p>
+                        <p>{{i.program_date}}</p>
                         <i class="time">{{i.announced_time}}</i>
                     </div>
                     {% if i.user == request.user %}
-                        <button class="end" data-id="{{i.id}}" type="button" onclick="endNotify(this)">End</button>
+                        <button class="notify-btn complete-btn end" data-id="{{i.id}}" type="button" onclick="endNotify(this)">End</button>
                         <div class="action-buttons">
-                            <button data-userid="{{i.id}}" onclick="deleteNotification(this)">Delete Review</button>
+                            <button class="notify-btn delete-btn" data-userid="{{i.id}}" onclick="deleteNotification(this)">Delete Review</button>
                         </div>
                     {% endif %}
                 </div>
@@ -546,6 +644,7 @@
                     <div class="user-details">
                         <b>{{i.title}}</b>
                         <p>{{i.description}}</p>
+                        <p>{{i.program_date}}</p>
                         <i class="time">{{i.announced_time}}</i>
                     </div>
                 </div>
@@ -564,6 +663,9 @@
     </div>
     
    <section>
+
+
+    <div class="loader" id="loader"></div>
   
  
 
@@ -572,7 +674,7 @@
       <span class="close-btn" onclick="closeModal()">&times;</span>
       <h2>Create New Entry</h2>
       <p>Fill out the details below to add a new entry.</p>
-      <form action="{% url 'dashboard:notification' %}" id="modalForm" method="post">
+      <form action="{% url 'dashboard:notification' %}" id="form" method="post">
         {% csrf_token %}
         <label for="title">Title</label>
         <input type="text" id="title" name="title" placeholder="Enter title..." required />
@@ -643,7 +745,7 @@
 
 
     const modalOverlay = document.getElementById('modalOverlay');
-    const modalForm = document.getElementById('modalForm');
+    const form = document.getElementById('form');
 
     function openModal() {
       modalOverlay.style.display = 'flex';
@@ -658,19 +760,33 @@
         closeModal();
       }
     }
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        loader.style.display = "block"; // Show loader
 
-    modalForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      let formdata=new FormData(e.target);
+        const formData = new FormData(form);
 
-      fetch(e.target.action,{
-        "method":"POST",
-        "body":formdata
-      }).then(res=>res.json()).then((data)=>{
-        console.log(data);
-        showAlert(data.status,data.title,data.message,"ok")
-      })
-      closeModal();
+        fetch(form.action, {
+            method: "POST",
+            body: formData,
+            
+        })
+            .then(res => res.json())
+            .then(data => {
+
+            if (data.status=="success"){
+                showAlert(data.status, data.title, data.message, "reload");
+            }
+            else{
+                showAlert(data.status, data.title, data.message, "ok");
+            }
+            
+            loader.style.display = "none"; // Hide loader after success
+            })
+            .catch(err => {
+            showAlert("error", "Submission Failed", err.message, "ok");
+            loader.style.display = "none"; // Hide loader after error
+            });
     });
 
     window.openModal=openModal;

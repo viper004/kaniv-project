@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+    {% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -40,6 +41,10 @@
         .nav-link:hover:after {
             width: 100%;
         }
+        a img{
+            width: 30px;
+            height: 30px;
+        }
     </style>
 </head>
 <body class="font-sans bg-gray-50">
@@ -64,8 +69,8 @@
                 
                 <div class="ml-4">
                     {% if request.user.is_authenticated %}
-                        <a href="{% url 'users:profile' %}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full font-medium transition duration-300">
-                            Profile
+                        <a href="{% url 'users:profile' %}">
+                            <img src="{% static 'icons/user.svg' %}" alt="{{request.user.username}}">
                         </a>
                     {% else %}
                         <a href="{% url 'users:login' %}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full font-medium transition duration-300">Login</a>
@@ -95,7 +100,7 @@
                 <div class="pt-4 border-t border-gray-200">
                     {% if request.user.is_authenticated %}
                         <a href="{% url 'users:profile' %}" class="block w-full px-4 py-2 text-left text-base font-medium rounded-full bg-blue-500 text-white hover:bg-blue-600">
-                            Profile
+                            <img src="{% static 'icons/user.svg' %}" alt="{{request.user.username}}">
                         </a>
                     {% else %}
                         <a href="{% url 'users:login' %}" class="block w-full px-4 py-2 text-left text-base font-medium rounded-full bg-blue-500 text-white hover:bg-blue-600">

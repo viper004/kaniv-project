@@ -1,8 +1,6 @@
 from django.urls import path
 from coordinator import views
 
-from convenier.views import changeDuty
-
 app_name="coordinator"
 
 urlpatterns=[

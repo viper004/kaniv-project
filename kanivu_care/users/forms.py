@@ -69,11 +69,11 @@ class UserRegistrationForm(forms.ModelForm):
 
 
 class userUpdateForm(UserChangeForm):
-    username=forms.CharField(max_length=150,required=True,widget=forms.TextInput(attrs={
+    username=forms.CharField(max_length=150,error_messages={'required':'Username is required'},required=True,widget=forms.TextInput(attrs={
         "id":"username"
     }))
 
-    first_name=forms.CharField(label="Name",max_length=15,widget=forms.TextInput(attrs={
+    first_name=forms.CharField(label="Name",error_messages={'required':'Name is required'},max_length=15,widget=forms.TextInput(attrs={
         "id":"fname"
     }))
 
@@ -93,7 +93,7 @@ class userProfileUpdateForm(forms.ModelForm):
         ("female", "female"),
     )
 
-    gender=forms.ChoiceField(choices=GENDER,widget=forms.Select(attrs={
+    gender=forms.ChoiceField(choices=GENDER,error_messages={'required':'Gender is required'},widget=forms.Select(attrs={
         "id":"gender"
     }))
 

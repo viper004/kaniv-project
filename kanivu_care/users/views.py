@@ -352,7 +352,7 @@ def UpdateProfile(req):
 
 @login_required(login_url="/users/login/")
 def verifyPhoneNumber(req):
-    phno=req.GET.get("phno","")
+    phno=req.GET.get("phno")
 
     if not phno.isdigit() or len(phno)!=10:
         return JsonResponse({
