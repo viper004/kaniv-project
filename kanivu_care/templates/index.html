@@ -62,7 +62,6 @@
                 <a href="#" class="nav-link text-gray-700 hover:text-blue-500">Home</a>
                 <a href="#" class="nav-link text-gray-700 hover:text-blue-500">About</a>
                 <a href="#" class="nav-link text-gray-700 hover:text-blue-500">Causes</a>
-                <a href="{% url 'convenier:convenier' %}" class="nav-link text-gray-700 hover:text-blue-500">Convenier</a>
                 {% if request.user.is_authenticated and not request.user.userprofile.role == "public_user" %}
                     <a href="{% url 'dashboard:dashboard' %}" class="nav-link text-gray-700 hover:text-blue-500">Dashboard</a>
                 {% endif %}
@@ -92,7 +91,6 @@
                 <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">Home</a>
                 <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">About</a>
                 <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">Causes</a>
-                <a href="{% url 'convenier:convenier' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">Convenier</a>
                 {% if not request.user.userprofile.role == "public_user" %}
                     <a href="{% url 'dashboard:dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">Dashboard</a>
                 {% endif %}

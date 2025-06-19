@@ -1,181 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gradient Confirmation Modal</title>
-  <style>
-    /* Base Styles */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    body {
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    }
-
-    /* Modal Container */
-    .modal-section {
-      width: 100%;
-      max-width: 500px;
-      margin: 2rem;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 16px;
-      padding: 2px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-      overflow: hidden;
-    }
-
-    .modal-content {
-      background: white;
-      border-radius: 14px;
-      padding: 2.5rem;
-      text-align: center;
-      position: relative;
-    }
-
-    /* Icon */
-    .modal-icon {
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
-      border-radius: 50%;
-      box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
-    }
-
-    .modal-icon svg {
-      width: 40px;
-      height: 40px;
-      stroke: #fff;
-      stroke-width: 2;
-    }
-
-    /* Text */
-    .modal-title {
-      font-size: 1.75rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .modal-message {
-      color: #52525b;
-      line-height: 1.6;
-      margin-bottom: 2rem;
-    }
-
-    .member-name {
-      font-weight: 600;
-      color: #3f3f46;
-    }
-
-    /* Buttons */
-    .modal-actions {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-    }
-
-    .modal-btn {
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      min-width: 120px;
-    }
-
-    .cancel-btn {
-      background: #f4f4f5;
-      color: #71717a;
-    }
-
-    .cancel-btn:hover {
-      background: #e4e4e7;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    .confirm-btn {
-      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
-      color: white;
-      box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
-    }
-
-    .confirm-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(255, 154, 158, 0.4);
-      background: linear-gradient(135deg, #fad0c4 0%, #ff9a9e 100%);
-    }
-
-    /* Responsive */
-    @media (max-width: 600px) {
-      .modal-content {
-        padding: 1.5rem;
-      }
-      
-      .modal-actions {
-        flex-direction: column;
-      }
-      
-      .modal-btn {
-        width: 100%;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elegant Delete Confirmation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Modern font */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        /* Modal backdrop */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+        }
+        
+        /* Modal container with gradient */
+        .modal-container {
+            background: linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(248,249,252,0.98) 100%);
+            border-radius: 16px;
+            width: 420px;
+            max-width: 90%;
+            box-shadow: 
+                0 12px 28px rgba(0, 0, 0, 0.12),
+                0 8px 20px rgba(0, 0, 0, 0.08);
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        /* Modal content */
+        .modal-content {
+            padding: 32px;
+            text-align: center;
+        }
+        
+        /* Warning icon */
+        .warning-icon {
+            font-size: 64px;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 4px 8px rgba(255, 71, 87, 0.2));
+            animation: pulse 1.8s infinite cubic-bezier(0.4, 0, 0.6, 1);
+        }
+        
+        /* Modal title */
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            letter-spacing: -0.2px;
+        }
+        
+        /* Modal description */
+        .modal-description {
+            color: #666;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 28px;
+            font-weight: 400;
+            max-width: 320px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Button container */
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+        
+        /* Buttons */
+        .modal-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            font-size: 15px;
+            letter-spacing: 0.2px;
+        }
+        
+        .cancel-btn {
+            background-color: rgba(0, 0, 0, 0.04);
+            color: #444;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+        
+        .cancel-btn:hover {
+            background-color: rgba(0, 0, 0, 0.08);
+            transform: translateY(-1px);
+        }
+        
+        .confirm-btn {
+            background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.2);
+        }
+        
+        .confirm-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(255, 71, 87, 0.3);
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+    </style>
 </head>
 <body>
-  <section class="modal-section">
-    <div class="modal-content">
-      <!-- Icon -->
-      <div class="modal-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="8" x2="12" y2="12"></line>
-          <line x1="12" y1="16" x2="12.01" y2="16"></line>
-        </svg>
-      </div>
-      
-      <!-- Title -->
-      <h2 class="modal-title">Remove Member?</h2>
-      
-      <!-- Message -->
-      <p class="modal-message">This will immediately revoke all access for <span class="member-name">Alex Johnson</span>. This action cannot be undone.</p>
-      
-      <!-- Buttons -->
-      <div class="modal-actions">
-        <button class="modal-btn cancel-btn">Cancel</button>
-        <button class="modal-btn confirm-btn">Remove Member</button>
-      </div>
+    <!-- Modal Backdrop -->
+    <div class="modal-backdrop">
+        <!-- Modal Container -->
+        <div class="modal-container">
+            <!-- Modal Content -->
+            <div class="modal-content">
+                <div class="warning-icon">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+                <h2 class="modal-title">Delete this content?</h2>
+                <p class="modal-description">
+                    This action will permanently remove the item from your collection. You won't be able to recover it later.
+                </p>
+                <div class="button-container">
+                    <button class="modal-btn cancel-btn">Cancel</button>
+                    <button class="modal-btn confirm-btn">Delete Forever</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </section>
-
-  <script>
-    // Simple interaction example
-    document.querySelector('.confirm-btn').addEventListener('click', function() {
-      alert('Member removed successfully!');
-      // In a real app, you would have your removal logic here
-    });
-    
-    document.querySelector('.cancel-btn').addEventListener('click', function() {
-      alert('Action canceled.');
-      // In a real app, you might close the modal or do nothing
-    });
-  </script>
 </body>
 </html>

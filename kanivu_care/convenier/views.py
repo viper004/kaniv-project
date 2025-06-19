@@ -10,11 +10,6 @@ from convenier.forms import convenierMemberLoginForm
 from convenier.functions import form_errors
 
 # Create your views here.
-@login_required(login_url="/users/login")
-def Convenier(req):
-    if not req.user.userprofile.role == "convenier":
-        return HttpResponseRedirect("/")
-    return render(req,"convenier/index.html")
 
 @login_required(login_url="/users/login")
 def createMember(req):

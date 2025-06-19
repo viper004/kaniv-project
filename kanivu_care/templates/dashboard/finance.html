@@ -543,6 +543,127 @@
       margin-right: 8px;
     }
 
+
+    
+.modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+        }
+        
+        /* Modal container with gradient */
+        .modal-container {
+            background: linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(248,249,252,0.98) 100%);
+            border-radius: 16px;
+            width: 420px;
+            max-width: 90%;
+            box-shadow: 
+                0 12px 28px rgba(0, 0, 0, 0.12),
+                0 8px 20px rgba(0, 0, 0, 0.08);
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        /* Modal content */
+        .modal-content {
+            padding: 32px;
+            text-align: center;
+        }
+        
+        /* Warning icon */
+        .warning-icon {
+            font-size: 64px;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 4px 8px rgba(255, 71, 87, 0.2));
+            animation: pulse 1.8s infinite cubic-bezier(0.4, 0, 0.6, 1);
+        }
+        
+        /* Modal title */
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            letter-spacing: -0.2px;
+        }
+        
+        /* Modal description */
+        .modal-description {
+            color: #666;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 28px;
+            font-weight: 400;
+            max-width: 320px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Button container */
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+        
+        /* Buttons */
+        .modal-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            font-size: 15px;
+            letter-spacing: 0.2px;
+        }
+        
+        .cancel-btn {
+            background-color: rgba(0, 0, 0, 0.04);
+            color: #444;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+        
+        .cancel-btn:hover {
+            background-color: rgba(0, 0, 0, 0.08);
+            transform: translateY(-1px);
+        }
+        
+        .confirm-btn {
+            background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.2);
+        }
+        
+        .confirm-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(255, 71, 87, 0.3);
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
     </style>
 </head>
 <body>
@@ -627,6 +748,28 @@
       </form>
     </div>
   </div>
+
+  
+<div class="modal-backdrop" id="confirm_modal">
+        <!-- Modal Container -->
+        <div class="modal-container">
+            <!-- Modal Content -->
+            <div class="modal-content">
+                <div class="warning-icon">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+                <h2 class="modal-title">Delete This Record?</h2>
+                <p class="modal-description">
+                    Are you sure that you wanted to delete this record.
+                </p>
+                <div class="button-container">
+                    <button class="modal-btn cancel-btn" id="cancel">Cancel</button>
+                    <button class="modal-btn confirm-btn" id="confirm">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 
   <div id="image_view">
@@ -716,8 +859,33 @@
         imageView.style.display="none";
     }
 
-   const deleteFinance=(e)=>{
-        if (!confirm("Are you sure wanted to delete")){
+    
+    const showConfirmation=()=>{
+       
+
+        return new Promise((resolve) => {
+            confirm_modal.style.display="flex";
+            let cancel=document.getElementById("cancel");
+            let confirmReq=document.getElementById("confirm");
+
+            cancel.onclick=()=>{
+                confirm_modal.style.display="none";
+                resolve(false);
+            }
+
+            confirmReq.onclick=()=>{
+                confirm_modal.style.display="none";
+                resolve(true)
+            }
+        })
+    }
+
+
+    const deleteFinance=async(e)=>{
+
+        let isConfirmed=await showConfirmation()
+    
+        if (!isConfirmed){
             return;
         }
         let url=`/dashboard/delete_finance/${e.dataset.userid}/`;
