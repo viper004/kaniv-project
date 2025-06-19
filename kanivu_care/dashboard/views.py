@@ -310,7 +310,7 @@ def kickMember(req):
     
 @login_required(login_url="users:login")
 def manageMembers(req):
-    if not (req.user.userprofile.role in ["convenier","coordinator"]):
+    if (req.user.userprofile.role == "public_user"):
         return HttpResponseRedirect("/")
 
 

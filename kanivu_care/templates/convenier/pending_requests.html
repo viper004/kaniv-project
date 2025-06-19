@@ -205,13 +205,14 @@
                 <div class="value">{{ i.user.memberregistration.duty }}</div>
                 </div>
                 <div class="button-group">
-                    <button type="button" class="btn btn-approve" id="approve" data-userid="{{i.user.id}}">✅ Approve</button>
-                    <button type="button" onclick="openModal()" class="btn btn-reject">❌ Reject</button>
+                    <button type="button" class="btn btn-approve" onclick="approveMember(this)" data-userid="{{i.user.id}}">✅ Approve</button>
+                    <button type="button" onclick="openModal(this)" data-userid="{{i.user.id}}" class="btn btn-reject">❌ Reject</button>
                 </div>
             </div>
 
 
             <!-- Modal -->
+            {% endfor %}
             <div class="modal" id="rejectModal">
                 <div class="modal-content">
                     <h3>Reason for Rejection</h3>
@@ -224,7 +225,6 @@
                     </div>
                 </div>
             </div>
-        {% endfor %}
     {% else %}
         <div class="glass-card">
             <h2>No pending requests</h2>
@@ -241,13 +241,13 @@
 
     
 
-    approve.addEventListener("click",()=>{
-        let userid=approve.dataset.userid;
+    const approveMember=(e)=>{
+        let userid=e.dataset.userid;
         let url=`/convenier/request_response/approve/${userid}/`;
         try{
             fetch(url).then(res=>res.json()).then((data)=>{
                 if (data.status=="success"){
-                    showAlert(data.status,data.title,data.message,"/convenier/pending_requests/");
+                    showAlert(data.status,data.title,data.message,"reload");
                 }
                 else{
                     showAlert(data.status,data.title,data.message,"ok");
@@ -257,8 +257,7 @@
         catch(error){
             showAlert("error","An error occured",error.message,"ok");
         }
-    });
-
+    }
     reject.addEventListener("click",()=>{
         const reason=document.getElementById("reason").value.trim();
 
@@ -266,11 +265,11 @@
         if (reason.length==0){
             return showAlert("error","Invalid reason","Reason connaot be blank","ok")
         }
-        let url=`/convenier/request_response/reject/${reject.dataset.id}/?reason=${encodeURIComponent(reason)}`;
+        let url=`/convenier/request_response/reject/${reject.dataset.userid}/?reason=${encodeURIComponent(reason)}`;
         try{
             fetch(url).then(res=>res.json()).then((data)=>{
                 if (data.status=="success"){
-                    showAlert(data.status,data.title,data.message,"/convenier/pending_requests/");
+                    showAlert(data.status,data.title,data.message,"reload");
                 }
                 else{
                     showAlert(data.status,data.title,data.message,"ok");
@@ -284,8 +283,9 @@
     })
 
 
-    function openModal() {
-      document.getElementById("rejectModal").style.display = "flex";
+    function openModal(e) {
+        reject.setAttribute("data-userid",e.dataset.userid)
+        document.getElementById("rejectModal").style.display = "flex";
     }
     function closeModal() {
       document.getElementById("rejectModal").style.display = "none";
@@ -293,6 +293,8 @@
 
     window.openModal=openModal;
     window.closeModal=closeModal;
+    window.approveMember=approveMember;
+
 
 
   </script>

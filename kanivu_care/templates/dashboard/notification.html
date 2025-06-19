@@ -573,6 +573,13 @@
   background: linear-gradient(135deg, #c0392b, #922b21);
 }
 
+.description{
+  text-wrap:wrap;
+  font-weight: bolder;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-size: 15px;
+}
+
     </style>
 </head>
 <body>
@@ -605,7 +612,7 @@
                     </div>
                     <div class="user-details">
                         <b>{{i.title}}</b>
-                        <p>{{i.description}}</p>
+                        <pre class="description">{{i.description}}</pre>
                         <p>{{i.program_date}}</p>
                         <i class="time">{{i.announced_time}}</i>
                     </div>
@@ -643,7 +650,7 @@
                     </div>
                     <div class="user-details">
                         <b>{{i.title}}</b>
-                        <p>{{i.description}}</p>
+                            <pre class="description">{{i.description}}</pre>
                         <p>{{i.program_date}}</p>
                         <i class="time">{{i.announced_time}}</i>
                     </div>

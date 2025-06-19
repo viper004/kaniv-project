@@ -1,204 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Stylish Modal</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gradient Confirmation Modal</title>
   <style>
+    /* Base Styles */
     * {
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: url('https://source.unsplash.com/random/1600x900') no-repeat center center/cover;
-      margin: 0;
-      padding: 0;
-      height: 100vh;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+
+    /* Modal Container */
+    .modal-section {
+      width: 100%;
+      max-width: 500px;
+      margin: 2rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 16px;
+      padding: 2px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
       overflow: hidden;
     }
 
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(8px);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-    }
-
-    .modal {
-      background: #ffffff;
-      border-radius: 15px;
-      padding: 30px 35px;
-      width: 420px;
-      max-width: 95%;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
-      animation: fadeInScale 0.35s ease;
+    .modal-content {
+      background: white;
+      border-radius: 14px;
+      padding: 2.5rem;
+      text-align: center;
       position: relative;
     }
 
-    @keyframes fadeInScale {
-      from {
-        opacity: 0;
-        transform: scale(0.9);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
+    /* Icon */
+    .modal-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+      border-radius: 50%;
+      box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
     }
 
-    .modal h2 {
-      margin-top: 0;
-      font-size: 24px;
-      color: #2c3e50;
+    .modal-icon svg {
+      width: 40px;
+      height: 40px;
+      stroke: #fff;
+      stroke-width: 2;
     }
 
-    .modal p {
-      font-size: 14px;
-      color: #555;
-      margin-bottom: 20px;
+    /* Text */
+    .modal-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
 
-    .modal label {
+    .modal-message {
+      color: #52525b;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    .member-name {
       font-weight: 600;
-      margin: 10px 0 5px;
-      display: block;
-      color: #444;
+      color: #3f3f46;
     }
 
-    .modal input[type="text"],
-    .modal textarea {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 15px;
-      background: #f9f9f9;
-      transition: all 0.2s ease;
+    /* Buttons */
+    .modal-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
     }
 
-    .modal input[type="text"]:focus,
-    .modal textarea:focus {
-      border-color: #4a90e2;
-      background: #fff;
-      outline: none;
-    }
-
-    .modal textarea {
-      min-height: 100px;
-      max-height: 400px;
-      resize: vertical;
-    }
-
-    .submit-btn {
-      width: 100%;
-      margin-top: 20px;
-      padding: 12px;
-      background: linear-gradient(to right, #4a90e2, #357abd);
-      color: #fff;
-      font-size: 16px;
-      font-weight: bold;
+    .modal-btn {
+      padding: 0.75rem 1.5rem;
       border: none;
       border-radius: 8px;
+      font-weight: 600;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: all 0.3s ease;
+      min-width: 120px;
     }
 
-    .submit-btn:hover {
-      background: linear-gradient(to right, #357abd, #2d6bb3);
+    .cancel-btn {
+      background: #f4f4f5;
+      color: #71717a;
     }
 
-    .close-btn {
-      position: absolute;
-      top: 12px;
-      right: 15px;
-      font-size: 24px;
-      color: #aaa;
-      cursor: pointer;
-      transition: color 0.2s ease;
+    .cancel-btn:hover {
+      background: #e4e4e7;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
-    .close-btn:hover {
-      color: #111;
-    }
-
-    .open-modal-btn {
-      margin: 100px auto;
-      display: block;
-      padding: 14px 30px;
-      font-size: 16px;
-      font-weight: bold;
-      border: none;
-      border-radius: 6px;
-      background-color: #4a90e2;
+    .confirm-btn {
+      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
       color: white;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      transition: background 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
     }
 
-    .open-modal-btn:hover {
-      background-color: #357abd;
+    .confirm-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 154, 158, 0.4);
+      background: linear-gradient(135deg, #fad0c4 0%, #ff9a9e 100%);
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .modal-content {
+        padding: 1.5rem;
+      }
+      
+      .modal-actions {
+        flex-direction: column;
+      }
+      
+      .modal-btn {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-
-  <button class="open-modal-btn" onclick="openModal()">Open Modal</button>
-
-  <div class="modal-overlay" id="modalOverlay">
-    <div class="modal">
-      <span class="close-btn" onclick="closeModal()">&times;</span>
-      <h2>Create New Entry</h2>
-      <p>Fill out the details below to add a new entry.</p>
-      <form id="modalForm">
-        <label for="title">Title</label>
-        <input type="text" id="title" name="title" placeholder="Enter title..." required />
-
-        <label for="description">Description</label>
-        <textarea id="description" name="description" placeholder="Write a description..." required></textarea>
-
-        <button type="submit" class="submit-btn">Submit</button>
-      </form>
+  <section class="modal-section">
+    <div class="modal-content">
+      <!-- Icon -->
+      <div class="modal-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </div>
+      
+      <!-- Title -->
+      <h2 class="modal-title">Remove Member?</h2>
+      
+      <!-- Message -->
+      <p class="modal-message">This will immediately revoke all access for <span class="member-name">Alex Johnson</span>. This action cannot be undone.</p>
+      
+      <!-- Buttons -->
+      <div class="modal-actions">
+        <button class="modal-btn cancel-btn">Cancel</button>
+        <button class="modal-btn confirm-btn">Remove Member</button>
+      </div>
     </div>
-  </div>
+  </section>
 
   <script>
-    const modalOverlay = document.getElementById('modalOverlay');
-    const modalForm = document.getElementById('modalForm');
-
-    function openModal() {
-      modalOverlay.style.display = 'flex';
-    }
-
-    function closeModal() {
-      modalOverlay.style.display = 'none';
-    }
-
-    window.onclick = function(event) {
-      if (event.target === modalOverlay) {
-        closeModal();
-      }
-    }
-
-    modalForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const title = document.getElementById('title').value;
-      const description = document.getElementById('description').value;
-
-      alert(`Submitted:\nTitle: ${title}\nDescription: ${description}`);
-
-      modalForm.reset();
-      closeModal();
+    // Simple interaction example
+    document.querySelector('.confirm-btn').addEventListener('click', function() {
+      alert('Member removed successfully!');
+      // In a real app, you would have your removal logic here
+    });
+    
+    document.querySelector('.cancel-btn').addEventListener('click', function() {
+      alert('Action canceled.');
+      // In a real app, you might close the modal or do nothing
     });
   </script>
-
 </body>
 </html>

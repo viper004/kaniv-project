@@ -203,7 +203,7 @@
     </header>
 
     <section id="items">
-        {% if request.user.userprofile.role == "convenier" or request.user.userprofile.role == "coordinator" %}
+        {% if not request.user.userprofile.role == "public_user" %}
             <div class="item" onclick="window.location.href='/dashboard/manage_members/'">
                 <div class="item-content">
                     <div class="item-icon">
@@ -214,7 +214,6 @@
                     
                 </div>
             </div>
-        {% endif %}
       
         <div class="item" onclick="window.location.href='/dashboard/notification/'">
             <div class="item-content">
@@ -237,6 +236,8 @@
                 
             </div>
         </div>
+        {% endif %}
+        
     </section>
 
     <script>

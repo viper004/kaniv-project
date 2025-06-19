@@ -480,7 +480,7 @@
         background-repeat: no-repeat;
         background-size: contain;
         background-position: center;
-        position: absolute;
+        position: fixed;
         left: 50%;
         box-shadow: 0 15px 35px rgba(0,0,0,0.1);
         padding: 2rem;
@@ -630,6 +630,7 @@
 
 
   <div id="image_view">
+    <i data-feather="download" onclick="downloadImage(this)"></i>
     <i data-feather="x" id="close" onclick="closeImage()"></i>
   </div>
 
@@ -665,19 +666,33 @@
     feather.replace()
 
     
+    
 
     document.addEventListener("keydown",(e)=>{
         if (e.key=="Escape"){
-            closePendingModal();
-            closeNestedModal();
+           imageView.style.display="none"
         }
     })
 
     const viewImage=(e)=>{
-        console.log(e.dataset.img);
         imageView.style.display="flex";
         imageView.style.backgroundImage=`url('${e.dataset.img}')`
 
+    }
+
+    const downloadImage=(e)=>{
+        let image=e.parentNode.style.backgroundImage.slice(5,-2);
+        console.log(image);
+
+        let filename=image.split('/').pop().split('?')[0]
+
+
+        let link=document.createElement("a");
+        link.href=link;
+        link.download=filename || "downloaded_image.jpg"
+        document.body.appendChild(link)
+        link.click();
+        document.body.removeChild(link)
     }
 
      const modalOverlay = document.getElementById('modalOverlay');
@@ -723,6 +738,7 @@
     window.deleteFinance=deleteFinance;
     window.openModal=openModal;
     window.closeModal=closeModal;
+    window.downloadImage=downloadImage;
 
 
 

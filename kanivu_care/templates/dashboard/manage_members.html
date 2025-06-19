@@ -672,12 +672,14 @@ aside .pending_lists{
                         <span class="detail-label">Duty:</span>
                         <span class="detail-value">{{ i.user.memberregistration.duty }}</span>
                     </div>
+                </div>
+                {% if request.user.userprofile.role == "convenier" or request.user.userprofile.role == "coordinator" %}
+                    <div class="action-buttons">
                         <span class="detail-label" id="change_duty_modal_btn" data-userid="{{i.user.id}}" data-duty="{{ i.user.memberregistration.duty }}" onclick="selectedUser(this)">Change Duty</span>
-                </div>
-                <div class="action-buttons">
-                    <button class="kick-btn" type="button" onclick="kick(this)" data-delid="{{i.user.id}}"><i class="fas fa-user-slash"></i> Kick {{i.user.username}}</button>
-                    <button data-id="{{i.user.id}}" class="promote btn btn-primary">Promote to Coordinator</button>
-                </div>
+                        <button class="kick-btn" type="button" onclick="kick(this)" data-delid="{{i.user.id}}"><i class="fas fa-user-slash"></i> Kick {{i.user.username}}</button>
+                        <button data-id="{{i.user.id}}" class="promote btn btn-primary">Promote to Coordinator</button>
+                    </div>
+                {% endif %}
             </div>
             
 
@@ -779,7 +781,7 @@ aside .pending_lists{
 
     const kick=(e)=>{
         if (confirm("Are you sure that you wanted to kick this user from member.")){
-            let url=`/convenier/kick_member/?id=${e.dataset.delid}`;
+            let url=`/dashboard/kick_member/?id=${e.dataset.delid}`;
 
             fetch(url).then(res=>res.json()).then((data)=>{
                 if (data.status=="success"){
