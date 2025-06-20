@@ -252,7 +252,6 @@ def changeDuty(req):
 
 @login_required(login_url="users:login")
 def kickMember(req):
-    print("User:", req.user.userprofile)
 
     if req.user.userprofile.role not in ["coordinator", "convenier"]:
         return JsonResponse({
@@ -326,7 +325,6 @@ def manageMembers(req):
         "members":members,
         "coordinators":coordinators,
         "pending_requests":pending_requests,
-        "pending_requests_count":pending_requests.count()
     }
     return render(req,"dashboard/manage_members.html",context=cntx)
 
