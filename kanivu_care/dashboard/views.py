@@ -84,8 +84,8 @@ def Notification(req):
         today=timezone.localdate()
         NotifyModel.objects.filter(is_completed=False,program_date__lt=today).update(is_completed=True)
         
-        pendingNotifications=NotifyModel.objects.filter(is_completed=False)
-        completedNotification=NotifyModel.objects.filter(is_completed=True)
+        pendingNotifications=NotifyModel.objects.filter(is_completed=False).order_by("-program_date")
+        completedNotification=NotifyModel.objects.filter(is_completed=True).order_by("-program_date")
     return render(req,"dashboard/notification.html",context={"pending_notifications":pendingNotifications,"completed_notifications":completedNotification,"today":today.isoformat()})
 
 

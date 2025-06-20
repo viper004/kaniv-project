@@ -201,16 +201,19 @@
       <label for="password">Enter Password</label>
       <input type="password" name="password" id="password" />
 
-      <label>Enter SMS OTP.</label>
-      <input type="hidden" name="sms_otp" id="sms_otp_collection">
-      <div class="otp-container" id="sms_otp_container">
-        <input type="text" maxlength="1" />
-        <input type="text" maxlength="1" />
-        <input type="text" maxlength="1" />
-        <input type="text" maxlength="1" />
-        <input type="text" maxlength="1" />
-        <input type="text" maxlength="1" />
-      </div>
+        {% if request.user.userprofile.phone_number %}
+            <label>Enter SMS OTP.</label>
+            <input type="hidden" name="sms_otp" id="sms_otp_collection">
+            <div class="otp-container" id="sms_otp_container">
+                <input type="text" maxlength="1" oninput="moveNext(this)" onkeydown="movePrev(event,this)" />
+                <input type="text" maxlength="1" oninput="moveNext(this)" onkeydown="movePrev(event,this)" />
+                <input type="text" maxlength="1" oninput="moveNext(this)" onkeydown="movePrev(event,this)" />
+                <input type="text" maxlength="1" oninput="moveNext(this)" onkeydown="movePrev(event,this)" />
+                <input type="text" maxlength="1" oninput="moveNext(this)" onkeydown="movePrev(event,this)" />
+                <input type="text" maxlength="1" oninput="moveNext(this)" onkeydown="movePrev(event,this)" />
+            </div>
+        {% endif %}
+
 
       <label>Enter Email OTP.</label>
       <input type="hidden" name="email_otp" id="email_otp_collection">
@@ -270,6 +273,20 @@
       });
     });
 
+     const moveNext=(input)=>{
+            if (input.value.length===1){
+                let next=input.nextElementSibling;
+                if (next) next.focus()
+            }
+        }
+        const movePrev=(event,input)=>{
+            if (event.key=="Backspace" && input.value==""){
+                let prev=input.previousElementSibling;
+                if (prev) prev.focus();
+            }
+        }
+
+
 
     deleteAccount.addEventListener("submit",(e)=>{
         e.preventDefault();
@@ -278,13 +295,20 @@
         }
 
         loader.style.display="block";
+
         let sms_otp_container=document.querySelectorAll("#sms_otp_container input")
-        let smsotp=Array.from(sms_otp_container).map(inp=>inp.value).join("")
-        smsOTPCollection.value=smsotp;
+        if (sms_otp_container.length>0){
+            let smsotp=Array.from(sms_otp_container).map(inp=>inp.value).join("")
+            smsOTPCollection.value=smsotp;
+        }
 
         let email_otp_container=document.querySelectorAll("#email_otp_container input")
         let emailotp=Array.from(email_otp_container).map(inp=>inp.value).join("")
         emailOTPCollection.value=emailotp;
+
+
+        
+       
         
 
         let formdata=new FormData(e.target);
@@ -314,6 +338,11 @@
             btn.disabled=true;
         }
     })
+
+
+    window.moveNext=moveNext;
+    window.movePrev=movePrev;
+
   </script>
 <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 

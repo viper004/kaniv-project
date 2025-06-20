@@ -622,12 +622,12 @@
 
     <div class="input-group">
       <input type="password" name="new_password1" id="newpwd1" placeholder=" " autocomplete="off" maxlength="20" required>
-      <label for="newpwd1">Old Password</label>
+      <label for="newpwd1">New Password</label>
     </div>
 
     <div class="input-group">
       <input type="password" name="new_password2" id="newpwd2" placeholder=" " autocomplete="off" maxlength="20" required>
-      <label for="newpwd2">Old Password</label>
+      <label for="newpwd2">New Password</label>
     </div>
     <button type="submit">Update Password</button>
 
@@ -722,7 +722,7 @@
                 }).then(res=>res.json()).then((data)=>{
                     console.log(data);
                     if (data.status=="success"){
-                        showAlert(data.status,data.title,data.message,"/dashboard/")
+                        showAlert(data.status,data.title,data.message,"reload")
                     }
                     else{
                         showAlert(data.status,data.title,data.message,"ok");

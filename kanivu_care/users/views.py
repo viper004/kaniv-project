@@ -50,8 +50,8 @@ def Register(req):
             return JsonResponse({
                 "status":"success",
                 "role":"student",
-                "title":"Account created!",
-                "message":"registration successful, please verify your phone number"
+                "title":"Verification code sent successfully",
+                "message":"registration successful, please verify your email with OTP"
             })
 
         else:
@@ -114,13 +114,6 @@ def numVerify(req):
             userp,_=UserProfile.objects.get_or_create(user=user)
 
             userp.role="public_user"
-
-
-
-            print("user name ",username)
-            print("password ",password)
-            
-            
             req.session.flush()
             loginUser=authenticate(req,username=username,password=password)
             print("login user ",loginUser)
@@ -246,8 +239,23 @@ def deleteAccount(req):
                 "message":"The entered password is incorrect.Recheck your password and try again"
             })
         
-        if SmsEnteredOTP and (SmsEnteredOTP==SmsStoredOTP):
-            if emailEnteredOTP and (emailEnteredOTP==emailStoredOTP):
+        if emailEnteredOTP and (emailEnteredOTP==emailStoredOTP):
+            if req.user.userprofile.phone_number:
+                if SmsEnteredOTP and (SmsEnteredOTP==SmsStoredOTP):
+                    req.user.delete()
+                    req.session.flush()
+                    return JsonResponse({
+                        "status":"success",
+                        "title":"Account deleted successfully",
+                        "message":"Your account is deleted successfully.Now you can't recover your account"
+                    })
+                else:
+                    return JsonResponse({
+                        "status":"error",
+                        "title":"Invalid OTP",
+                        "message":"The entered OTP of phone number was incorrect.Try again!"
+                    })
+            else:
                 req.user.delete()
                 req.session.flush()
                 return JsonResponse({
@@ -255,30 +263,28 @@ def deleteAccount(req):
                     "title":"Account deleted successfully",
                     "message":"Your account is deleted successfully.Now you can't recover your account"
                 })
-            else:
-                return JsonResponse({
-                    "status":"error",
-                    "title":"Invalid OTP",
-                    "message":"The entered OTP of email was incorrect.Try again!"
-                })
+                
         else:
             return JsonResponse({
                 "status":"error",
                 "title":"Invalid OTP",
-                "message":"The entered OTP of phone number was incorrect.Try again!"
+                "message":"The entered OTP of email was incorrect.Try again!"
             })
         
     else:
-        smsotp="".join(str(secrets.randbelow(10)) for i in range(6))
-        print("Account deletion otp for sms is ",smsotp)
-        req.session["account_deletion_otp_for_sms"]=smsotp
+        if req.user.userprofile.phone_number:
+            smsotp="".join(str(secrets.randbelow(10)) for i in range(6))
+            print("Account deletion otp for sms is ",smsotp)
+            req.session["account_deletion_otp_for_sms"]=smsotp
+
+            phno=req.user.userprofile.phone_number
+            print("current user phone number is ",phno)
 
         emailotp="".join(str(secrets.randbelow(10)) for i in range(6))
         print("Account deletion otp for email is ",emailotp)
         req.session["account_deletion_otp_for_email"]=emailotp
 
-        phno=req.user.userprofile.phone_number
-        print("current user phone number is ",phno)
+        
     return render(req,"users/delete_account.html")
 
 
