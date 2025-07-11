@@ -27,8 +27,20 @@ class FinanceModel(models.Model):
     description=models.TextField()
     collection_date=models.DateField()
     announced_date=models.DateField(auto_now_add=True)
-    image=models.ImageField(upload_to="media/finance/")
+    image=models.ImageField(upload_to="finance/")
 
     def __str__(self):
         return self.user.username
     
+class KitReceiverModel(models.Model):
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    name=models.CharField(max_length=30)
+    age=models.IntegerField()
+    family=models.TextField()
+    address=models.TextField()
+    location=models.URLField(max_length=255)
+    photo=models.ImageField(upload_to="kit/")
+    announced_date=models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name

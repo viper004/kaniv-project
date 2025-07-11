@@ -310,9 +310,9 @@ def UpdateProfile(req):
     
     if req.method=="POST":
         if req.user.is_authenticated:
-            user_form=userUpdateForm(req.POST or None,instance=req.user)
+            user_form=userUpdateForm(req.POST,instance=req.user)
             profile, created = UserProfile.objects.get_or_create(user=req.user)
-            profile_form = userProfileUpdateForm(req.POST or None, instance=profile)
+            profile_form = userProfileUpdateForm(req.POST,req.FILES, instance=profile)
 
             
             if user_form.is_valid() and profile_form.is_valid():
@@ -360,6 +360,8 @@ def UpdateProfile(req):
 def verifyPhoneNumber(req):
     phno=req.GET.get("phno")
 
+    print(phno)
+
     if not phno.isdigit() or len(phno)!=10:
         return JsonResponse({
             "status": "error",
@@ -388,7 +390,7 @@ def verifyPhoneNumber(req):
 @login_required(login_url="/users/login/")
 def updatePhoneNumber(req):
     if (req.method=="POST"):
-        enteredOTP=req.POST.get("otp_collection")
+        enteredOTP=req.POST.get("num_otp_collection")
         storedOTP=req.session.get("update_num_otp")
 
         if not storedOTP:

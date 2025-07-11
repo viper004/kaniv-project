@@ -477,7 +477,7 @@
         <p>Update your personal information</p>
     </div>
 
-    <form id="profileForm" class="edit-card" action="{% url 'users:update' %}" method="post">
+    <form id="profileForm" class="edit-card" action="{% url 'users:update' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
         
@@ -506,6 +506,10 @@
 
         <div class="form-group">
             <button type="button" onclick="openModal('change_password_form')" class="upload-btn">Change Password</button>
+        </div>
+        <div class="form-group">
+            <label for="photo" class="upload-btn">Update Photo</label>
+            <input type="file" name="photo" id="photo" accept="image" style="display: none;"/>
         </div>
 
         <div class="form-group">
@@ -538,6 +542,7 @@
         </div>
     </form>
 </div>
+
 
 
     

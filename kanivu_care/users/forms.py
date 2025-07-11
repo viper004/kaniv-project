@@ -97,11 +97,15 @@ class userProfileUpdateForm(forms.ModelForm):
         "id":"gender"
     }))
 
+    photo=forms.ImageField(required=False,widget=forms.FileInput(attrs={
+        "id":"photo"
+    }))
+
     address=forms.TextInput()
 
     class Meta:
         model=UserProfile
-        fields=["gender","address"]
+        fields=["gender","photo"]
 
 
 class userPasswordChangeForm(PasswordChangeForm):

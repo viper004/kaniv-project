@@ -215,27 +215,44 @@
                 </div>
             </div>
       
-        <div class="item" onclick="window.location.href='/dashboard/notification/'">
-            <div class="item-content">
-                <div class="item-icon">
-                    <i class="fas fa-bell"></i>
+            <div class="item" onclick="window.location.href='/dashboard/notification/'">
+                <div class="item-content">
+                    <div class="item-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3 class="item-title">Notifications</h3>
+                    <p class="item-desc">Send important alerts and announcements to selected members or groups</p>
+                    
                 </div>
-                <h3 class="item-title">Notifications</h3>
-                <p class="item-desc">Send important alerts and announcements to selected members or groups</p>
-                
             </div>
-        </div>
-        
-        <div class="item" onclick="window.location.href='/dashboard/finance/'">
-            <div class="item-content">
-                <div class="item-icon">
-                    <i class="fas fa-chart-line"></i>
+            
+            <div class="item" onclick="window.location.href='/dashboard/finance/'">
+                <div class="item-content">
+                    <div class="item-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="item-title">Financial Reports</h3>
+                    <p class="item-desc">View and analyze financial data with interactive charts and exports</p>
+                    
                 </div>
-                <h3 class="item-title">Financial Reports</h3>
-                <p class="item-desc">View and analyze financial data with interactive charts and exports</p>
-                
             </div>
-        </div>
+
+            {% if not request.user.userprofile.role == "member" %}
+
+
+                <div class="item" onclick="window.location.href='/dashboard/kit_receivers/'">
+                    <div class="item-content">
+                        <div class="item-icon">
+                            <i class="fas fa-bag-shopping"></i>
+
+                        </div>
+                        <h3 class="item-title">Kit</h3>
+                        <p class="item-desc">Kit recievers</p>
+                        
+                    </div>
+                </div>
+            {% endif %}
+
         {% endif %}
         
     </section>
