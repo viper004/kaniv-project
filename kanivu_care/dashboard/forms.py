@@ -1,6 +1,6 @@
 from django import forms
 
-from dashboard.models import FinanceModel
+from dashboard.models import FinanceModel,KitReceiverModel
 
 
 class financeModelForm(forms.ModelForm):
@@ -31,3 +31,13 @@ class financeModelForm(forms.ModelForm):
     class Meta:
         model=FinanceModel
         exclude=["user"]
+
+
+class kitReceiverForm(forms.ModelForm):
+    photo=forms.ImageField(required=False,widget=forms.FileInput(attrs={
+        "id":"photo"
+    }))
+    class Meta:
+        model=KitReceiverModel
+        exclude=("user","announced_date")
+        

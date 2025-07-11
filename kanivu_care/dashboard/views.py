@@ -6,8 +6,8 @@ from django.utils import timezone
 
 from datetime import datetime
 
-from dashboard.models import NotifyModel,FinanceModel
-from dashboard.forms import financeModelForm
+from dashboard.models import NotifyModel,FinanceModel,KitReceiverModel
+from dashboard.forms import financeModelForm,kitReceiverForm
 
 from users.functions import form_errors
 from users.models import UserProfile
@@ -93,7 +93,7 @@ def deleteNotification(req,id):
     notification=NotifyModel.objects.filter(id=id)
 
     if notification.exists():
-        if (req.user==notification.first().user):
+        if (req.user==notification.first().user or req.user.userprofile.role == "convenier"):
             notification.first().delete()
             return JsonResponse({
                 "status":"success",
@@ -119,7 +119,7 @@ def endNotify(req,id):
 
     if notification.exists():
         instance=notification.first()
-        if (req.user==instance.user):
+        if (req.user==instance.user or req.user.userprofile.role == "convenier"):
             instance.is_completed=True
             instance.save()
             return JsonResponse({
@@ -179,7 +179,7 @@ def deleteFinance(req,id):
     finance=FinanceModel.objects.filter(id=id)
 
     if finance.exists():
-        if (req.user==finance.first().user):
+        if (req.user==finance.first().user or req.user.userprofile.role == "convenier"):
             finance.first().delete()
             return JsonResponse({
                 "status":"success",
@@ -198,15 +198,109 @@ def deleteFinance(req,id):
             "title":"This finance is does not exist",
             "message":"This finance record is no longer available on our database"
         })
-
-
+    
+@login_required(login_url="users:login")
+def kitReceivers(req):
+    if (req.user.userprofile.role not in ["convenier","coordinator"]):
+        return HttpResponseRedirect("/dashboard/")
+    if (req.method=="POST"):
+        form=kitReceiverForm(req.POST,req.FILES)
+        if form.is_valid():
+            kit=form.save(commit=False)
+            kit.user=req.user
+            kit.save()
+            return JsonResponse({
+                "status":"success",
+                "title":"New entry uploaded",
+                "message":"The new entry for kit receivers is successfully submitted."
+            })
+        else:
+            error=form_errors(form)
+            return JsonResponse({
+                "status":"error",
+                "title":"Entry submission failed",
+                "message":error
+            })
+    else:
+        form=kitReceiverForm()
+    
+    cntx={
+        "form":form,
+        "kit":KitReceiverModel.objects.all()
+    }
+    return render(req,"dashboard/kit.html",context=cntx)
 
 
 @login_required(login_url="users:login")
+def updateKit(req):
+    if (req.method=="POST"):
+        kitid=req.POST.get("kitid")
+        if not kitid:
+            return JsonResponse({
+                "status":"error",
+                "title":"Kit id is not found!",
+                "message":"Reload your webpage then try again."
+            })
+        kit=KitReceiverModel.objects.filter(id=kitid)
+        if kit.exists():
+            if (kit.first().user==req.user or req.user.userprofile.role == "convenier"):
+                form=kitReceiverForm(req.POST,req.FILES,instance=kit.first())
+                if form.is_valid():
+                    form.save()
+                    return JsonResponse({
+                        "status":"success",
+                        "title":"Updated Successfully",
+                        "message":"Your updation for this kit is successfully updated."
+                    })
+                else:
+                    errors=form_errors(form)
+                    return JsonResponse({
+                        "status":"error",
+                        "title":"Entry submission failed",
+                        "message":errors
+                    })
+            else:
+                return JsonResponse({
+                "status":"error",
+                "title":"Not authorized!",
+                "message":"Only the kit's informations are can be edit or delete for the created users."
+            })
+        else:
+            return JsonResponse({
+                "status":"error",
+                "title":"Not found!",
+                "message":"This record is not exists."
+            })
+        
+
+@login_required(login_url="users:login")
+def deleteKit(req,id):
+    finance=KitReceiverModel.objects.filter(id=id)
+
+    if finance.exists():
+        if (req.user==finance.first().user or req.user.userprofile.role == "convenier"):
+            finance.first().delete()
+            return JsonResponse({
+                "status":"success",
+                "title":"Kit receiver record Deleted.",
+                "message":"Your kit receiver record is successfully deleted!"
+            })
+        else:
+            return JsonResponse({
+                "status":"error",
+                "title":"Not the same user",
+                "message":"You can only delete kit receiver record of yours."
+            })
+    else:
+        return JsonResponse({
+            "status":"error",
+            "title":"This kit receiver is does not exist",
+            "message":"This kit receiver record is no longer available on our database"
+        })
+    
+@login_required(login_url="users:login")
 def changeDuty(req):
-    print(req.user.userprofile.role)
     if req.user.userprofile.role not in ["convenier","coordinator"]:
-        print("not")
         return HttpResponseRedirect("/")
     if (req.method=="POST"):
         id=req.POST.get("id")

@@ -737,7 +737,7 @@
                         <p>{{i.program_date}}</p>
                         <i class="time">{{i.announced_time}}</i>
                     </div>
-                    {% if i.user == request.user %}
+                    {% if i.user == request.user or request.user.userprofile.role == "convenier" %}
                         <button class="notify-btn complete-btn end" data-id="{{i.id}}" type="button" onclick="endNotify(this)">End</button>
                         <div class="action-buttons">
                             <button class="notify-btn delete-btn" data-userid="{{i.id}}" onclick="deleteNotification(this)">Delete Notification</button>

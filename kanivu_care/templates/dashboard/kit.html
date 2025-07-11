@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finance</title>
+    <title>Kit Receivers</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -175,6 +175,7 @@
             display: flex; align-items: center; justify-content: center;
             color: white; font-size: 1.5rem; font-weight: 600;
             margin-right: 1.2rem; flex-shrink: 0;
+            border: 1px solid green;
         }
         
         .user-info {
@@ -376,6 +377,13 @@
       color: #2c3e50;
     }
 
+    ::-webkit-inner-spin-button,::-webkit-outer-spin-button{
+        appearance: none;
+    }
+
+    #id_age{
+        width: 50px;
+    }
     .modal p {
       font-size: 14px;
       color: #555;
@@ -389,10 +397,8 @@
       color: #444;
     }
 
-    .modal input[type="text"],
-    input[type="date"],
+    .modal input,
     select,
-    input[type="file"],
     .modal textarea {
       width: 100%;
       padding: 12px 14px;
@@ -403,7 +409,7 @@
       transition: all 0.2s ease;
     }
 
-    .modal input[type="text"]:focus,
+    .modal input:focus,
     .modal textarea:focus {
       border-color: #4a90e2;
       background: #fff;
@@ -515,16 +521,17 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 
-    .btn-view-img {
-      background-color: #0078D4;
-      color: #fff;
-      padding: 10px;
-      position: absolute;
+    .location {
+        background-color: #0078D4;
+        color: #fff;
+        padding: 10px;
+        position: absolute;
         right: 0px;
         top: 20px;
+        text-decoration: none;
     }
 
-    .btn-view-img:hover {
+    .location:hover {
       background-color: #005fa3;
       transform: scale(1.05);
     }
@@ -669,8 +676,8 @@
 <body>
     <div class="container">
         <header>
-            <h1>FINANCE</h1>
-            <p class="subtitle">Record collections, upload proofs, and track all entries by date and type.</p>
+            <h1>KIT RECEIVERS</h1>
+            <p class="subtitle">Record of kit receivers.</p>
         </header>
         {% if request.user.userprofile.role == "convenier" or request.user.userprofile.role == "coordinator" %}
             <aside>
@@ -680,38 +687,41 @@
 
         
 
-        {% if finance %}
+        {% if kit %}
             <div class="section-header">
-                <h2 class="section-title">Finance</h2>
+                <h2 class="section-title">Kit Receivers</h2>
             </div>
             <div class="user-grid">
-                {% for i in finance %}
+                {% for i in kit %}
                 <div class="user-card">
                     <div class="user-header">
-                        <div class="user-avatar"></div>
+                        {% if i.photo %}
+                            <img src="{{i.photo.url}}" alt="{{i.name}}" class="user-avatar">
+                        {% else %}
+                            <div class="user-avatar"></div>
+                        {% endif %}
                         <div class="user-info">
-                            <div class="user-name">{{ i.user.username }}</div>
+                            <div class="user-name">{{ i.name }}</div>
                             <span class="user-role role-coordinator">{{i.user.userprofile.role}}</span>
                         </div>
                     </div>
                     <div class="user-details">
-                        <b>{{i.collection_type}}</b>
-                        <p>{{i.description}}</p>
-                        <p>Collection Date: {{i.collection_date}}</p>
+                        <b class="age">Age: {{i.age}}</b>
+                        <p>Address: <pre class="address">{{i.address}}</pre></p>
+                        <p>Family Details: <pre class="family">{{i.family}}</pre></p>
                         <i class="time">{{i.announced_date}}</i>
                     </div>
-
-
-                    
-
-
-                    <button class="custom-btn btn-view-img" data-img="{{i.image.url}}" type="button" onclick="viewImage(this)">
-                        <i class="fas fa-image"></i> View Image
-                    </button>
+                    <a href="{{i.location}}" target="_blank" class="custom-btn location">
+                        <i class="fas fa-location-dot"></i>See Location
+                    </a>
                     {% if i.user == request.user or request.user.userprofile.role == "convenier" %}
                         <div class="action-buttons">
-                            <button class="custom-btn btn-delete-rec" data-userid="{{i.id}}" onclick="deleteFinance(this)">
+                            <button class="custom-btn btn-delete-rec" data-userid="{{i.id}}" onclick="deleteKit(this)">
                                 <i class="fas fa-trash"></i> Delete Record
+                            </button>
+
+                            <button class="custom-btn" style="background: #0078D4;color: #fff;" data-kitid="{{i.id}}" onclick="updateKit(this)">
+                                <i class="fas fa-edit"></i> Update Record
                             </button>
                         </div>
                     {% endif %}
@@ -721,32 +731,33 @@
         {% else %}
             <div class="user-grid">
                 <div class="empty-state">
-                    <div data-feather="bell"></div>
-                    <h3 class="empty-text">No finance</h3>
+                    <i data-feather="shopping-bag"></i>
+
+                    <h3 class="empty-text">No Kit Receivers</h3>
                 </div>
             </div>
         {% endif %}
-        
-        
-        
     </div>
-    
    <section>
-  
- 
-
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
-      <span class="close-btn" onclick="closeModal()">&times;</span>
+      <span class="close-btn" onclick="closeModal('modalOverlay')">&times;</span>
       <h2>Create New Entry</h2>
       <p>Fill out the details below to add a new entry.</p>
-      <form action="{% url 'dashboard:finance' %}" id="finance_form" method="post" enctype="multipart/form-data">
+      <form onsubmit="formSubmit(event)" action="{% url 'dashboard:kit_receivers' %}" id="form" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{form.as_p}}
+
 
         <button type="submit" class="submit-btn">Submit</button>
       </form>
     </div>
+  </div>
+
+
+  
+  <div class="modal-overlay" id="update_kit">
+    
   </div>
 
   
@@ -769,17 +780,7 @@
             </div>
         </div>
     </div>
-
-
-
-  <div id="image_view">
-    <i data-feather="download" onclick="downloadImage(this)"></i>
-    <i data-feather="x" id="close" onclick="closeImage()"></i>
-  </div>
-
 </section>
-
-
 
 
 </body>
@@ -787,9 +788,10 @@
     import {showAlert} from "{% static 'scripts/alert.js' %}";
     const imageView=document.getElementById("image_view");
     const close=document.getElementById("close");
-    const financeForm=document.getElementById("finance_form");
+    const financeForm=document.getElementById("form");
+    const updateKitModal=document.getElementById("update_kit")
 
-    financeForm.addEventListener("submit",(e)=>{
+    const formSubmit=(e)=>{
         e.preventDefault();
         let formdata=new FormData(e.target);
         fetch(e.target.action,{
@@ -804,8 +806,7 @@
                 showAlert(data.status,data.title,data.message,"ok");
             }
         })
-    })
-
+    }
     feather.replace()
 
     
@@ -817,26 +818,7 @@
         }
     })
 
-    const viewImage=(e)=>{
-        imageView.style.display="flex";
-        imageView.style.backgroundImage=`url('${e.dataset.img}')`
 
-    }
-
-    const downloadImage=(e)=>{
-        let image=e.parentNode.style.backgroundImage.slice(5,-2);
-        console.log(image);
-
-        let filename=image.split('/').pop().split('?')[0]
-
-
-        let link=document.createElement("a");
-        link.href=link;
-        link.download=filename || "downloaded_image.jpg"
-        document.body.appendChild(link)
-        link.click();
-        document.body.removeChild(link)
-    }
 
      const modalOverlay = document.getElementById('modalOverlay');
     const modalForm = document.getElementById('modalForm');
@@ -845,24 +827,77 @@
       modalOverlay.style.display = 'flex';
     }
 
-    function closeModal() {
-      modalOverlay.style.display = 'none';
+    function closeModal(e) {
+        let temp=document.getElementById(e)
+      temp.style.display = 'none';
     }
 
-    window.onclick = function(event) {
-      if (event.target === modalOverlay) {
-        closeModal();
-      }
-    }
 
-    const closeImage=()=>{
-        imageView.style.display="none";
-    }
+const updateKit = (e) => {
+  const parentBox = e.closest(".user-card");
 
-    
+  let photo = parentBox.querySelector("img")?.src;
+  let name = parentBox.querySelector(".user-name")?.innerText.split(":").pop().trim();
+  let age = parentBox.querySelector(".age")?.innerText.split(":").pop().trim();
+  let family = parentBox.querySelector(".family")?.innerText.split(":").pop().trim();
+  let address = parentBox.querySelector(".address")?.innerText.split(":").pop().trim();
+  let location = parentBox.querySelector(".location")?.href;
+
+  let kitid=e.dataset.kitid
+
+  let photoHtml = `${photo ? `<img src="${photo}" width="100" />` : "<b>No photo has been updated</b>"}`;
+
+
+  console.log(photo);
+
+  updateKitModal.innerHTML = `
+    <div class="modal">
+      <span class="close-btn" onclick="closeModal('update_kit')">&times;</span>
+      <h2>Update Kit Entry</h2>
+      <p>Fill out the details below to update the entry.</p>
+      <form id="update_form" method="post" action="{% url 'dashboard:update_kit' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" value=${kitid} name="kitid"/>
+        <p>
+            <label for="update_name">Name:</label>
+            <input type="text" value="${name}" name="name" id="update_name" required>
+        </p>
+        <p>
+            <label for="update_age">Age:</label>
+            <input type="number" value="${age}" name="age" id="update_age" required>
+        </p>
+        <p>
+            <label for="update_family">Family:</label>
+            <textarea name="family" id="update_family" required>${family}</textarea>
+        </p>
+        <p>
+            <label for="update_address">Address:</label>
+            <textarea name="address" id="update_address" required>${address}</textarea>
+        </p>
+        <p>
+            <label for="update_location">Location:</label>
+            <input type="url" name="location" value="${location}" id="update_location" required>
+        </p>
+        <p>
+            <label for="update_photo">Photo:</label>
+            <input type="file" name="photo" id="update_photo" accept="image/*">
+            <br><small>Current Photo:</small><br>
+            ${photoHtml}
+        </p>
+        <button type="submit" class="submit-btn">Submit</button>
+      </form>
+    </div>`;
+
+  updateKitModal.style.display = "flex";
+
+  // Attach JS submit handler if needed
+  document.querySelector("#update_form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    formSubmit(event); // Your custom formSubmit function
+  });
+};
+
     const showConfirmation=()=>{
-       
-
         return new Promise((resolve) => {
             confirm_modal.style.display="flex";
             let cancel=document.getElementById("cancel");
@@ -881,14 +916,14 @@
     }
 
 
-    const deleteFinance=async(e)=>{
+    const deleteKit=async(e)=>{
 
         let isConfirmed=await showConfirmation()
     
         if (!isConfirmed){
             return;
         }
-        let url=`/dashboard/delete_finance/${e.dataset.userid}/`;
+        let url=`/dashboard/delete_kit/${e.dataset.userid}/`;
         fetch(url).then(res=>res.json()).then((data)=>{
             if (data.status=="success"){
                 showAlert(data.status,data.title,data.message,"reload");
@@ -901,21 +936,11 @@
     }
 
 
-    window.viewImage=viewImage;
-    window.closeImage=closeImage;
-    window.deleteFinance=deleteFinance;
+    window.deleteKit=deleteKit;
     window.openModal=openModal;
     window.closeModal=closeModal;
-    window.downloadImage=downloadImage;
-
-
-
-
-
-
-
-
-
+    window.updateKit=updateKit;
+    window.formSubmit=formSubmit;
 </script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 

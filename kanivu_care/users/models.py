@@ -23,6 +23,7 @@ class UserProfile(models.Model):
     gender=models.CharField(max_length=10,choices=GENDER_CHOICE,null=True,blank=True)
     address=models.TextField(null=True,blank=True)
     created_at=models.DateTimeField(auto_now_add=True)
+    photo=models.ImageField(upload_to="profile_pics/",null=True,blank=True)
 
     def __str__(self):
         return self.user.username

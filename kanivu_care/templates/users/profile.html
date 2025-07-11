@@ -251,13 +251,6 @@
         #academic_edit .info-grid .info-item .info-label{
             color: #fff;
         }
-        .user-avatar {
-            width: 60px; height: 60px; border-radius: 50%;
-            background: linear-gradient(135deg, #7c4dff, #00e5ff);
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 1.5rem; font-weight: 600;
-            margin-right: 1.2rem; flex-shrink: 0;
-        }
     </style>
 </head>
 <body>
@@ -269,7 +262,11 @@
         
         <div class="profile-card">
             <div class="profile-sidebar">
-                <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Profile Picture" class="profile-pic">
+                {% if request.user.userprofile.photo %}
+                    <img src="{{request.user.userprofile.photo.url}}" alt="Profile Picture" class="profile-pic">
+                {% else %}
+                    <div class="profile-pic"></div>
+                {% endif %}
                 <div class="user-name">{{request.user.first_name}}</div>
                 <div class="user-role">@{{request.user.username}}</div><br>
 
@@ -328,7 +325,7 @@
                         </div>
                         <div class="info-item">
                             <div class="info-label">Email</div>
-                            <div class="info-value">{{request.user.email}}</div>
+                            <div class="info-value" style="text-transform: lowercase;">{{request.user.email}}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">Phone</div>
