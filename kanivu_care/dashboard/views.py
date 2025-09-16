@@ -6,8 +6,8 @@ from django.utils import timezone
 
 from datetime import datetime
 
-from dashboard.models import NotifyModel,FinanceModel,KitReceiverModel
-from dashboard.forms import financeModelForm,kitReceiverForm
+from dashboard.models import NotifyModel,FinanceModel,KitReceiverModel,AnnouncementModel
+from dashboard.forms import financeModelForm,kitReceiverForm,announcementForm
 
 from users.functions import form_errors
 from users.models import UserProfile
@@ -139,6 +139,37 @@ def endNotify(req,id):
             "title":"This notification doesn't exist",
             "message":"This notification is no longer available on our database"
         })
+    
+def Announcement(req):
+    if (req.method=="POST"):
+        if not req.user.is_authenticated:
+            return JsonResponse({
+                "status":"error",
+                "title":"Login required",
+                "message":"You need to login for create the announcements"
+            })
+        form=announcementForm(req.POST,req.FILES)
+        if form.is_valid():
+            announce=form.save(commit=False)
+            announce.user=req.user
+            announce.save()
+            return JsonResponse({
+                "status":"success",
+                "title":"Announcement added",
+                "message":"Public announcement is added successfully"
+            })
+        else:
+            error=form_errors(form)
+            return JsonResponse({
+                "status":"error",
+                "title":"Failed to add announcement",
+                "message":error
+            })
+    else:
+        announcements=AnnouncementModel.objects.all()
+        return render(req,"announcements.html",context={"announcements":announcements})
+        
+
     
 @login_required(login_url="users:login")
 def Finance(req):

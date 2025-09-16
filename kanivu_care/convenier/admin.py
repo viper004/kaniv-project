@@ -1,8 +1,7 @@
 from django.contrib import admin
 
-from convenier.models import convinierModel,pendingMemberAddRequest
+from convenier.models import pendingMemberAddRequest
 
-admin.site.register(convinierModel)
 admin.site.register(pendingMemberAddRequest)
 
 

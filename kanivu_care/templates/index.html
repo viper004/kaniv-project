@@ -61,7 +61,7 @@
             <div class="hidden md:flex items-center space-x-8">
                 <a href="#" class="nav-link text-gray-700 hover:text-blue-500">Home</a>
                 <a href="#" class="nav-link text-gray-700 hover:text-blue-500">About</a>
-                <a href="#" class="nav-link text-gray-700 hover:text-blue-500">Causes</a>
+                <a href="{% url 'dashboard:announcement' %}" class="nav-link text-gray-700 hover:text-blue-500">Announcements</a>
                 {% if request.user.is_authenticated and not request.user.userprofile.role == "public_user" %}
                     <a href="{% url 'dashboard:dashboard' %}" class="nav-link text-gray-700 hover:text-blue-500">Dashboard</a>
                 {% endif %}
@@ -90,7 +90,7 @@
             <div class="px-2 pt-2 pb-3 space-y-1">
                 <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">Home</a>
                 <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">About</a>
-                <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">Causes</a>
+                <a href="{% url 'dashboard:announcement' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">Announcements</a>
                 {% if not request.user.userprofile.role == "public_user" %}
                     <a href="{% url 'dashboard:dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">Dashboard</a>
                 {% endif %}

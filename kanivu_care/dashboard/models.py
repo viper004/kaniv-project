@@ -44,3 +44,18 @@ class KitReceiverModel(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+class AnnouncementModel(models.Model):
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    title=models.CharField(max_length=255)
+    description=models.TextField()
+    video_url=models.URLField(null=True,blank=True)
+    thumbnail=models.ImageField(upload_to="announcement/",null=True,blank=True)
+    photo1=models.ImageField(upload_to="announcement/",null=True,blank=True)
+    photo2=models.ImageField(upload_to="announcement/",null=True,blank=True)
+    event_date=models.DateField()
+    announced_date=models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.username

@@ -350,7 +350,7 @@
       background: #ffffff;
       border-radius: 15px;
       padding: 30px 35px;
-      width: 420px;
+      width: 600px;
       max-width: 95%;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
       animation: fadeInScale 0.35s ease;
@@ -387,8 +387,8 @@
       color: #444;
     }
 
-    .modal input[type="text"],
-    input[type="date"],
+    .modal select,
+    input,
     .modal textarea {
       width: 100%;
       padding: 12px 14px;
@@ -399,8 +399,9 @@
       transition: all 0.2s ease;
     }
 
-    .modal input[type="text"]:focus,
-    .modal textarea:focus {
+    .modal select:focus,
+    .modal textarea:focus,
+    .modal input:focus {
       border-color: #4a90e2;
       background: #fff;
       outline: none;
@@ -580,7 +581,10 @@
   font-size: 15px;
 }
 
-
+#form{
+    max-height: 60vh;
+    overflow-y: scroll;
+}
 
 .modal-backdrop {
             position: fixed;
@@ -802,19 +806,26 @@
       <span class="close-btn" onclick="closeModal()">&times;</span>
       <h2>Create New Entry</h2>
       <p>Fill out the details below to add a new entry.</p>
-      <form action="{% url 'dashboard:notification' %}" id="form" method="post">
-        {% csrf_token %}
-        <label for="title">Title</label>
-        <input type="text" id="title" name="title" placeholder="Enter title..." required />
+      <label for="notify_choice">Select Notification Type</label>
+      <select style="cursor: pointer;" id="notify_choice" onchange="toggleNotificationType(this.value)">
+        <option value="normal">Normal Notification</option>
+        <option value="public">Public Notification</option>
+      </select>
+      <div id="form-container">
+            <form action="{% url 'dashboard:notification' %}" onsubmit="submitForm(event)" id="form" method="post">
+                {% csrf_token %}
+                <label for="title">Title *</label>
+                <input type="text" id="title" name="title" placeholder="Enter title..." required />
 
-        <label for="program_date">Program Date</label>
-        <input type="date" name="program_date" id="program_date" min="{{today}}"/>
+                <label for="program_date">Program Date *</label>
+                <input type="date" name="program_date" id="program_date" min="{{today}}"/>
 
-        <label for="description">Description</label>
-        <textarea id="description" name="description" placeholder="Write a description..." required></textarea>
+                <label for="description">Description *</label>
+                <textarea id="description" name="description" placeholder="Write a description..." required></textarea>
 
-        <button type="submit" class="submit-btn">Submit</button>
-      </form>
+                <button type="submit" class="submit-btn">Submit</button>
+            </form>
+      </div>
     </div>
   </div>
 
@@ -845,6 +856,8 @@
 </body>
 <script type="module">
     import {showAlert} from "{% static 'scripts/alert.js' %}";
+
+    const formContainer=document.getElementById("form-container");
 
     feather.replace()
 
@@ -911,7 +924,62 @@
         })
     }
 
+    const toggleNotificationType=(type)=>{
+        let html_form;
+        if (type=="normal"){
+            html_form=`<form action="{% url 'dashboard:notification' %}" onsubmit="submitForm(event)" id="form" method="post">
+        {% csrf_token %}
+        <label for="title">Title *</label>
+        <input type="text" id="title" name="title" placeholder="Enter title..." required />
 
+        <label for="program_date">Program Date *</label>
+        <input type="date" name="program_date" id="program_date" min="{{today}}"/>
+
+        <label for="description">Description *</label>
+        <textarea id="description" name="description" placeholder="Write a description..." required></textarea>
+
+        <button type="submit" class="submit-btn">Submit</button>
+      </form>`
+        }
+        else if (type=="public"){
+            html_form=`
+            <form action="{% url 'dashboard:announcement' %}" onsubmit="submitForm(event)" id="form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <label for="title">Title *</label>
+        <input type="text" id="title" name="title" placeholder="Enter title..." required />
+
+        <label for="event_date">Program Date *</label>
+        <input type="date" name="event_date" id="event_date" required/>
+
+        <label for="description">Description *</label>
+        <textarea id="description" name="description" placeholder="Write a description..." required></textarea>
+        
+        <label for="video_url">Video URL</label>
+        <input type="url" id="video_url" name="video_url" placeholder="Enter URL of video" />
+
+        <label for="thumbnail">Thumbnail of video</label>
+        <input type="file" accept="image/*" name="thumbnail" id="thumbnail"/>
+
+        <label for="photo1">Photo 1</label>
+        <input type="file" accept="image/*" name="photo1" id="photo1"/>
+        
+        <label for="photo2">Photo 2</label>
+        <input type="file" accept="image/*" name="photo2" id="photo2"/>
+        
+
+        <button type="submit" class="submit-btn">Submit</button>
+      </form>
+      `
+        }
+        else{
+            showAlert("error","Invalid choice","Only accepts normal or public notification","ok");
+            return toggleNotificationType("normal")
+        }
+
+        formContainer.innerHTML=html_form;
+
+    }
 
     const modalOverlay = document.getElementById('modalOverlay');
     const form = document.getElementById('form');
@@ -929,13 +997,13 @@
         closeModal();
       }
     }
-    form.addEventListener("submit", (e) => {
+    const submitForm=(e)=>{
         e.preventDefault();
         loader.style.display = "block"; // Show loader
 
-        const formData = new FormData(form);
+        const formData = new FormData(e.target);
 
-        fetch(form.action, {
+        fetch(e.target.action, {
             method: "POST",
             body: formData,
             
@@ -956,14 +1024,14 @@
             showAlert("error", "Submission Failed", err.message, "ok");
             loader.style.display = "none"; // Hide loader after error
             });
-    });
+    }
 
     window.openModal=openModal;
     window.closeModal=closeModal;
+    window.submitForm=submitForm;
     window.deleteNotification=deleteNotification;
     window.endNotify=endNotify;
-
-
+    window.toggleNotificationType=toggleNotificationType;
 
 
 
