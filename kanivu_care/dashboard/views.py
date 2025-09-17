@@ -6,6 +6,7 @@ from django.utils import timezone
 
 from datetime import datetime
 import requests
+import re
 
 from dashboard.models import NotifyModel,FinanceModel,KitReceiverModel,AnnouncementModel
 from dashboard.forms import financeModelForm,kitReceiverForm,announcementForm
@@ -84,12 +85,13 @@ def Notification(req):
     else:
         today=timezone.localdate()
         NotifyModel.objects.filter(is_completed=False,program_date__lt=today).update(is_completed=True)
+        AnnouncementModel.objects.filter(is_completed=False,event_date__lt=today).update(is_completed=True)
         
         pendingNotifications=NotifyModel.objects.filter(is_completed=False).order_by("-program_date")
         completedNotification=NotifyModel.objects.filter(is_completed=True).order_by("-program_date")
 
-        annnouncements=AnnouncementModel.objects.filter(is_completed=False)
-        previous_announcements=AnnouncementModel.objects.filter(is_completed=True)
+        annnouncements=AnnouncementModel.objects.filter(is_completed=False).order_by('-event_date')
+        previous_announcements=AnnouncementModel.objects.filter(is_completed=True).order_by('-event_date')
 
         cntx={
             "pending_notifications":pendingNotifications,
@@ -152,6 +154,39 @@ def endNotify(req,id):
             "message":"This notification is no longer available on our database"
         })
     
+def getThumbnail(url):
+    
+
+    patterns = [
+        r"(?:v=|vi=)([a-zA-Z0-9_-]{11})",        # watch?v=VIDEOID
+        r"(?:youtu\.be/)([a-zA-Z0-9_-]{11})",    # youtu.be/VIDEOID
+        r"(?:shorts/)([a-zA-Z0-9_-]{11})",       # shorts/VIDEOID
+        r"(?:embed/)([a-zA-Z0-9_-]{11})"         # embed/VIDEOID
+    ]
+
+    video_id = None
+    for pattern in patterns:
+        match = re.search(pattern, url)
+        if match:
+            video_id = match.group(1)
+            break
+
+    if not video_id:
+        response=requests.get(f"https://www.youtube.com/oembed?url={url}&format=json")
+        if "application/json" in response.headers.get("Content-Type",""):
+            data=response.json()
+
+            if (data["thumbnail_url"]):
+                return data["thumbnail_url"]
+            else:
+                return False
+        else:
+            return False
+    
+    print(f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg")
+
+    return f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg"
+
 def Announcement(req):
     if (req.method=="POST"):
         try:
@@ -177,24 +212,15 @@ def Announcement(req):
                             "message":"Public announcement is added successfully"
                         })
                     else:
-                        response=requests.get(f"https://www.youtube.com/oembed?url={videoUrl}&format=json")
-                        if "application/json" in response.headers.get("Content-Type",""):
-                            data=response.json()
-
-                            if (data["thumbnail_url"]):
-                                announce.thumbnail_url=data["thumbnail_url"]
-                                announce.save()
-                                return JsonResponse({
-                                    "status":"success",
-                                    "title":"Announcement added",
-                                    "message":"Public announcement is added successfully"
-                                })
-                            else:
-                                 return JsonResponse({
-                                    "status":"error",
-                                    "title":"Thumbnail is required",
-                                    "message":"Cannot find thumbnail of the video.So add the thumbnail"
-                                })
+                        get_thumbnail=getThumbnail(videoUrl)
+                        if get_thumbnail is not False:
+                            announce.thumbnail_url=get_thumbnail
+                            announce.save()
+                            return JsonResponse({
+                                "status":"success",
+                                "title":"Successfully updated",
+                                "message":"This announcement is updated successfully"
+                            })
                         else:
                             return JsonResponse({
                                 "status":"error",
@@ -237,7 +263,7 @@ def Announcement(req):
         return render(req,"announcements.html",context=cntx)
     
 
-        
+    
 
 def updateAnnouncement(req):
     if (req.method=="POST"):
@@ -248,6 +274,7 @@ def updateAnnouncement(req):
                 "message":"You need to login for create the announcements"
             })
         
+        
         announcement=AnnouncementModel.objects.filter(id=req.POST.get("data_id"))
         if not announcement.exists():
             return JsonResponse({
@@ -257,10 +284,56 @@ def updateAnnouncement(req):
             })
         
         form=announcementForm(req.POST,req.FILES,instance=announcement.first())
+        thumbnail_clear=req.POST.get("thumbnail_clear")
         if form.is_valid():
-            commit=form.save(commit=False)
-            commit.is_completed=announcement.first().is_completed
-            commit.save()
+            announce=form.save(commit=False)
+            announce.is_completed=announcement.first().is_completed
+            if (req.POST.get("video_url")):
+                videoUrl=req.POST.get("video_url")
+                thumbnail=req.FILES.get("thumbnail")
+                if (thumbnail):
+                    announce.thumbnail=thumbnail
+                    announce.save()
+                    return JsonResponse({
+                        "status":"success",
+                        "title":"Successfully updated",
+                        "message":"This announcement is updated successfully"
+                    })
+                else:
+                    get_thumbnail=getThumbnail(videoUrl)
+                    if thumbnail_clear is not None:
+                        announce.thumbnail.delete(save=False)
+                        announce.thumbnail=None
+                        if get_thumbnail is not False:
+                            announce.thumbnail_url=get_thumbnail
+                            announce.save()
+                            return JsonResponse({
+                                "status":"success",
+                                "title":"Successfully updated",
+                                "message":"This announcement is updated successfully"
+                            })
+                        else:
+                            return JsonResponse({
+                                "status":"error",
+                                "title":"Thumbnail is required",
+                                "message":"Cannot find thumbnail of the video.So add the thumbnail"
+                            })
+                    if get_thumbnail is not False:
+                        announce.thumbnail_url=get_thumbnail
+                        announce.save()
+                        return JsonResponse({
+                            "status":"success",
+                            "title":"Successfully updated",
+                            "message":"This announcement is updated successfully"
+                        })
+                    else:
+                        return JsonResponse({
+                            "status":"error",
+                            "title":"Thumbnail is required",
+                            "message":"Cannot find thumbnail of the video.So add the thumbnail"
+                        })
+                    
+            announce.save()
             return JsonResponse({
                 "status":"success",
                 "title":"Successfully updated",

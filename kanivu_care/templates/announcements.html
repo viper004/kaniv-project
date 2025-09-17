@@ -646,6 +646,8 @@
                         <a href="{{i.video_url}}" target="_blank" class="thumbnail-container">
                             {% if i.thumbnail %}
                                 <img src="{{i.thumbnail.url}}" alt="Tech Conference" class="thumbnail">
+                            {% else %}
+                                <img src="{{i.thumbnail_url}}" alt="Tech Conference" class="thumbnail">
                             {% endif %}
                             <div class="play-btn">
                                 <i class="fas fa-play"></i>
