@@ -1,11 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+    {% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event Showcase</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+         :root {
+            --primary: #7c4dff; --primary-light: #b47cff;
+            --secondary: #00e5ff; --secondary-light: #6effff;
+            --accent: #ff4081; --accent-light: #ff79b0;
+            --dark: #263238; --light: #f5f7fa;
+            --card-bg: #ffffff; --body-bg: #f0f2f5;
+            --success: #00c853; --warning: #ffab00;
+            --shadow: 0 15px 35px rgba(0,0,0,0.1); --radius: 16px;
+        }
         * {
             margin: 0;
             padding: 0;
@@ -16,22 +26,55 @@
         body {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
+        }
+        header {
+            text-align: center; margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 2.8rem; font-weight: 700;
+            color: var(--primary); margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem; color: #607d8b;
+            max-width: 700px; margin: 0 auto 2rem;
+        }
+        
+        .section-header {
+            display: flex; align-items: center;
+            margin: 3rem 0 1.5rem;
+        }
+        
+        .section-title {
+            font-size: 1.8rem; font-weight: 600;
+            color: var(--dark); position: relative;
+            padding-left: 1.5rem;
+        }
+        
+        .section-title::before {
+            content: ''; position: absolute;
+            left: 0; top: 50%; transform: translateY(-50%);
+            height: 70%; width: 5px;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            border-radius: 5px;
         }
         
         .container {
             width: 100%;
-            max-width: 1200px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 25px;
-            padding: 20px;
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
         }
-        
         .event-card {
+            cursor: pointer;
             background: white;
             border-radius: 16px;
             overflow: hidden;
@@ -39,8 +82,9 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             display: flex;
             flex-direction: column;
-            height: 100%;
             position: relative;
+            max-width: 30%;
+            width: 100%;
         }
         
         .event-card:hover {
@@ -512,42 +556,101 @@
     </style>
 </head>
 <body>
+    <header>
+            <h1>Announcement</h1>
+            <p class="subtitle">Weekly update including fund collection details and upcoming event information.</p>
+        </header>
+
+        <div class="section-header">
+            <h2 class="section-title">Ongoing Announcement</h2>
+        </div>
     <div class="container">
 
+        {% if ongoing_announcements %}
+            {% for i in ongoing_announcements %}
 
-        {% if announcements %}
-            {% for i in announcements %}
-
-                <div class="event-card" data-id="1">
+                <div class="event-card">
                     <div class="card-actions">
 
 
-                        
-                        <button class="action-btn edit-btn"  data-thumbnail="{% if i.thumbnail %}{{i.thumbnail.url}}{% endif %}"
-                            data-photo1="{% if i.photo1 %}{{i.photo1.url}}{% endif %}"
-                            data-photo2="{% if i.photo2 %}{{i.photo2.url}}{% endif %}"
-                            onclick="openEditModal(this,['{{i.title}}','{{i.description}}',
-                        '{{i.event_date}}','{{i.video_url}}'])">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="action-btn delete-btn" data-thumbnail="{% if i.thumbnail %}{{i.thumbnail.url}}{% endif %}"
-                            data-photo1="{% if i.photo1 %}{{i.photo1.url}}{% endif %}"
-                            data-photo2="{% if i.photo2 %}{{i.photo2.url}}{% endif %}"
-                            onclick="openDeleteModal(this,['{{i.title}}','{{i.description}}',
-                        '{{i.event_date}}','{{i.video_url}}'])">
-                            <i class="fas fa-trash"></i>
-                        </button>
                     </div>
                     
                     {% if i.video_url %}
-                        <div class="thumbnail-container">
+                        <a href="{{i.video_url}}" target="_blank" class="thumbnail-container">
+                            {% if i.thumbnail %}
+                                <img src="{{i.thumbnail.url}}" alt="Tech Conference" class="thumbnail">
+                            {% else %}
+                                <img src="{{i.thumbnail_url}}" alt="Tech Conference" class="thumbnail">
+                            {% endif %}
+                            <div class="play-btn">
+                                <i class="fas fa-play"></i>
+                            </div>
+                        </a>
+                    {% endif %}
+                    
+                    <div class="card-content" data-thumbnail="{% if i.thumbnail %}{{i.thumbnail.url}}{% endif %}"
+                            data-photo1="{% if i.photo1 %}{{i.photo1.url}}{% endif %}"
+                            data-photo2="{% if i.photo2 %}{{i.photo2.url}}{% endif %}"
+                            onclick="openModal(this,[`{{i.title}}`,`{{i.description}}`,
+                        `{{i.event_date}}`,`{{i.announced_date}}`,`{{i.video_url}}`])">
+                        <h3 class="event-title">{{i.title}}</h3>
+                        
+                        <p class="event-description">
+                            {{i.description|truncatechars:100}}
+                        </p>
+                        
+                        <div class="event-details">
+                            <div class="event-date"><i class="fas fa-calendar-alt"></i> {{i.event_date}}</div>
+                            <div class="announced-date"><i class="fas fa-bullhorn"></i> {{i.announced_date}}</div>
+                        </div>
+                        
+                        <div class="event-photos">
+                            {% if i.photo1 %}
+                                <img src="{{i.photo1.url}}" alt="Event Photo 1" class="event-photo">
+                            {% endif %}
+
+                            {% if i.photo2 %}
+                                <img src="{{i.photo2.url}}" alt="Event Photo 2" class="event-photo">
+                            {% endif %}
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        
+    </div>
+
+    <div class="section-header">
+            <h2 class="section-title">Previous Announcement</h2>
+        </div>
+    <div class="container">
+
+        {% if previous_announcements %}
+            {% for i in previous_announcements %}
+
+                <div class="event-card" data-id="1"  data-thumbnail="{% if i.thumbnail %}{{i.thumbnail.url}}{% endif %}"
+                            data-photo1="{% if i.photo1 %}{{i.photo1.url}}{% endif %}"
+                            data-photo2="{% if i.photo2 %}{{i.photo2.url}}{% endif %}"
+                            onclick="openModal(this,[`{{i.title}}`,`{{i.description}}`,
+                        `{{i.event_date}}`,`{{i.announced_date}}`,`{{i.video_url}}`])">
+                    <div class="card-actions">
+
+
+                
+                    </div>
+                    
+                    {% if i.video_url %}
+                        <a href="{{i.video_url}}" target="_blank" class="thumbnail-container">
                             {% if i.thumbnail %}
                                 <img src="{{i.thumbnail.url}}" alt="Tech Conference" class="thumbnail">
                             {% endif %}
                             <div class="play-btn">
                                 <i class="fas fa-play"></i>
                             </div>
-                        </div>
+                        </a>
                     {% endif %}
                     
                     <div class="card-content">
@@ -563,29 +666,26 @@
                         </div>
                         
                         <div class="event-photos">
-                            {% if photo1 %}
+                            {% if i.photo1 %}
                                 <img src="{{i.photo1.url}}" alt="Event Photo 1" class="event-photo">
                             {% endif %}
 
-                            {% if photo2 %}
+                            {% if i.photo2 %}
                                 <img src="{{i.photo2.url}}" alt="Event Photo 2" class="event-photo">
                             {% endif %}
                         </div>
                         
-                        <button class="see-more-btn"
-                            data-thumbnail="{% if i.thumbnail %}{{i.thumbnail.url}}{% endif %}"
-                            data-photo1="{% if i.photo1 %}{{i.photo1.url}}{% endif %}"
-                            data-photo2="{% if i.photo2 %}{{i.photo2.url}}{% endif %}"
-                            onclick="openModal(this,['{{i.title}}','{{i.description}}',
-                        '{{i.event_date}}','{{i.announced_date}}','{{i.video_url}}'])">
-                            <i class="fas fa-expand"></i> See More Details
-                        </button>
+                        
                     </div>
                 </div>
             {% endfor %}
         {% endif %}
         
+        
     </div>
+
+
+    
 
     <!-- Detail Modal -->
     <div class="modal" id="event-modal">
@@ -594,134 +694,30 @@
             
             <h2 class="modal-title" id="modal-title"></h2>
             
-            <p class="modal-description" id="modal-description"></p>
+            <pre class="modal-description" id="modal-description"></pre>
             
             <div class="modal-details">
                 <div class="modal-date"><i class="fas fa-calendar-alt"></i> Event Date: <span id="modal-event-date"></span></div>
                 <div class="modal-date"><i class="fas fa-bullhorn"></i> Announced: <span id="modal-announced-date"></span></div>
             </div>
             
-            <img src="" alt="Event Thumbnail" class="modal-thumbnail" id="modal-thumbnail">
+            <a href="#" id="video_modal" style="position: relative;" target="_blank">
+                <img src="" alt="Event Thumbnail" class="modal-thumbnail" id="modal-thumbnail">
+                <div class="play-btn" style="position: absolute; top: 50%;">
+                    <i class="fas fa-play"></i>
+                </div>
+            </a>
             
             <div class="modal-images">
                 <img src="" alt="Event Photo 1" class="modal-image" id="modal-photo1">
                 <img src="" alt="Event Photo 2" class="modal-image" id="modal-photo2">
             </div>
-            
-            <a href="#" target="_blank" class="modal-video-link" id="modal-video-link">
-                <i class="fas fa-play-circle"></i> Watch Event Video
-            </a>
         </div>
     </div>
 
-    <!-- Edit Modal -->
-    <div class="modal" id="edit-modal">
-        <div class="edit-modal-content">
-            <button class="close-modal" onclick="closeEditModal()">&times;</button>
-            
-            <h2 class="modal-title">Edit Event</h2>
-            
-            <form class="edit-form" id="edit-form">
-                <input type="hidden" id="edit-id">
-                
-                <div class="form-group">
-                    <label for="edit-title">Event Title</label>
-                    <input type="text" id="edit-title" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="edit-description">Description</label>
-                    <textarea id="edit-description" required></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="edit-event-date">Event Date</label>
-                    <input type="date" id="edit-event-date" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="edit-video-url">Video URL</label>
-                    <input type="url" id="edit-video-url" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="edit-thumbnail">Thumbnail URL</label>
-                    <input type="url" id="edit-thumbnail" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="edit-photo1">Photo 1 URL</label>
-                    <input type="url" id="edit-photo1" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="edit-photo2">Photo 2 URL</label>
-                    <input type="url" id="edit-photo2" required>
-                </div>
-                
-                <div class="form-actions">
-                    <button type="button" class="cancel-btn" onclick="closeEditModal()">Cancel</button>
-                    <button type="submit" class="save-btn">Save Changes</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Delete Confirmation Modal -->
-    <div class="modal" id="delete-modal">
-        <div class="delete-modal-content">
-            <button class="close-modal" onclick="closeDeleteModal()">&times;</button>
-            
-            <div class="delete-icon">
-                <i class="fas fa-exclamation-triangle"></i>
-            </div>
-            
-            <h2>Delete Event</h2>
-            <p>Are you sure you want to delete this event? This action cannot be undone.</p>
-            
-            <div class="delete-actions">
-                <button class="cancel-btn" onclick="closeDeleteModal()">Cancel</button>
-                <button class="delete-btn" id="confirm-delete">Delete Event</button>
-            </div>
-        </div>
-    </div>
 
     <script>
-        // Event data
-        const events = {
-            1: {
-                title: "Annual Tech Conference 2023",
-                description: "Join us for the biggest tech event of the year featuring industry leaders, cutting-edge technologies, and networking opportunities. This year we're focusing on AI, blockchain, and sustainable tech solutions. The conference will include keynote speeches, hands-on workshops, panel discussions, and an exhibition hall showcasing the latest innovations from leading tech companies. Whether you're a developer, entrepreneur, or tech enthusiast, you'll find valuable insights and connections at this event.",
-                eventDate: "November 15-17, 2023",
-                announcedDate: "August 10, 2023",
-                videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-                thumbnail: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-                photo1: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-                photo2: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
-            },
-            2: {
-                title: "Summer Music Festival",
-                description: "Experience the ultimate music festival with top artists, food trucks, and amazing atmosphere. Three days of non-stop music and fun. Featuring performances from internationally acclaimed artists across multiple stages, gourmet food trucks, art installations, and camping facilities. This year we're adding a silent disco, wellness area, and craft beer tasting experience. Don't miss the most anticipated music event of the summer!",
-                eventDate: "July 21-23, 2023",
-                announcedDate: "May 5, 2023",
-                videoUrl: "https://www.youtube.com/watch?v=LXb3EKWsInQ",
-                thumbnail: "https://images.unsplash.com/icon-1540575467063-178a50c2df87?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-                photo1: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-                photo2: "https://images.unsplash.com/icon-1540575467063-178a50c2df87?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
-            },
-            3: {
-                title: "International Food Expo",
-                description: "Taste culinary delights from around the world. Featuring top chefs, cooking demonstrations, and hundreds of food vendors. This year's expo will showcase cuisines from over 50 countries, with live cooking demonstrations by Michelin-starred chefs, wine and craft beer tastings, and specialty food markets. Learn cooking techniques in our interactive workshops, and vote for your favorite dish in the People's Choice awards. A paradise for food lovers!",
-                eventDate: "September 8-10, 2023",
-                announcedDate: "June 22, 2023",
-                videoUrl: "https://www.youtube.com/watch?v=JwG4Rk1rdcQ",
-                thumbnail: "https://images.unsplash.com/icon-1551818255-e6e109c4f799?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-                photo1: "https://images.unsplash.com/icon-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-                photo2: "https://images.unsplash.com/icon-1551818255-e6e109c4f799?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
-            }
-        };
 
-        // Get DOM elements
         const eventModal = document.getElementById('event-modal');
         const closeModalBtn = document.getElementById('close-modal');
         
@@ -733,23 +729,8 @@
         const modalThumbnail = document.getElementById('modal-thumbnail');
         const modalPhoto1 = document.getElementById('modal-photo1');
         const modalPhoto2 = document.getElementById('modal-photo2');
-        const modalVideoLink = document.getElementById('modal-video-link');
-        
-        // Edit modal elements
-        const editModal = document.getElementById('edit-modal');
-        const editForm = document.getElementById('edit-form');
-        const editId = document.getElementById('edit-id');
-        const editTitle = document.getElementById('edit-title');
-        const editDescription = document.getElementById('edit-description');
-        const editEventDate = document.getElementById('edit-event-date');
-        const editVideoUrl = document.getElementById('edit-video-url');
-        const editThumbnail = document.getElementById('edit-thumbnail');
-        const editPhoto1 = document.getElementById('edit-photo1');
-        const editPhoto2 = document.getElementById('edit-photo2');
-        
-        // Delete modal elements
-        const deleteModal = document.getElementById('delete-modal');
-        const confirmDeleteBtn = document.getElementById('confirm-delete');
+
+        const modalVideoLink=document.getElementById("video_modal")
         
         function openModal(values,data) {
 
@@ -814,166 +795,6 @@
             }
         });
         
-        // Open edit modal
-        function openEditModal(values,data) {
-            
-            // Populate edit form with event data
-            editId.value = values.dataset.id;
-            editTitle.value = data[0];
-            editDescription.value = data[1];
-            editEventDate.value = data[2];
-
-            // editVideoUrl.value = event.videoUrl;
-            // editThumbnail.value = event.thumbnail;
-            // editPhoto1.value = event.photo1;
-            // editPhoto2.value = event.photo2;
-
-
-            modalTitle.textContent = data[0];
-            modalDescription.textContent = data[1];
-            modalEventDate.textContent = data[2];
-
-            if (values.dataset.thumbnail){
-                modalThumbnail.style.display="flex";
-                modalThumbnail.src = values.dataset.thumbnail;
-            }
-            else{
-                modalThumbnail.style.display="none";
-            }
-
-            if (values.dataset.photo1){
-                modalPhoto1.style.display="flex";
-                modalPhoto1.src = values.dataset.photo1;
-            }
-            else{
-                modalPhoto1.style.display="none";
-            }
-
-            if (values.dataset.photo2){
-                modalPhoto2.style.display="flex";
-                modalPhoto2.src = values.dataset.photo2;
-            }
-            else{
-                modalPhoto2.style.display="none";
-            }
-
-
-            if (values.dataset.thumbnail){
-                modalThumbnail.style.display="flex";
-                modalThumbnail.src = values.dataset.thumbnail;
-            }
-            else{
-                modalThumbnail.style.display="none";
-            }
-
-            if (data[3]){
-                modalVideoLink.style.display="flex";
-                modalVideoLink.src = data[4];
-            }
-            else{
-                modalVideoLink.style.display="none";
-            }
-
-            // Show modal
-            eventModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-
-            
-            // Show edit modal
-            editModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-        
-        // Close edit modal
-        function closeEditModal() {
-            editModal.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-        
-        // Handle edit form submission
-        editForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const eventId = editId.value;
-            events[eventId] = {
-                title: editTitle.value,
-                description: editDescription.value,
-                eventDate: editEventDate.value,
-                videoUrl: editVideoUrl.value,
-                thumbnail: editThumbnail.value,
-                photo1: editPhoto1.value,
-                photo2: editPhoto2.value
-            };
-            
-            // Update the card display
-            updateEventCard(eventId);
-            
-            // Close the modal
-            closeEditModal();
-            
-            // Show success message (in a real app, you might use a toast notification)
-            alert('Event updated successfully!');
-        });
-        
-        // Update event card after edit
-        function updateEventCard(eventId) {
-            const event = events[eventId];
-            const card = document.querySelector(`.event-card[data-id="${eventId}"]`);
-            
-            // Update card content
-            card.querySelector('.event-title').textContent = event.title;
-            card.querySelector('.event-description').textContent = event.description.substring(0, 100) + '...';
-            card.querySelector('.event-date').innerHTML = `<i class="fas fa-calendar-alt"></i> ${event.eventDate}`;
-            card.querySelector('.announced-date').innerHTML = `<i class="fas fa-bullhorn"></i> ${event.announcedDate}`;
-            card.querySelector('.thumbnail').src = event.thumbnail;
-            card.querySelectorAll('.event-photo')[0].src = event.photo1;
-            card.querySelectorAll('.event-photo')[1].src = event.photo2;
-        }
-        
-        // Open delete confirmation modal
-        function openDeleteModal(eventId) {
-            // Set the event ID to be deleted
-            confirmDeleteBtn.setAttribute('data-id', eventId);
-            
-            // Show delete modal
-            deleteModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-        
-        // Close delete modal
-        function closeDeleteModal() {
-            deleteModal.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-        
-        // Handle delete confirmation
-        confirmDeleteBtn.addEventListener('click', function() {
-            const eventId = this.getAttribute('data-id');
-            
-            // Remove the event card from the DOM
-            const card = document.querySelector(`.event-card[data-id="${eventId}"]`);
-            card.style.opacity = '0';
-            card.style.transform = 'translateX(100px)';
-            
-            // Wait for animation to complete before removing
-            setTimeout(() => {
-                card.remove();
-                
-                // Show success message
-                alert('Event deleted successfully!');
-            }, 300);
-            
-            // Close the modal
-            closeDeleteModal();
-        });
-        
-        // Navigate to video URL when thumbnail is clicked
-        document.querySelectorAll('.thumbnail-container').forEach((container, index) => {
-            container.addEventListener('click', () => {
-                const eventId = index + 1;
-                window.open(events[eventId].videoUrl, '_blank');
-            });
-        });
     </script>
 </body>
 </html>

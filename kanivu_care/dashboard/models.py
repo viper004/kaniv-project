@@ -52,10 +52,13 @@ class AnnouncementModel(models.Model):
     description=models.TextField()
     video_url=models.URLField(null=True,blank=True)
     thumbnail=models.ImageField(upload_to="announcement/",null=True,blank=True)
+    thumbnail_url=models.URLField(null=True,blank=True)
     photo1=models.ImageField(upload_to="announcement/",null=True,blank=True)
     photo2=models.ImageField(upload_to="announcement/",null=True,blank=True)
     event_date=models.DateField()
     announced_date=models.DateTimeField(auto_now_add=True)
+    is_completed=models.BooleanField(default=False)
+    is_hidden=models.BooleanField(default=False)
 
     def __str__(self):
-        return self.user.username
+        return self.title

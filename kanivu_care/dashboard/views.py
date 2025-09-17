@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 from datetime import datetime
+import requests
 
 from dashboard.models import NotifyModel,FinanceModel,KitReceiverModel,AnnouncementModel
 from dashboard.forms import financeModelForm,kitReceiverForm,announcementForm
@@ -86,7 +87,18 @@ def Notification(req):
         
         pendingNotifications=NotifyModel.objects.filter(is_completed=False).order_by("-program_date")
         completedNotification=NotifyModel.objects.filter(is_completed=True).order_by("-program_date")
-    return render(req,"dashboard/notification.html",context={"pending_notifications":pendingNotifications,"completed_notifications":completedNotification,"today":today.isoformat()})
+
+        annnouncements=AnnouncementModel.objects.filter(is_completed=False)
+        previous_announcements=AnnouncementModel.objects.filter(is_completed=True)
+
+        cntx={
+            "pending_notifications":pendingNotifications,
+            "completed_notifications":completedNotification,
+            "announcements":annnouncements,
+            "previous_announcements":previous_announcements,
+            "today":today.isoformat()
+        }
+    return render(req,"dashboard/notification.html",context=cntx)
 
 
 def deleteNotification(req,id):
@@ -142,33 +154,180 @@ def endNotify(req,id):
     
 def Announcement(req):
     if (req.method=="POST"):
+        try:
+            if not req.user.is_authenticated:
+                return JsonResponse({
+                    "status":"error",
+                    "title":"Login required",
+                    "message":"You need to login for create the announcements"
+                })
+            form=announcementForm(req.POST,req.FILES)
+            if form.is_valid():
+                announce=form.save(commit=False)
+                announce.user=req.user
+                if (req.POST.get("video_url")):
+                    videoUrl=req.POST.get("video_url")
+                    thumbnail=req.FILES.get("thumbnail")
+                    if (thumbnail):
+                        announce.thumbnail=thumbnail
+                        announce.save()
+                        return JsonResponse({
+                            "status":"success",
+                            "title":"Announcement added",
+                            "message":"Public announcement is added successfully"
+                        })
+                    else:
+                        response=requests.get(f"https://www.youtube.com/oembed?url={videoUrl}&format=json")
+                        if "application/json" in response.headers.get("Content-Type",""):
+                            data=response.json()
+
+                            if (data["thumbnail_url"]):
+                                announce.thumbnail_url=data["thumbnail_url"]
+                                announce.save()
+                                return JsonResponse({
+                                    "status":"success",
+                                    "title":"Announcement added",
+                                    "message":"Public announcement is added successfully"
+                                })
+                            else:
+                                 return JsonResponse({
+                                    "status":"error",
+                                    "title":"Thumbnail is required",
+                                    "message":"Cannot find thumbnail of the video.So add the thumbnail"
+                                })
+                        else:
+                            return JsonResponse({
+                                "status":"error",
+                                "title":"Thumbnail is required",
+                                "message":"Cannot find thumbnail of the video.So add the thumbnail"
+                            })
+                        
+                announce.save()
+                return JsonResponse({
+                    "status":"success",
+                    "title":"Announcement added",
+                    "message":"Public announcement is added successfully"
+                })
+            else:
+                error=form_errors(form)
+                return JsonResponse({
+                    "status":"error",
+                    "title":"Failed to add announcement",
+                    "message":error
+                })
+        
+        except Exception:
+            return JsonResponse({
+                "status":"error",
+                "title":"Thumbnail is required",
+                "message":"Cannot find thumbnail of the video.So add the thumbnail"
+            })
+
+    else:
+        unhided_announcements=AnnouncementModel.objects.filter(is_hidden=False)
+        ongoing_announcements=unhided_announcements.filter(is_completed=False)
+        previous_announcements=unhided_announcements.filter(is_completed=True)
+
+        cntx={
+            "ongoing_announcements":ongoing_announcements,
+            "previous_announcements":previous_announcements
+        }
+
+
+        return render(req,"announcements.html",context=cntx)
+    
+
+        
+
+def updateAnnouncement(req):
+    if (req.method=="POST"):
         if not req.user.is_authenticated:
             return JsonResponse({
                 "status":"error",
                 "title":"Login required",
                 "message":"You need to login for create the announcements"
             })
-        form=announcementForm(req.POST,req.FILES)
+        
+        announcement=AnnouncementModel.objects.filter(id=req.POST.get("data_id"))
+        if not announcement.exists():
+            return JsonResponse({
+                "status":"error",
+                "title":"Not found",
+                "message":"This announcement is not founded.Refresh and try again"
+            })
+        
+        form=announcementForm(req.POST,req.FILES,instance=announcement.first())
         if form.is_valid():
-            announce=form.save(commit=False)
-            announce.user=req.user
-            announce.save()
+            commit=form.save(commit=False)
+            commit.is_completed=announcement.first().is_completed
+            commit.save()
             return JsonResponse({
                 "status":"success",
-                "title":"Announcement added",
-                "message":"Public announcement is added successfully"
+                "title":"Successfully updated",
+                "message":"This announcement is updated successfully"
             })
         else:
             error=form_errors(form)
             return JsonResponse({
                 "status":"error",
-                "title":"Failed to add announcement",
+                "title":"Failed to update announcement",
                 "message":error
             })
     else:
-        announcements=AnnouncementModel.objects.all()
-        return render(req,"announcements.html",context={"announcements":announcements})
+        try:
+            id=req.GET.get("id")
+            method=req.GET.get("method")
+
+
+            announcement=AnnouncementModel.objects.get(id=id)
+            if method=="end":
+                announcement.is_completed=True
+                announcement.save()
+                
+                return JsonResponse({
+                    "status":"success",
+                    "title":"Announcement is setted as previous.",
+                    "message":"Your announcement is successfully moved to previous announcement (By Force)!"
+                })
+            elif method=="toggle_hide":
+                announcement.is_hidden=not announcement.is_hidden
+                announcement.save()
+                if announcement.is_hidden:
+                    is_hidden="Hided"
+                else:
+                    is_hidden="Unhided"
+                return JsonResponse({
+                    "status":"success",
+                    "title":f"Announcement is {is_hidden}.",
+                    "message":f"Your announcement is {is_hidden} successfully"
+                })
+            elif method=="delete":
+                announcement.delete()
+                return JsonResponse({
+                    "status":"success",
+                    "title":"Announcement is deleted.",
+                    "message":"Your announcement is successfully deleted!"
+                })
+            else:
+                return JsonResponse({
+                    "status":"error",
+                    "title":"Invalid method",
+                    "message":"Only accepts end,toggle_hide and delete."
+                })
+
+        except AnnouncementModel.DoesNotExist:
+            return JsonResponse({
+                "status":"error",
+                "title":"Announcement is not exists",
+                "message":"This announcement is doesn't exists.Refresh and try again"
+            })
         
+        except Exception as e:
+            return JsonResponse({
+                "status":"error",
+                "title":"An error occured!",
+                "message":str(e)
+            })
 
     
 @login_required(login_url="users:login")
