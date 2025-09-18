@@ -35,7 +35,7 @@ class memberRegistration(models.Model):
 
     
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE,related_name="memberregistration")
     adno = models.CharField(max_length=255)
     department = models.CharField(max_length=50, choices=DEPARTMENT_CHOICES)
     batch = models.CharField(max_length=10)

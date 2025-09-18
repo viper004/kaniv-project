@@ -21,4 +21,8 @@ urlpatterns=[
     path("manage_members/demote/<int:id>/",views.demoteUser,name="demote"),
     path("change_duty/",views.changeDuty,name="change_duty"),
     path("kick_member/",views.kickMember,name="kick_member"),
+    path("collection_team/",views.collectionTeam,name="collection_team"),
+    path("collection_team_notification/",views.collectionTeamNotification,name="collection_team_notification"),
+
+
 ]

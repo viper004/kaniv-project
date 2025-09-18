@@ -8,7 +8,7 @@ from datetime import datetime
 import requests
 import re
 
-from dashboard.models import NotifyModel,FinanceModel,KitReceiverModel,AnnouncementModel
+from dashboard.models import NotifyModel,FinanceModel,KitReceiverModel,AnnouncementModel,NotifyModelPriority
 from dashboard.forms import financeModelForm,kitReceiverForm,announcementForm
 
 from users.functions import form_errors
@@ -35,9 +35,18 @@ def Notification(req):
     if (req.method=="POST"):
         if not req.user.userprofile.role in ["convenier","coordinator"]:
             return HttpResponseRedirect("/")
+        
+        
         title=req.POST.get("title")
         description=req.POST.get("description")
         programDate=req.POST.get("program_date")
+        department=req.POST.get("department")
+        priorityDuty=req.POST.get("selected_section")
+        
+
+        
+
+
         today=timezone.localdate()
 
 
@@ -65,12 +74,42 @@ def Notification(req):
                     "title":"Invalid Program Date",
                     "message":"Program date cannot be set as past"
                 })
-            NotifyModel.objects.create(
-                user=req.user,
-                title=title,
-                description=description,
-                program_date=programDateStripped
-            )
+            if department and priorityDuty:
+                print("yes")
+                if not any(choice[0] == priorityDuty for choice in NotifyModelPriority.PRIORITY_DUTY):
+                    return JsonResponse({
+                        "status":"error",
+                        "title":"Invalid section",
+                        "message":"Only accepts Collection,Finance,No option"
+                    })
+                if any(choice[0] == department for choice in memberRegistration.DEPARTMENT_CHOICES):
+                    notify=NotifyModel.objects.create(
+                        user=req.user,
+                        title=title,
+                        description=description,
+                        program_date=programDateStripped,
+                        
+                    )
+
+                    NotifyModelPriority.objects.create(
+                        notify=notify,
+                        department=department,
+                        priority_duty=priorityDuty
+                    )
+                    return JsonResponse({
+                        "status":"success",
+                        "title":"Notification Uploaded",
+                        "message":"Your notification is successfully submitted!"
+                    })
+                    
+            else:
+                NotifyModel.objects.create(
+                    user=req.user,
+                    title=title,
+                    description=description,
+                    program_date=programDateStripped
+                )
+                
             return JsonResponse({
                 "status":"success",
                 "title":"Notification Uploaded",
@@ -93,14 +132,17 @@ def Notification(req):
         annnouncements=AnnouncementModel.objects.filter(is_completed=False).order_by('-event_date')
         previous_announcements=AnnouncementModel.objects.filter(is_completed=True).order_by('-event_date')
 
+
         cntx={
             "pending_notifications":pendingNotifications,
             "completed_notifications":completedNotification,
             "announcements":annnouncements,
             "previous_announcements":previous_announcements,
-            "today":today.isoformat()
+            "today":today.isoformat(),
+            "departments":memberRegistration.DEPARTMENT_CHOICES,
         }
     return render(req,"dashboard/notification.html",context=cntx)
+
 
 
 def deleteNotification(req,id):
@@ -196,6 +238,13 @@ def Announcement(req):
                     "title":"Login required",
                     "message":"You need to login for create the announcements"
                 })
+            
+            if req.user.userprofile.role not in ["convenier","coordinator"]:
+                return JsonResponse({
+                    "status":"error",
+                    "title":"Request rejected",
+                    "message":"Announcement only can be created by convenier or coordinator"
+                })
             form=announcementForm(req.POST,req.FILES)
             if form.is_valid():
                 announce=form.save(commit=False)
@@ -264,30 +313,30 @@ def Announcement(req):
     
 
     
-
+@login_required(login_url="users:login")
 def updateAnnouncement(req):
     if (req.method=="POST"):
-        if not req.user.is_authenticated:
-            return JsonResponse({
-                "status":"error",
-                "title":"Login required",
-                "message":"You need to login for create the announcements"
-            })
-        
-        
-        announcement=AnnouncementModel.objects.filter(id=req.POST.get("data_id"))
-        if not announcement.exists():
+        announcements=AnnouncementModel.objects.filter(id=req.POST.get("data_id"))
+        if not announcements.exists():
             return JsonResponse({
                 "status":"error",
                 "title":"Not found",
                 "message":"This announcement is not founded.Refresh and try again"
             })
+        announcement=announcements.first()
         
-        form=announcementForm(req.POST,req.FILES,instance=announcement.first())
+        form=announcementForm(req.POST,req.FILES,instance=announcement)
+
+        if not req.user==announcement.user or not req.user.userprofile.role == "convenier":
+            return JsonResponse({
+                "status":"error",
+                "title":"Request rejected",
+                "message":"Only convenier or the owner of announcement can be update"
+            })
         thumbnail_clear=req.POST.get("thumbnail_clear")
         if form.is_valid():
             announce=form.save(commit=False)
-            announce.is_completed=announcement.first().is_completed
+            announce.is_completed=announcement.is_completed
             if (req.POST.get("video_url")):
                 videoUrl=req.POST.get("video_url")
                 thumbnail=req.FILES.get("thumbnail")
@@ -353,6 +402,12 @@ def updateAnnouncement(req):
 
 
             announcement=AnnouncementModel.objects.get(id=id)
+            if not req.user==announcement.user or not req.user.userprofile.role == "convenier":
+                return JsonResponse({
+                    "status":"error",
+                    "title":"Request rejected",
+                    "message":"Only convenier or the owner of announcement can be update"
+                })
             if method=="end":
                 announcement.is_completed=True
                 announcement.save()
@@ -724,3 +779,67 @@ def demoteUser(req,id):
         "message":"Coordinator is demoted as member!",
     })
 
+
+
+@login_required(login_url="users:login")
+def collectionTeam(req):
+    if req.user.userprofile.role not in ["convenier","coordinator"] and req.user.memberregistration.duty not in ["Collection Team","Team Controller"]:
+        return JsonResponse({
+            "status":"error",
+            "title":"Request rejected",
+            "message":"You are not allowed to access this page"
+        })
+    
+    return render(req,"dashboard/collection_team.html")
+
+@login_required(login_url="users:login")
+def collectionTeamNotification(req):
+    if req.user.userprofile.role not in ["convenier","coordinator"] and req.user.memberregistration.duty not in ["Collection Team","Team Controller"]:
+        return JsonResponse({
+            "status":"error",
+            "title":"Request rejected",
+            "message":"You are not allowed to access this page"
+        })
+    try:
+        readed_collection_id=req.GET.get("readed_collection_id")
+        if readed_collection_id:
+            if req.user.userprofile.role not in "member":
+                return JsonResponse({
+                    "status":"error",
+                    "title":"Request rejected",
+                    "message":"Only members can set as read the notification"
+                })
+            collection=NotifyModelPriority.objects.get(id=readed_collection_id)
+            if not req.user.memberregistration.department == collection.department:
+                return JsonResponse({
+                    "status":"error",
+                    "title":"Request rejected",
+                    "message":f"Only ${collection.department} students can set as readed"
+                })
+            collection.is_readed=True
+            collection.readed_by=req.user
+            collection.save()
+            return JsonResponse({
+                "status":"success",
+                "title":"Readed successfully",
+                "message":"This notification is setted as readed"
+            })
+
+        notifications=NotifyModelPriority.objects.filter(priority_duty="Collection Team")
+        print(notifications)
+        cntx={
+            "notifications":notifications
+        }
+    except NotifyModelPriority.DoesNotExist:
+        return JsonResponse({
+            "status":"error",
+            "title":"Not found",
+            "message":"This notfication section is not founded"
+        })
+    except Exception as e:
+        return JsonResponse({
+            "status":"error",
+            "title":"An error occured",
+            "message":str(e)
+        })
+    return render(req,"dashboard/collection_team_notification.html",context=cntx)

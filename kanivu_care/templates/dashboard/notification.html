@@ -742,6 +742,11 @@
             50% { transform: scale(1.05); }
         }
 
+        #modal_submit_btn:disabled{
+            background: grey;
+            cursor: not-allowed;
+        }
+
     </style>
 </head>
 <body>
@@ -828,104 +833,105 @@
             </div>
         {% endif %}
 
+        {% if request.user.userprofile.role == "convenier" or request.user.userprofile.role == "coordinator" %}
 
 
-
-        {% if announcements %}
-            <div class="section-header">
-                <h2 class="section-title">Ongoing Announcement</h2>
-            </div>
-            <div class="user-grid">
-                {% for i in announcements %}
-                    <div class="user-card">
-                        <div class="user-header">
-                            <div class="user-avatar"></div>
-                            <div class="user-info">
-                                <div class="user-name">{{ i.user.username }}</div>
-                                <span class="user-role role-coordinator">{{i.user.userprofile.role}}</span>
-                            </div>
-                        </div>
-                        <div class="user-details">
-                            <b>{{i.title}}</b>
-                            <p class="description">{{i.description|truncatechars:50}}</p>
-                            <p>{{i.program_date}}</p>
-                            <i class="time">{{i.announced_time}}</i>
-                        </div>
-                        {% if i.user == request.user or request.user.userprofile.role == "convenier" %}
-                            <button class="announcement_btn announcement_end" data-id="{{i.id}}" type="button" onclick="updateStateAnnouncement(this,'{{i.id}}','end')">
-                                <i class="fa-solid fa-circle-check" style="color: #0c0;"></i>
-
-                            </button>
-                            <button class="announcement_btn eye" data-id="{{i.id}}" type="button" onclick="updateStateAnnouncement(this,'{{i.id}}','toggle_hide')">
-                                <i class="fas fa-eye" id="eye_icon" style="color: rgb(13, 13, 202);"></i>
-                            </button>
-                            <div class="action-buttons">
-                                <button class="announcement_btn" data-userid="{{i.id}}" onclick="updateStateAnnouncement(this,'{{i.id}}','delete')">
-                                    <i class="fas fa-trash" style="color: red;"></i>
-                                </button>
-                                <button class="announcement_btn" data-id="{{i.id}}" type="button" onclick="openEditModal([`{{i.title}}`,`{{i.description}}`,
-                        `{{i.event_date}}`,`{{i.video_url}}`,`{{i.id}}`])">
-                                    <i class="fas fa-edit" style="color: rgb(1, 243, 1);"></i>
-                                </button>
-                            </div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="user-grid">
-                <div class="empty-state">
-                    <div data-feather="bell"></div>
-                    <h3 class="empty-text">No announcements are available</h3>
+            {% if announcements %}
+                <div class="section-header">
+                    <h2 class="section-title">Ongoing Announcement</h2>
                 </div>
-            </div>
-        {% endif %}
-        
-        {% if previous_announcements %}
-            <div class="section-header">
-                <h2 class="section-title">Previous Notifications</h2>
-            </div>
-            <div class="user-grid">
-                {% for i in previous_announcements %}
-                    <div class="user-card">
-                        <div class="user-header">
-                            <div class="user-avatar"></div>
-                            <div class="user-info">
-                                <div class="user-name">{{ i.user.username }}</div>
-                                <span class="user-role role-coordinator">{{i.user.userprofile.role}}</span>
+                <div class="user-grid">
+                    {% for i in announcements %}
+                        <div class="user-card">
+                            <div class="user-header">
+                                <div class="user-avatar"></div>
+                                <div class="user-info">
+                                    <div class="user-name">{{ i.user.username }}</div>
+                                    <span class="user-role role-coordinator">{{i.user.userprofile.role}}</span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="user-details">
-                            <b>{{i.title}}</b>
-                            <p class="description">{{i.description|truncatechars:50}}</p>
-                            <p>{{i.program_date}}</p>
-                            <i class="time">{{i.announced_time}}</i>
-                        </div>
-                        {% if i.user == request.user or request.user.userprofile.role == "convenier" %}
-                            <button class="announcement_btn eye" data-id="{{i.id}}" type="button" onclick="updateStateAnnouncement(this,'{{i.id}}','toggle_hide')">
-                                <i class="fas fa-eye" style="color: rgb(13, 13, 202);"></i>
-                            </button>
-                            <div class="action-buttons">
-                                <button class="announcement_btn" data-userid="{{i.id}}" onclick="updateStateAnnouncement(this,'{{i.id}}','delete')">
-                                    <i class="fas fa-trash" style="color: red;"></i>
-                                </button>
-                                <button class="announcement_btn" type="button"
-                             onclick="openEditModal([`{{i.title}}`,`{{i.description}}`,
-                        `{{i.event_date}}`,`{{i.video_url}}`,`{{i.id}}`])">
-                                    <i class="fas fa-edit" style="color: rgb(1, 243, 1);"></i>
-                                </button>
+                            <div class="user-details">
+                                <b>{{i.title}}</b>
+                                <p class="description">{{i.description|truncatechars:50}}</p>
+                                <p>{{i.program_date}}</p>
+                                <i class="time">{{i.announced_time}}</i>
                             </div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="user-grid">
-                <div class="empty-state">
-                    <div data-feather="bell"></div>
-                    <h3 class="empty-text">No previous announcements are available</h3>
+                            {% if i.user == request.user or request.user.userprofile.role == "convenier" %}
+                                <button class="announcement_btn announcement_end" data-id="{{i.id}}" type="button" onclick="updateStateAnnouncement(this,'{{i.id}}','end')">
+                                    <i class="fa-solid fa-circle-check" style="color: #0c0;"></i>
+
+                                </button>
+                                <button class="announcement_btn eye" data-id="{{i.id}}" type="button" onclick="updateStateAnnouncement(this,'{{i.id}}','toggle_hide')">
+                                    <i class="fas fa-eye" id="eye_icon" style="color: rgb(13, 13, 202);"></i>
+                                </button>
+                                <div class="action-buttons">
+                                    <button class="announcement_btn" data-userid="{{i.id}}" onclick="updateStateAnnouncement(this,'{{i.id}}','delete')">
+                                        <i class="fas fa-trash" style="color: red;"></i>
+                                    </button>
+                                    <button class="announcement_btn" data-id="{{i.id}}" type="button" onclick="openEditModal([`{{i.title}}`,`{{i.description}}`,
+                            `{{i.event_date}}`,`{{i.video_url}}`,`{{i.id}}`])">
+                                        <i class="fas fa-edit" style="color: rgb(1, 243, 1);"></i>
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
                 </div>
-            </div>
+            {% else %}
+                <div class="user-grid">
+                    <div class="empty-state">
+                        <div data-feather="bell"></div>
+                        <h3 class="empty-text">No announcements are available</h3>
+                    </div>
+                </div>
+            {% endif %}
+            
+            {% if previous_announcements %}
+                <div class="section-header">
+                    <h2 class="section-title">Previous Notifications</h2>
+                </div>
+                <div class="user-grid">
+                    {% for i in previous_announcements %}
+                        <div class="user-card">
+                            <div class="user-header">
+                                <div class="user-avatar"></div>
+                                <div class="user-info">
+                                    <div class="user-name">{{ i.user.username }}</div>
+                                    <span class="user-role role-coordinator">{{i.user.userprofile.role}}</span>
+                                </div>
+                            </div>
+                            <div class="user-details">
+                                <b>{{i.title}}</b>
+                                <p class="description">{{i.description|truncatechars:50}}</p>
+                                <p>{{i.program_date}}</p>
+                                <i class="time">{{i.announced_time}}</i>
+                            </div>
+                            {% if i.user == request.user or request.user.userprofile.role == "convenier" %}
+                                <button class="announcement_btn eye" data-id="{{i.id}}" type="button" onclick="updateStateAnnouncement(this,'{{i.id}}','toggle_hide')">
+                                    <i class="fas fa-eye" style="color: rgb(13, 13, 202);"></i>
+                                </button>
+                                <div class="action-buttons">
+                                    <button class="announcement_btn" data-userid="{{i.id}}" onclick="updateStateAnnouncement(this,'{{i.id}}','delete')">
+                                        <i class="fas fa-trash" style="color: red;"></i>
+                                    </button>
+                                    <button class="announcement_btn" type="button"
+                                onclick="openEditModal([`{{i.title}}`,`{{i.description}}`,
+                            `{{i.event_date}}`,`{{i.video_url}}`,`{{i.id}}`])">
+                                        <i class="fas fa-edit" style="color: rgb(1, 243, 1);"></i>
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="user-grid">
+                    <div class="empty-state">
+                        <div data-feather="bell"></div>
+                        <h3 class="empty-text">No previous announcements are available</h3>
+                    </div>
+                </div>
+            {% endif %}
         {% endif %}
         
         
@@ -954,13 +960,22 @@
                 <label for="title">Title *</label>
                 <input type="text" id="title" name="title" placeholder="Enter title..." required />
 
+                <label for="select_section">Select Section (Optional)</label>
+                <select style="cursor: pointer;" id="select_section" onchange="toggleSection(this)">
+                    <option value="">Select Option</option>
+                    <option value="collection">Collection</option>
+                    <option value="finance">Finance</option>
+                </select>
+
                 <label for="program_date">Program Date *</label>
                 <input type="date" name="program_date" id="program_date" min="{{today}}"/>
 
                 <label for="description">Description *</label>
                 <textarea id="description" name="description" placeholder="Write a description..." required></textarea>
+                
+                <button type="submit" class="submit-btn" id="modal_submit_btn">Submit</button>
+        </div>
 
-                <button type="submit" class="submit-btn">Submit</button>
             </form>
       </div>
     </div>
@@ -1000,7 +1015,6 @@
 
     const formContainer=document.getElementById("form-container");
     const editModalOverlay=document.getElementById("edit_modal_overlay");
-
     
     const openEditModal=(datas)=>{
         let dateObj=new Date(datas[2])
@@ -1030,11 +1044,6 @@
                 <label for="thumbnail">Thumbnail of video</label>
                 <input type="file" accept="image/*" name="thumbnail" id="thumbnail"/>
 
-                <div style="display:flex;">
-                    <input type="checkbox" style="width:20px;height:20px;margin-top:12px;margin-right:10px" name="thumbnail_clear" id="thumbnail_clear"/>
-                    <label for="thumbnail_clear">Clear thumbnail and set default thumbnail of video</label>
-                </div>
-
                 <label for="photo1">Photo 1</label>
                 <input type="file" accept="image/*" name="photo1" id="photo1"/>
                 
@@ -1051,14 +1060,75 @@
 
     feather.replace()
 
+
+    const toggleSection=(select)=>{
+
+        let select_html = select.value || "";
+
+        select_html = `
+        <select style="cursor: pointer;" name="selected_section" id="select_section" onchange="toggleSection(this)">
+            <option value="" ${select_html === "" ? "selected" : ""}>Select Option</option>
+            <option value="Collection Team" ${select_html === "collection" ? "selected" : ""}>Collection Team</option>
+            <option value="Finance" ${select_html === "finance" ? "selected" : ""}>Finance</option>
+        </select>
+        `;
+
+
+        if (select.value=="collection"){
+            formContainer.innerHTML=`<form action="{% url 'dashboard:notification' %}" onsubmit="submitForm(event)" id="form" method="post">
+                {% csrf_token %}
+                <label for="title">Title *</label>
+                <input type="text" id="title" name="title" placeholder="Enter title..." required />
+
+                <label for="select_section">Select Section (Optional)</label>
+                ${select_html}
+
+                <label for="program_date">Program Date *</label>
+                <input type="date" name="program_date" id="program_date" min="{{today}}"/>
+
+                <label for="description">Description *</label>
+                <textarea id="description" name="description" placeholder="Write a description..." required></textarea>
+
+                <label>Do you wanted to tag dept/members?</label>
+                
+                <label for="select_dept">Select Dept (Optional)</label>
+                <select style="cursor: pointer;" name="department" id="select_dept">
+                    <option value="">No Mention</option>
+
+                    {% for value,label in departments %}
+                        <option value="{{value}}">{{label}}</option>
+                    {% endfor %}
+                    
+                </select>
+
+                <button type="submit" class="submit-btn" id="modal_submit_btn">Submit</button>
+
+            </form>`
+        }
+        else{
+            formContainer.innerHTML=`<form action="{% url 'dashboard:notification' %}" onsubmit="submitForm(event)" id="form" method="post">
+                {% csrf_token %}
+                <label for="title">Title *</label>
+                <input type="text" id="title" name="title" placeholder="Enter title..." required />
+
+                <label for="select_section">Select Section (Optional)</label>
+                    ${select_html}
+
+                <label for="program_date">Program Date *</label>
+                <input type="date" name="program_date" id="program_date" min="{{today}}"/>
+
+                <label for="description">Description *</label>
+                <textarea id="description" name="description" placeholder="Write a description..." required></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn" id="modal_submit_btn">Submit</button>
+
+            </form>`
+        }
+    }
+
     
 
-    document.addEventListener("keydown",(e)=>{
-        if (e.key=="Escape"){
-            closePendingModal();
-            closeNestedModal();
-        }
-    });
 
     const showConfirmation=()=>{
        
@@ -1248,6 +1318,7 @@
     window.toggleNotificationType=toggleNotificationType;
     window.updateStateAnnouncement=updateStateAnnouncement;
     window.openEditModal=openEditModal;
+    window.toggleSection=toggleSection;
 
 
 

@@ -253,6 +253,20 @@
                 </div>
             {% endif %}
 
+
+            {% if request.user.userprofile.role == "convenier" or request.user.userprofile.role == "coordinator" or request.user.memberregistration.duty == "Team Controller" or request.user.memberregistration.duty == "Collection Team" %}
+                <div class="item" onclick="window.location.href='/dashboard/collection_team/'">
+                    <div class="item-content">
+                        <div class="item-icon">
+                            <i class="fas fa-hand-holding-dollar"></i>
+                        </div>
+                        <h3 class="item-title">Collection Team</h3>
+                        <p class="item-desc">View and analyze financial data with interactive charts and exports</p>
+                        
+                    </div>
+                </div>
+            {% endif %}
+
         {% endif %}
         
     </section>

@@ -1,19 +1,36 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from members.models import memberRegistration
+
 
 # Create your models here.
 
 class NotifyModel(models.Model):
+    
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     title=models.CharField(max_length=255)
     description=models.TextField()
     is_completed=models.BooleanField(default=False)
     program_date=models.DateField()
-    announced_time=models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.user.username}'s {self.title}"
+    
+class NotifyModelPriority(models.Model):
+    PRIORITY_DUTY=(
+        ("Finance", "Finance"),
+        ("Collection Team", "Collection Team")
+    )
+    notify=models.ForeignKey(NotifyModel,on_delete=models.CASCADE)
+    department = models.CharField(max_length=50, choices=memberRegistration.DEPARTMENT_CHOICES,null=True,blank=True)
+    priority_duty=models.CharField(max_length=20,choices=PRIORITY_DUTY,null=True,blank=True)
+    is_readed=models.BooleanField(default=False)
+    readed_by=models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
+    announced_time=models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.notify.title
     
 class FinanceModel(models.Model):
 

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Role Management Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #7c4dff; --primary-light: #b47cff;
+            --secondary: #00e5ff; --secondary-light: #6effff;
+            --accent: #ff4081; --accent-light: #ff79b0;
+            --dark: #263238; --light: #f5f7fa;
+            --card-bg: #ffffff; --body-bg: #f0f2f5;
+            --success: #00c853; --warning: #ffab00;
+            --shadow: 0 15px 35px rgba(0,0,0,0.1); --radius: 16px;
+        }
+        
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--body-bg); color: var(--dark);
+            line-height: 1.7; min-height: 100vh;
+            padding: 2rem 4rem;
+            height: 100vh auto;
+        }
+        aside #create_notify {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        z-index: 100;
+    }
+    
+    aside #create_notify,strong {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem 1.5rem;
+        background: linear-gradient(135deg, #7c4dff, #b47cff);
+        color: white;
+        font-weight: 600;
+        border-radius: 50px;
+        box-shadow: 0 10px 25px rgba(124, 77, 255, 0.3);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        border: none;
+        cursor: pointer;
+    }
+    
+    aside #create_notify:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(124, 77, 255, 0.4);
+        background: linear-gradient(135deg, #b47cff, #7c4dff);
+    }
+    
+    aside #create_notify:active {
+        transform: translateY(1px);
+    }
+    
+    /* Optional: Add a plus icon */
+    aside #create_notify::before {
+        content: '+';
+        margin-right: 8px;
+        font-size: 1.2rem;
+    }
+
+    aside #pending_lists{
+        position: absolute;
+        background: linear-gradient(135deg, #61E786, #EDCCEC);
+        top:10%;
+        right: 2%;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        aside {
+            bottom: 1.5rem;
+            right: 1.5rem;
+        }
+        
+        aside a {
+            padding: 0.8rem 1.2rem;
+            font-size: 0.9rem;
+        }
+    }
+        .container {
+            max-width: 1600px; margin: 0 auto;
+        }
+        
+        header {
+            text-align: center; margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 2.8rem; font-weight: 700;
+            color: var(--primary); margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem; color: #607d8b;
+            max-width: 700px; margin: 0 auto 2rem;
+        }
+        
+        .section-header {
+            display: flex; align-items: center;
+            margin: 3rem 0 1.5rem;
+        }
+        
+        .section-title {
+            font-size: 1.8rem; font-weight: 600;
+            color: var(--dark); position: relative;
+            padding-left: 1.5rem;
+        }
+        
+        .section-title::before {
+            content: ''; position: absolute;
+            left: 0; top: 50%; transform: translateY(-50%);
+            height: 70%; width: 5px;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            border-radius: 5px;
+        }
+        .dept{
+            text-transform: capitalize;
+        }
+        .user-grid {
+            display: grid; gap: 2rem;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            max-height: 850px;
+            overflow-y: scroll;
+        }
+
+        .user-grid::-webkit-scrollbar{
+            display: none;
+        }
+        
+        .user-card {
+            background: var(--card-bg); border-radius: var(--radius);
+            box-shadow: var(--shadow); padding: 2rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: none; position: relative;
+            overflow: hidden;
+        }
+
+        .user-card.active{
+            background: rgba(255, 64, 129, 0.1);
+        }
+        
+        .user-card::before {
+            content: ''; position: absolute;
+            top: 0; left: 0; width: 100%; height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+        
+        .user-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .user-header {
+            display: flex; align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .user-avatar {
+            width: 60px; height: 60px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.5rem; font-weight: 600;
+            margin-right: 1.2rem; flex-shrink: 0;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-size: 1.3rem; font-weight: 600;
+            color: var(--dark); margin-bottom: 0.3rem;
+            text-transform: capitalize;
+        }
+        
+        .user-role {
+            display: inline-block; padding: 0.3rem 1rem;
+            border-radius: 100px; font-size: 0.75rem;
+            font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .role-member {
+            background: rgba(0, 200, 83, 0.1);
+            color: var(--success);
+        }
+        
+        .role-coordinator {
+            background: rgba(255, 64, 129, 0.1);
+            color: var(--accent);
+        }
+        
+        .user-details {
+            margin: 1.5rem 0;
+        }
+        
+        .detail-row {
+            display: flex; margin-bottom: 0.8rem;
+        }
+        
+        .detail-label {
+            font-weight: 500; color: #78909c;
+            min-width: 120px; font-size: 0.9rem;
+        }
+        
+        .detail-value {
+            font-weight: 500; color: var(--dark);
+        }
+        
+        .action-buttons {
+            display: flex; gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .btn {
+            padding: 0.8rem 1.2rem; border: none;
+            border-radius: var(--radius); font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease;
+            flex: 1; display: flex; align-items: center;
+            justify-content: center; font-size: 0.9rem;
+        }
+        
+        
+        .empty-state {
+            text-align: center; padding: 4rem;
+            background: white; border-radius: var(--radius);
+            box-shadow: var(--shadow); grid-column: 1 / -1;
+            margin-top: 20px;
+        }
+        
+        .empty-icon {
+            font-size: 3rem; color: #cfd8dc;
+            margin-bottom: 1.5rem;
+        }
+        
+        .empty-text {
+            font-size: 1.2rem; color: #78909c;
+            margin-bottom: 1.5rem;
+        }
+        
+        @media (max-width: 1200px) {
+            body { padding: 2rem; }
+        }
+        
+        @media (max-width: 768px) {
+            body { padding: 1.5rem; }
+            h1 { font-size: 2.2rem; }
+            .user-grid { grid-template-columns: 1fr; }
+            .user-header { flex-direction: column; text-align: center; }
+            .user-avatar { margin-right: 0; margin-bottom: 1rem; }
+            .action-buttons { flex-direction: column; }
+        }
+
+        .read_btn{
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 18px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: 0.3s ease;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Notification</h1>
+            <p class="subtitle">Weekly update including fund collection details and upcoming event information.</p>
+        </header>
+
+        
+
+        {% if notifications %}
+            <div class="section-header">
+                <h2 class="section-title">Ongoing Notification</h2>
+            </div>
+            <div class="user-grid">
+                {% for i in notifications %}
+                    <div class="user-card {% if request.user.memberregistration.department == i.department and not i.is_readed %} active {% endif %}">
+                        {% if request.user.memberregistration.department == i.department and not i.is_readed %}
+                            <button class="read_btn" type="button" onclick="readNotify('{{i.id}}')">
+                                <i class="fa-solid fa-circle-check" style="color: #0c0;"></i>
+                            </button>
+                        {% endif %}
+                        <div class="user-header">
+                            <div class="user-avatar"></div>
+                            <div class="user-info">
+                                <div class="user-name">{{ i.notify.user.username }}</div>
+                                <span class="user-role role-coordinator">{{i.notify.user.userprofile.role}}</span>
+                            </div>
+                        </div>
+                        <div class="user-details">
+                            <b>{{i.title}}</b>
+                            <pre class="description">{{i.notify.description}}</pre>
+                            <b class="departments">Dept: {{i.department}}</b>
+                            <p>{{i.notify.program_date}}</p>
+                            <i class="time">{{i.announced_time}}</i>
+                        </div>
+                        {% if i.is_readed %}
+                            <span style="color: grey;font-size: 14px;">Readed by {{i.readed_by}} in {{i.readed_by.memberregistration.department}}</span>
+                        {% else %}
+                            <span style="color: grey;font-size: 14px;">No one is readed</span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="user-grid">
+                <div class="empty-state">
+                    <div data-feather="bell"></div>
+                    <h3 class="empty-text">No notifications are pending</h3>
+                </div>
+            </div>
+        {% endif %}
+        
+    </div>
+    
+</body>
+<script type="module">
+    import {showAlert} from "{% static 'scripts/alert.js' %}";
+    const departments=document.querySelectorAll(".departments");
+    departments.forEach((d) => {
+        d.textContent = d.textContent
+            .replace(/_/g, " ")
+            .replace(/\b\w/g, (char) => char.toUpperCase());
+        });
+
+    const readNotify=(id)=>{
+        let url = `/dashboard/collection_team_notification/?readed_collection_id=${id}`;
+        fetch(url).then(res=>res.json()).then((data)=>{
+            if (data.status=="success"){
+                showAlert("success",data.title,data.message,"reload")
+            }
+            else{
+                showAlert("error",data.title,data.message,"ok");
+            }
+        })
+    }
+
+    feather.replace();
+
+    window.readNotify=readNotify;
+</script>
+<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
+</html>
