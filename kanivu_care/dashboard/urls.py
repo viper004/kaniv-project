@@ -23,6 +23,8 @@ urlpatterns=[
     path("kick_member/",views.kickMember,name="kick_member"),
     path("collection_team/",views.collectionTeam,name="collection_team"),
     path("collection_team_notification/",views.collectionTeamNotification,name="collection_team_notification"),
+    path("finance_team_notification/",views.financeTeamNotification,name="finance_team_notification"),
+
 
 
 ]

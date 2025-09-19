@@ -40,87 +40,85 @@ def Notification(req):
         title=req.POST.get("title")
         description=req.POST.get("description")
         programDate=req.POST.get("program_date")
-        department=req.POST.get("department")
-        priorityDuty=req.POST.get("selected_section")
+        section=req.POST.get("section")
         
-
-        
-
 
         today=timezone.localdate()
 
+        if not title or not description:
+            return JsonResponse({
+                "status":"error",
+                "title":"Both fields are required",
+                "message":"Title and description are required"
+            })
+        
+        if not programDate:
+            return JsonResponse({
+                "status":"error",
+                "title":"Program Date required",
+                "message":"Program date is required.It cannot be blank"
+            })
+        
+        programDateStripped=datetime.strptime(programDate,"%Y-%m-%d").date()
+        
 
-        try:
-            if not title or not description:
-                return JsonResponse({
-                    "status":"error",
-                    "title":"Both fields are required",
-                    "message":"Title and description are required"
-                })
+        if programDateStripped<today:
+            return JsonResponse({
+                "status":"error",
+                "title":"Invalid Program Date",
+                "message":"Program date cannot be set as past"
+            })
+        
+        notify=NotifyModel.objects.create(
+            user=req.user,
+            title=title,
+            description=description,
+            program_date=programDateStripped,
             
-            if not programDate:
-                return JsonResponse({
-                    "status":"error",
-                    "title":"Program Date required",
-                    "message":"Program date is required.It cannot be blank"
-                })
-            
-            programDateStripped=datetime.strptime(programDate,"%Y-%m-%d").date()
-            
+        )
+    
+        if section:
+            if section=="collection":
+                department=req.POST.get("department")
+                priorityDuty=req.POST.get("selected_section")
+                if department and priorityDuty:
+                    print("yes")
+                    if not any(choice[0] == priorityDuty for choice in NotifyModelPriority.PRIORITY_DUTY):
+                        return JsonResponse({
+                            "status":"error",
+                            "title":"Invalid section",
+                            "message":"Only accepts Collection,Finance,No option"
+                        })
+                    if any(choice[0] == department for choice in memberRegistration.DEPARTMENT_CHOICES):
+                        
 
-            if programDateStripped<today:
-                return JsonResponse({
-                    "status":"error",
-                    "title":"Invalid Program Date",
-                    "message":"Program date cannot be set as past"
-                })
-            if department and priorityDuty:
-                print("yes")
-                if not any(choice[0] == priorityDuty for choice in NotifyModelPriority.PRIORITY_DUTY):
-                    return JsonResponse({
-                        "status":"error",
-                        "title":"Invalid section",
-                        "message":"Only accepts Collection,Finance,No option"
-                    })
-                if any(choice[0] == department for choice in memberRegistration.DEPARTMENT_CHOICES):
-                    notify=NotifyModel.objects.create(
+                        NotifyModelPriority.objects.create(
+                            notify=notify,
+                            department=department,
+                            priority_duty=priorityDuty
+                        )
+                        return JsonResponse({
+                            "status":"success",
+                            "title":"Notification Uploaded",
+                            "message":"Your notification is successfully submitted!"
+                        })
+                        
+                else:
+                    NotifyModel.objects.create(
                         user=req.user,
                         title=title,
                         description=description,
-                        program_date=programDateStripped,
-                        
+                        program_date=programDateStripped
                     )
-
-                    NotifyModelPriority.objects.create(
-                        notify=notify,
-                        department=department,
-                        priority_duty=priorityDuty
-                    )
-                    return JsonResponse({
-                        "status":"success",
-                        "title":"Notification Uploaded",
-                        "message":"Your notification is successfully submitted!"
-                    })
                     
-            else:
-                NotifyModel.objects.create(
-                    user=req.user,
-                    title=title,
-                    description=description,
-                    program_date=programDateStripped
-                )
+                return JsonResponse({
+                    "status":"success",
+                    "title":"Notification Uploaded",
+                    "message":"Your notification is successfully submitted!"
+                })
+            
+            
                 
-            return JsonResponse({
-                "status":"success",
-                "title":"Notification Uploaded",
-                "message":"Your notification is successfully submitted!"
-            })
-        except Exception as e:
-            return JsonResponse({
-                "status":"error",
-                "title":"Unexpected error occured",
-                "message":str(e)
-            })
     else:
         today=timezone.localdate()
         NotifyModel.objects.filter(is_completed=False,program_date__lt=today).update(is_completed=True)
@@ -803,7 +801,7 @@ def collectionTeamNotification(req):
     try:
         readed_collection_id=req.GET.get("readed_collection_id")
         if readed_collection_id:
-            if req.user.userprofile.role not in "member":
+            if not req.user.userprofile.role == "member":
                 return JsonResponse({
                     "status":"error",
                     "title":"Request rejected",
@@ -828,7 +826,8 @@ def collectionTeamNotification(req):
         notifications=NotifyModelPriority.objects.filter(priority_duty="Collection Team")
         print(notifications)
         cntx={
-            "notifications":notifications
+            "notifications":notifications,
+            "priority_duty":"Collection Team"
         }
     except NotifyModelPriority.DoesNotExist:
         return JsonResponse({
@@ -843,3 +842,60 @@ def collectionTeamNotification(req):
             "message":str(e)
         })
     return render(req,"dashboard/collection_team_notification.html",context=cntx)
+    
+
+
+
+@login_required(login_url="users:login")
+def financeTeamNotification(req):
+    if req.user.userprofile.role not in ["convenier","coordinator"] and req.user.memberregistration.duty not in ["Finance","Team Controller"]:
+        return JsonResponse({
+            "status":"error",
+            "title":"Request rejected",
+            "message":"You are not allowed to access this page"
+        })
+    try:
+        readed_finance_id=req.GET.get("readed_finance_id")
+        if readed_finance_id:
+            if not req.user.userprofile.role == "member":
+                return JsonResponse({
+                    "status":"error",
+                    "title":"Request rejected",
+                    "message":"Only members can set as read the notification"
+                })
+            finance=NotifyModelPriority.objects.get(id=readed_finance_id)
+            if not req.user.memberregistration.department == finance.department:
+                return JsonResponse({
+                    "status":"error",
+                    "title":"Request rejected",
+                    "message":f"Only ${finance.department} students can set as readed"
+                })
+            finance.is_readed=True
+            finance.readed_by=req.user
+            finance.save()
+            return JsonResponse({
+                "status":"success",
+                "title":"Readed successfully",
+                "message":"This notification is setted as readed"
+            })
+
+        notifications=NotifyModelPriority.objects.filter(priority_duty="Finance")
+        print(notifications)
+        cntx={
+            "notifications":notifications,
+            "priority_duty":"Finance"
+        }
+    except NotifyModelPriority.DoesNotExist:
+        return JsonResponse({
+            "status":"error",
+            "title":"Not found",
+            "message":"This notfication section is not founded"
+        })
+    except Exception as e:
+        return JsonResponse({
+            "status":"error",
+            "title":"An error occured",
+            "message":str(e)
+        })
+    return render(req,"dashboard/collection_team_notification.html",context=cntx)
+    
