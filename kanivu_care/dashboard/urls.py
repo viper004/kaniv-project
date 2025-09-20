@@ -12,6 +12,7 @@ urlpatterns=[
     path("announcement/",views.Announcement,name="announcement"),
     path("announcement/update_announcement/",views.updateAnnouncement,name="update_announcement"),
     path("finance/",views.Finance,name="finance"),
+    path("finance_notification/",views.financeNotification,name="finance_notification"),
     path("delete_finance/<int:id>/",views.deleteFinance,name="delete_finance"),
     path("kit_receivers/",views.kitReceivers,name="kit_receivers"),
     path("update_kit/",views.updateKit,name="update_kit"),
@@ -22,8 +23,10 @@ urlpatterns=[
     path("change_duty/",views.changeDuty,name="change_duty"),
     path("kick_member/",views.kickMember,name="kick_member"),
     path("collection_team/",views.collectionTeam,name="collection_team"),
+    path("update_collection_team/",views.updateCollectionTeam,name="update_collection_team"),
     path("collection_team_notification/",views.collectionTeamNotification,name="collection_team_notification"),
-    path("finance_team_notification/",views.financeTeamNotification,name="finance_team_notification"),
+    path("donations/",views.donations,name="donations"),
+
 
 
 

@@ -352,7 +352,7 @@
       border-radius: 15px;
       padding: 30px 35px;
       width: 650px;
-      height: 90vh;
+      height: 60vh;
       overflow-y: scroll;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
       animation: fadeInScale 0.35s ease;
@@ -664,6 +664,12 @@
             50% { transform: scale(1.05); }
         }
 
+        #bell_wrap{
+            position: absolute;
+            top: 10%;
+            right: 10%;
+        }
+
     </style>
 </head>
 <body>
@@ -677,6 +683,12 @@
                 <button type="button" id="create_finance" onclick="openModal()">Create</button>
             </aside>
         {% endif %}
+
+
+        <a href="{% url 'dashboard:finance_notification' %}" id="bell_wrap">
+            <i class="fas fa-bell"></i>
+        </a>
+
 
         
 

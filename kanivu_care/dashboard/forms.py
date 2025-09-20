@@ -1,6 +1,27 @@
 from django import forms
 
-from dashboard.models import FinanceModel,KitReceiverModel,AnnouncementModel
+from dashboard.models import FinanceModel,KitReceiverModel,AnnouncementModel,CollectionModel
+
+
+
+
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+class MultipleFileField(forms.FileField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("widget", MultipleFileInput())
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            result = [single_file_clean(d, initial) for d in data]
+        else:
+            result = single_file_clean(data, initial)
+        return result
+    
+
 
 
 class financeModelForm(forms.ModelForm):
@@ -30,7 +51,56 @@ class financeModelForm(forms.ModelForm):
 
     class Meta:
         model=FinanceModel
-        exclude=["user"]
+        exclude=["user","announced_date"]
+        
+
+class CollectionModelForm(forms.ModelForm):
+    description = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            "id": "description"
+        })
+    )
+
+    collection_date = forms.DateField(
+        required=True,
+        widget=forms.DateInput(
+            attrs={
+                "id": "date",
+                "type": "date"  # important for date picker
+            },
+            format='%Y-%m-%d'  # format for display
+        ),
+        input_formats=['%Y-%m-%d']  # format for parsing
+    )
+
+    collection_type = forms.ChoiceField(
+        choices=CollectionModel.COLLECTION_TYPE_CHOICES,
+        required=True,
+        widget=forms.Select(attrs={
+            "id": "select"
+        })
+    )
+
+    total = forms.IntegerField(
+        required=True,
+        widget=forms.NumberInput(attrs={
+            "id": "total"
+        })
+    )
+
+    # Use the custom MultipleFileField instead of regular FileField
+    images = MultipleFileField(
+        required=True,
+        widget=MultipleFileInput(attrs={
+            "id": "image",
+            "multiple": True
+        })
+    )
+
+    class Meta:
+        model = CollectionModel
+        exclude = ["user", "announced_date", "is_completed"]
 
 
 class kitReceiverForm(forms.ModelForm):

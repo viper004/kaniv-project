@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donation Records - Hope Foundation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+        
+        header h1 {
+            font-size: 2.2rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 30px;
+            padding: 8px 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .search-box input {
+            border: none;
+            outline: none;
+            padding: 8px;
+            font-size: 16px;
+            width: 250px;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .filter-btn {
+            padding: 8px 15px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn:hover {
+            background: #f1f1f1;
+        }
+        
+        .donation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .donation-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+        
+        .donation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .donor-name {
+            font-weight: 600;
+            font-size: 18px;
+            color: #2c3e50;
+        }
+        
+        .donation-amount {
+            font-weight: 700;
+            color: #27ae60;
+            font-size: 18px;
+        }
+        
+        .card-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 3px;
+        }
+        
+        .detail-value {
+            font-size: 15px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .donation-date {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-completed {
+            background: #e8f5e9;
+            color: #27ae60;
+        }
+        
+        .status-pending {
+            background: #ffecb3;
+            color: #f39c12;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+            gap: 10px;
+        }
+        
+        .pagination-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .pagination-btn.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        .pagination-btn:hover:not(.active) {
+            background: #f1f1f1;
+        }
+        
+        .summary {
+            display: flex;
+            justify-content: space-around;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+        
+        .summary-item {
+            text-align: center;
+        }
+        
+        .summary-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .summary-label {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        @media (max-width: 768px) {
+            .donation-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .search-box input {
+                width: 100%;
+            }
+            
+            .filters {
+                width: 100%;
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Donation Records</h1>
+            <p>View all donations made to Hope Foundation</p>
+        </header>
+        
+        <div class="summary">
+            <div class="summary-item">
+                <div class="summary-value">$12,548</div>
+                <div class="summary-label">Total Donations</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value">84</div>
+                <div class="summary-label">Total Donors</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value">$149.38</div>
+                <div class="summary-label">Average Donation</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search donations...">
+            </div>
+            
+            <div class="filters">
+                <div class="filter-btn">
+                    <i class="fas fa-filter"></i>
+                    <span>All</span>
+                </div>
+                <div class="filter-btn">
+                    <i class="fas fa-sort-amount-down"></i>
+                    <span>Recent</span>
+                </div>
+                <div class="filter-btn">
+                    <i class="fas fa-dollar-sign"></i>
+                    <span>Amount</span>
+                </div>
+                <div class="filter-btn">
+                    <i class="fas fa-download"></i>
+                    <span>Export</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="donation-grid">
+            <!-- Donation Record 1 -->
+            <div class="donation-card">
+                <div class="card-header">
+                    <div class="donor-name">John Doe</div>
+                    <div class="donation-amount">$100.00</div>
+                </div>
+                <div class="card-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Email</span>
+                        <span class="detail-value">john.doe@example.com</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Phone</span>
+                        <span class="detail-value">(555) 123-4567</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Payment Method</span>
+                        <span class="detail-value">Visa ****1234</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Recurring</span>
+                        <span class="detail-value">One-time</span>
+                    </div>
+                </div>
+                <div class="note">
+                    <span class="detail-label">Note</span>
+                    <span class="detail-value">Please use for educational programs</span>
+                </div>
+                <div class="card-footer">
+                    <div class="donation-date">Oct 15, 2023</div>
+                    <div class="status status-completed">Completed</div>
+                </div>
+            </div>
+            
+            <!-- Donation Record 2 -->
+            <div class="donation-card">
+                <div class="card-header">
+                    <div class="donor-name">Sarah Johnson</div>
+                    <div class="donation-amount">$250.00</div>
+                </div>
+                <div class="card-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Email</span>
+                        <span class="detail-value">sarahj@example.com</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Phone</span>
+                        <span class="detail-value">(555) 987-6543</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Payment Method</span>
+                        <span class="detail-value">Mastercard ****5678</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Recurring</span>
+                        <span class="detail-value">Monthly</span>
+                    </div>
+                </div>
+                <div class="note">
+                    <span class="detail-label">Note</span>
+                    <span class="detail-value">For food assistance programs</span>
+                </div>
+                <div class="card-footer">
+                    <div class="donation-date">Oct 14, 2023</div>
+                    <div class="status status-completed">Completed</div>
+                </div>
+            </div>
+            
+            <!-- Donation Record 3 -->
+            <div class="donation-card">
+                <div class="card-header">
+                    <div class="donor-name">Michael Chen</div>
+                    <div class="donation-amount">$50.00</div>
+                </div>
+                <div class="card-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Email</span>
+                        <span class="detail-value">michael.chen@example.com</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Phone</span>
+                        <span class="detail-value">(555) 456-7890</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Payment Method</span>
+                        <span class="detail-value">PayPal</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Recurring</span>
+                        <span class="detail-value">One-time</span>
+                    </div>
+                </div>
+                <div class="note">
+                    <span class="detail-label">Note</span>
+                    <span class="detail-value">-</span>
+                </div>
+                <div class="card-footer">
+                    <div class="donation-date">Oct 14, 2023</div>
+                    <div class="status status-completed">Completed</div>
+                </div>
+            </div>
+            
+            <!-- Donation Record 4 -->
+            <div class="donation-card">
+                <div class="card-header">
+                    <div class="donor-name">Emily Williams</div>
+                    <div class="donation-amount">$500.00</div>
+                </div>
+                <div class="card-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Email</span>
+                        <span class="detail-value">emilyw@example.com</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Phone</span>
+                        <span class="detail-value">(555) 234-5678</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Payment Method</span>
+                        <span class="detail-value">Amex ****9012</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Recurring</span>
+                        <span class="detail-value">Quarterly</span>
+                    </div>
+                </div>
+                <div class="note">
+                    <span class="detail-label">Note</span>
+                    <span class="detail-value">Keep up the great work!</span>
+                </div>
+                <div class="card-footer">
+                    <div class="donation-date">Oct 13, 2023</div>
+                    <div class="status status-completed">Completed</div>
+                </div>
+            </div>
+            
+            <!-- Donation Record 5 -->
+            <div class="donation-card">
+                <div class="card-header">
+                    <div class="donor-name">Robert Martinez</div>
+                    <div class="donation-amount">$75.00</div>
+                </div>
+                <div class="card-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Email</span>
+                        <span class="detail-value">robertm@example.com</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Phone</span>
+                        <span class="detail-value">(555) 345-6789</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Payment Method</span>
+                        <span class="detail-value">Visa ****3456</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Recurring</span>
+                        <span class="detail-value">One-time</span>
+                    </div>
+                </div>
+                <div class="note">
+                    <span class="detail-label">Note</span>
+                    <span class="detail-value">For hurricane relief efforts</span>
+                </div>
+                <div class="card-footer">
+                    <div class="donation-date">Oct 12, 2023</div>
+                    <div class="status status-completed">Completed</div>
+                </div>
+            </div>
+            
+            <!-- Donation Record 6 -->
+            <div class="donation-card">
+                <div class="card-header">
+                    <div class="donor-name">Jennifer Lee</div>
+                    <div class="donation-amount">$150.00</div>
+                </div>
+                <div class="card-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Email</span>
+                        <span class="detail-value">jennifer.lee@example.com</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Phone</span>
+                        <span class="detail-value">(555) 876-5432</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Payment Method</span>
+                        <span class="detail-value">Mastercard ****7890</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Recurring</span>
+                        <span class="detail-value">Monthly</span>
+                    </div>
+                </div>
+                <div class="note">
+                    <span class="detail-label">Note</span>
+                    <span class="detail-value">Please send me updates on how my donation is used</span>
+                </div>
+                <div class="card-footer">
+                    <div class="donation-date">Oct 12, 2023</div>
+                    <div class="status status-pending">Processing</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="pagination">
+            <div class="pagination-btn active">1</div>
+            <div class="pagination-btn">2</div>
+            <div class="pagination-btn">3</div>
+            <div class="pagination-btn">></div>
+        </div>
+    </div>
+
+    <script>
+        // Simple interaction for the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Filter buttons
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    filterButtons.forEach(btn => btn.style.background = 'white');
+                    this.style.background = '#f1f1f1';
+                });
+            });
+            
+            // Pagination buttons
+            const paginationButtons = document.querySelectorAll('.pagination-btn');
+            
+            paginationButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    paginationButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Search functionality
+            const searchInput = document.querySelector('.search-box input');
+            
+            searchInput.addEventListener('keyup', function() {
+                const searchTerm = this.value.toLowerCase();
+                const donationCards = document.querySelectorAll('.donation-card');
+                
+                donationCards.forEach(card => {
+                    const donorName = card.querySelector('.donor-name').textContent.toLowerCase();
+                    const donorEmail = card.querySelector('.detail-item .detail-value').textContent.toLowerCase();
+                    
+                    if (donorName.includes(searchTerm) || donorEmail.includes(searchTerm)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

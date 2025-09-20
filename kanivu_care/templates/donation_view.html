@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donation Confirmation - Hope Foundation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 0;
+            background: linear-gradient(120deg, #3498db, #8e44ad);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .confirmation-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .confirmation-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .confirmation-icon {
+            width: 80px;
+            height: 80px;
+            background: #4CAF50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+        }
+        
+        .confirmation-icon i {
+            font-size: 40px;
+            color: white;
+        }
+        
+        .confirmation-title {
+            color: #3498db;
+        }
+        
+        .confirmation-title h2 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .confirmation-title p {
+            color: #777;
+        }
+        
+        .data-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            color: #8e44ad;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .data-item {
+            margin-bottom: 15px;
+        }
+        
+        .data-label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .data-label i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .data-value {
+            font-size: 18px;
+            color: #333;
+            padding-left: 26px;
+        }
+        
+        .impact-section {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .impact-title {
+            color: #3498db;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .impact-item {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: transform 0.3s;
+        }
+        
+        .impact-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .impact-item i {
+            font-size: 2.5rem;
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(120deg, #3498db, #8e44ad);
+            color: white;
+            border: none;
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .confirmation-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .confirmation-icon {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            .data-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            header h1 {
+                font-size: 2.2rem;
+            }
+            
+            header p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Thank You for Your Donation!</h1>
+            <p>Your generosity helps us make a difference in the lives of those in need.</p>
+        </header>
+        
+        <div class="confirmation-card">
+            <div class="confirmation-header">
+                <div class="confirmation-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="confirmation-title">
+                    <h2>Donation Confirmed</h2>
+                    <p>Transaction ID: HF-2023-789456123</p>
+                </div>
+            </div>
+            
+            <div class="data-section">
+                <h3 class="section-title">
+                    <i class="fas fa-user-circle"></i> Personal Details
+                </h3>
+                
+                <div class="data-grid">
+                    <div class="data-item">
+                        <div class="data-label">
+                            <i class="fas fa-user"></i> Full Name
+                        </div>
+                        <div class="data-value">John Doe</div>
+                    </div>
+                    
+                    <div class="data-item">
+                        <div class="data-label">
+                            <i class="fas fa-envelope"></i> Email Address
+                        </div>
+                        <div class="data-value">john.doe@example.com</div>
+                    </div>
+                    
+                    <div class="data-item">
+                        <div class="data-label">
+                            <i class="fas fa-phone"></i> Phone Number
+                        </div>
+                        <div class="data-value">(555) 123-4567</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="data-section">
+                <h3 class="section-title">
+                    <i class="fas fa-dollar-sign"></i> Donation Details
+                </h3>
+                
+                <div class="data-grid">
+                    <div class="data-item">
+                        <div class="data-label">
+                            <i class="fas fa-money-bill-wave"></i> Donation Amount
+                        </div>
+                        <div class="data-value">$100.00 USD</div>
+                    </div>
+                    
+                    <div class="data-item">
+                        <div class="data-label">
+                            <i class="fas fa-calendar"></i> Donation Date
+                        </div>
+                        <div class="data-value">October 15, 2023</div>
+                    </div>
+                    
+                    <div class="data-item">
+                        <div class="data-label">
+                            <i class="fas fa-sync"></i> Recurring
+                        </div>
+                        <div class="data-value">One-time donation</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="data-section">
+                <h3 class="section-title">
+                    <i class="fas fa-credit-card"></i> Payment Information
+                </h3>
+                
+                <div class="data-grid">
+                    <div class="data-item">
+                        <div class="data-label">
+                            <i class="fas fa-credit-card"></i> Card Type
+                        </div>
+                        <div class="data-value">Visa</div>
+                    </div>
+                    
+                    <div class="data-item">
+                        <div class="data-label">
+                            <i class="fas fa-hashtag"></i> Card Number
+                        </div>
+                        <div class="data-value">**** **** **** 1234</div>
+                    </div>
+                    
+                    <div class="data-item">
+                        <div class="data-label">
+                            <i class="fas fa-calendar-alt"></i> Expiry Date
+                        </div>
+                        <div class="data-value">12/25</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="data-section">
+                <h3 class="section-title">
+                    <i class="fas fa-comment"></i> Additional Information
+                </h3>
+                
+                <div class="data-item">
+                    <div class="data-label">
+                        <i class="fas fa-sticky-note"></i> Note
+                    </div>
+                    <div class="data-value">Please use this donation for educational programs. Thank you for the important work you do!</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="impact-section">
+            <h2 class="impact-title">How Your Donation Will Help</h2>
+            
+            <div class="impact-grid">
+                <div class="impact-item">
+                    <i class="fas fa-utensils"></i>
+                    <h3>Provide Meals</h3>
+                    <p>Your donation will provide 50 meals for families in need</p>
+                </div>
+                
+                <div class="impact-item">
+                    <i class="fas fa-book-open"></i>
+                    <h3>Support Education</h3>
+                    <p>Your contribution will help send 2 children to school for a month</p>
+                </div>
+                
+                <div class="impact-item">
+                    <i class="fas fa-house-medical"></i>
+                    <h3>Offer Shelter</h3>
+                    <p>Your support will provide a week of housing for a family</p>
+                </div>
+                
+                <div class="impact-item">
+                    <i class="fas fa-heartbeat"></i>
+                    <h3>Healthcare Access</h3>
+                    <p>Your donation will provide medical care for 5 people</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <a href="#" class="btn btn-primary">
+                <i class="fas fa-print"></i> Print Receipt
+            </a>
+            <a href="#" class="btn btn-secondary">
+                <i class="fas fa-share-alt"></i> Share Your Support
+            </a>
+            <a href="#" class="btn btn-secondary">
+                <i class="fas fa-donate"></i> Make Another Donation
+            </a>
+        </div>
+        
+        <footer>
+            <p>Hope Foundation is a 501(c)(3) organization. donations are tax-deductible to the extent allowed by law.</p>
+            <p>© 2023 Hope Foundation. All rights reserved. | 123 Charity Lane, City, State 12345</p>
+        </footer>
+    </div>
+
+    <script>
+        // This script would typically pull data from the form submission
+        // For demonstration, we're using static data
+        
+        // In a real implementation, you might retrieve data from URL parameters or storage
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Donation confirmation page loaded');
+            
+            // Example of how you might retrieve and display dynamic data
+            /*
+            const urlParams = new URLSearchParams(window.location.search);
+            const donationAmount = urlParams.get('amount');
+            const donorName = urlParams.get('name');
+            
+            if (donationAmount) {
+                document.querySelector('[data-value="amount"]').textContent = '$' + donationAmount;
+            }
+            
+            if (donorName) {
+                document.querySelector('[data-value="name"]').textContent = donorName;
+            }
+            */
+        });
+    </script>
+</body>
+</html>

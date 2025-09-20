@@ -62,6 +62,7 @@
                 <a href="#" class="nav-link text-gray-700 hover:text-blue-500">Home</a>
                 <a href="#" class="nav-link text-gray-700 hover:text-blue-500">About</a>
                 <a href="{% url 'dashboard:announcement' %}" class="nav-link text-gray-700 hover:text-blue-500">Announcements</a>
+                <a href="{% url 'web:donation' %}" class="nav-link text-gray-700 hover:text-blue-500">Donation</a>
                 {% if request.user.is_authenticated and not request.user.userprofile.role == "public_user" %}
                     <a href="{% url 'dashboard:dashboard' %}" class="nav-link text-gray-700 hover:text-blue-500">Dashboard</a>
                 {% endif %}
@@ -90,6 +91,8 @@
             <div class="px-2 pt-2 pb-3 space-y-1">
                 <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">Home</a>
                 <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">About</a>
+                <a href="{% url 'web:donation' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">Donation</a>
+
                 <a href="{% url 'dashboard:announcement' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">Announcements</a>
                 {% if not request.user.userprofile.role == "public_user" %}
                     <a href="{% url 'dashboard:dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">Dashboard</a>
@@ -119,7 +122,7 @@
                     <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-6">Together We Can Make a Difference</h1>
                     <p class="text-xl mb-8">Join us in our mission to provide food, shelter, and education to those in need around the world.</p>
                     <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                        <button class="bg-white text-blue-500 hover:bg-gray-100 px-6 py-3 rounded-full font-bold transition duration-300">
+                        <button type="button" onclick="window.location.href='/donation/'" class="bg-white text-blue-500 hover:bg-gray-100 px-6 py-3 rounded-full font-bold transition duration-300">
                             Donate Now
                         </button>
                         <button class="border-2 border-white text-white hover:bg-white hover:text-blue-500 px-6 py-3 rounded-full font-bold transition duration-300">
@@ -186,7 +189,7 @@
                         <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
                             <div class="bg-blue-500 h-2 rounded-full" style="width: 50%"></div>
                         </div>
-                        <button class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-full font-medium transition duration-300">
+                        <button type="button" onclick="window.location.href='/donation/'" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-full font-medium transition duration-300">
                             Donate Now
                         </button>
                     </div>
@@ -207,7 +210,7 @@
                         <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
                             <div class="bg-blue-500 h-2 rounded-full" style="width: 47%"></div>
                         </div>
-                        <button class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-full font-medium transition duration-300">
+                        <button type="button" onclick="window.location.href='/donation/'" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-full font-medium transition duration-300">
                             Donate Now
                         </button>
                     </div>
@@ -228,7 +231,7 @@
                         <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
                             <div class="bg-blue-500 h-2 rounded-full" style="width: 53%"></div>
                         </div>
-                        <button class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-full font-medium transition duration-300">
+                        <button type="button" onclick="window.location.href='/donation/'" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-full font-medium transition duration-300">
                             Donate Now
                         </button>
                     </div>

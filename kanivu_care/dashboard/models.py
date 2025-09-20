@@ -49,6 +49,37 @@ class FinanceModel(models.Model):
     def __str__(self):
         return self.user.username
     
+
+class CollectionGalleryModel(models.Model):
+    image=models.ImageField(upload_to="collections/")
+
+    def __str__(self):
+        return str(self.image)
+
+    
+
+ 
+class CollectionModel(models.Model):
+
+    COLLECTION_TYPE_CHOICES=(
+        ("Weekly Collection","Weekly Collection"),
+        ("Event Based Collection","Event Based Collection"),
+        ("Special Collection","Special Collection"),
+    )
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    collection_type=models.CharField(choices=COLLECTION_TYPE_CHOICES)
+    description=models.TextField()
+    collection_date=models.DateField()
+    announced_date=models.DateField(auto_now_add=True)
+    total=models.IntegerField()
+    is_completed=models.BooleanField(default=False)
+    images=models.ManyToManyField(CollectionGalleryModel,blank=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.collection_type}"
+    
+
+    
 class KitReceiverModel(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     name=models.CharField(max_length=30)
@@ -79,3 +110,5 @@ class AnnouncementModel(models.Model):
 
     def __str__(self):
         return self.title
+    
+    

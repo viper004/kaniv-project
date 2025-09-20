@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hope Foundation - Donate</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 0;
+            background: linear-gradient(120deg, #3498db, #8e44ad);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .info {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .info h2 {
+            color: #3498db;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f1f1f1;
+        }
+        
+        .impact {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .impact-item {
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .impact-item i {
+            font-size: 2.5rem;
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+        
+        .donation-form {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .form-title {
+            color: #3498db;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f1f1f1;
+        }
+        
+        .form-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            color: #8e44ad;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+            transition: all 0.3s;
+        }
+        
+        .input-with-icon input, 
+        .input-with-icon textarea, 
+        .input-with-icon select {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .input-with-icon input:focus, 
+        .input-with-icon textarea:focus, 
+        .input-with-icon select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        /* Textarea specific styling */
+        .input-with-icon textarea {
+            resize: vertical;
+            min-height: 100px;
+            max-height: 200px;
+            width: 100%;
+            /* Prevent horizontal resize */
+            resize: none;
+        }
+        
+        /* Adjust icon position when textarea expands */
+        .input-with-icon textarea:focus + i,
+        .input-with-icon textarea:not(:placeholder-shown) + i {
+            top: 20px;
+            transform: none;
+        }
+        
+        .amount-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .amount-option {
+            flex: 1;
+            min-width: 80px;
+            text-align: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .amount-option:hover {
+            background: #e9ecef;
+        }
+        
+        .amount-option.selected {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        
+        .custom-amount.visible {
+            display: block;
+        }
+        
+        .donate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(120deg, #3498db, #8e44ad);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .donate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            header h1 {
+                font-size: 2.2rem;
+            }
+            
+            header p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Make a Difference Today</h1>
+            <p>Your donation can change lives and create a better tomorrow for those in need. Every contribution matters.</p>
+        </header>
+        
+        <div class="content">
+            <div class="info">
+                <h2>How Your Donation Helps</h2>
+                <p>At Hope Foundation, we believe in transparency and impact. Here's how your generosity makes a difference:</p>
+                
+                <div class="impact">
+                    <div class="impact-item">
+                        <i class="fas fa-utensils"></i>
+                        <h3>Feed Families</h3>
+                        <p>₹50 provides food for a family for one week</p>
+                    </div>
+                    
+                    <div class="impact-item">
+                        <i class="fas fa-book-open"></i>
+                        <h3>Education</h3>
+                        <p>₹100 sends a child to school for one month</p>
+                    </div>
+                    
+                    <div class="impact-item">
+                        <i class="fas fa-house-medical"></i>
+                        <h3>Shelter</h3>
+                        <p>₹200 provides housing for a family for one month</p>
+                    </div>
+                </div>
+                
+                <p>We ensure that 90% of every donation goes directly to our programs, with only 10% used for administrative costs.</p>
+                <p>Thank you for your generosity and trust in our mission to create a better world for everyone.</p>
+            </div>
+            
+            <div class="donation-form">
+                <h2 class="form-title">Make a Donation</h2>
+                
+                <form action="{% url 'web:donation' %}" method="post" id="donationForm">
+                    {% csrf_token %}
+                    <!-- Personal Details Section -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-user-circle"></i> Personal Details
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-user"></i>
+                                <input type="text" id="name" name="full_name" value="{{request.user.first_name}}" placeholder="Enter your name" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" id="email" name="email" value="{{request.user.email}}" placeholder="Enter Your Email" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-phone"></i>
+                                <input type="tel" id="phone" name="phone_number" value="{{request.user.userprofile.phone_number}}" placeholder="Enter Your Phone Number" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Donation Amount Section -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fa-solid fa-indian-rupee-sign"></i> Donation Amount
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label>Donation Amount (USD)</label>
+                            <div class="amount-options">
+                                <div class="amount-option" data-amount="25">₹25</div>
+                                <div class="amount-option" data-amount="50">₹50</div>
+                                <div class="amount-option" data-amount="100">₹100</div>
+                                <div class="amount-option" data-amount="250">₹250</div>
+                                <div class="amount-option" id="customOption">Custom</div>
+                            </div>
+                            
+                            <div class="form-group custom-amount">
+                                <label>Custom Amount</label>
+                                <div class="input-with-icon">
+                                    <i class="fa-solid fa-indian-rupee-sign"></i>
+                                    <input type="number" name="amount" id="customAmount" placeholder="Enter amount">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Details Section -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-credit-card"></i> Payment Details
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label>Card Number</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-credit-card"></i>
+                                <input type="text" name="card_no" id="cardNumber" placeholder="1234 5678 9012 3456" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Name on card</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-user"></i>
+                                <input type="text" id="cardName" name="name_on_card" placeholder="Name on card" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" style="display: flex; gap: 15px;">
+                            <div style="flex: 1;">
+                                <label>Expiry Date</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <input type="text" id="expiry" maxlength="5" name="expiry" placeholder="MM/YY" required>
+                                </div>
+                            </div>
+                            
+                            <div style="flex: 1;">
+                                <label>CVV</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-lock"></i>
+                                    <input type="text" id="cvv" name="cvv" maxlength="3" placeholder="123" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Note Section -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-comment"></i> Additional Information
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label>Note (Optional)</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-comment"></i>
+                                <textarea id="note" name="note" placeholder="Add a personal message or specify how you'd like your donation to be used"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="donate-btn">Donate Now</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Amount selection logic
+            const amountOptions = document.querySelectorAll('.amount-option');
+            const customAmountField = document.querySelector('.custom-amount');
+            const customOption = document.getElementById('customOption');
+            const customAmountInput = document.getElementById('customAmount');
+            
+            amountOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove selected class from all options
+                    amountOptions.forEach(opt => opt.classList.remove('selected'));
+                    
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                    
+                    // Show custom amount field if custom option is selected
+                    if (this.id === 'customOption') {
+                        customAmountField.classList.add('visible');
+                        customAmountInput.focus();
+                        customAmountInput.value = '';
+                    } else {
+                        customAmountField.classList.remove('visible');
+                        customAmountInput.value=this.dataset.amount;
+                    }
+                });
+            });
+            
+            // Adjust textarea icon position when content changes
+            const noteTextarea = document.getElementById('note');
+            const noteIcon = noteTextarea.previousElementSibling;
+            
+            noteTextarea.addEventListener('input', function() {
+                // Adjust icon position based on scroll height
+                if (this.scrollHeight > 100) {
+                    noteIcon.style.top = '20px';
+                    noteIcon.style.transform = 'none';
+                } else {
+                    noteIcon.style.top = '50%';
+                    noteIcon.style.transform = 'translateY(-50%)';
+                }
+            });
+            
+            // Form submission
+            const donationForm = document.getElementById('donationForm');
+            
+            donationForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Get selected amount
+                let amount = 0;
+                const selectedOption = document.querySelector('.amount-option.selected');
+                
+                if (selectedOption.id === 'customOption') {
+                    amount = customAmountInput.value;
+                } else {
+                    amount = selectedOption.getAttribute('data-amount');
+                }
+                
+                // In a real application, you would process payment here
+                alert(`Thank you for your donation of ₹₹{amount}! This is a demo page, so no actual payment was processed.`);
+                
+                // Reset form
+                donationForm.reset();
+                amountOptions.forEach(opt => opt.classList.remove('selected'));
+                customAmountField.classList.remove('visible');
+                
+                // Reset icon position
+                noteIcon.style.top = '50%';
+                noteIcon.style.transform = 'translateY(-50%)';
+            });
+        });
+    </script>
+</body>
+</html>
