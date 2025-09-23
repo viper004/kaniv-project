@@ -552,7 +552,7 @@
   <h2>Number Verification</h2>
   <div class="modal_form_group">
     <label for="phone">Enter New Number</label>
-    <input type="text" id="newphno" placeholder="Enter your new number">
+    <input type="text" id="newphno" maxlength="10" placeholder="Enter your new number">
   </div>
   <div class="modal_form_group">
     <button class="btn" onclick="sendOTP()">Get OTP</button>
@@ -562,7 +562,7 @@
     {% csrf_token %}
     <div class="modal_form_group">
       <label>Enter OTP</label>
-      <input type="hidden" name="otp_collection" id="otp_collection"/>
+      <input type="hidden" name="num_otp_collection" id="otp_collection"/>
       <div class="otp-inputs">
         <input type="text" maxlength="1" oninput="moveNext(this)" onkeydown="movePrev(event,this)">
         <input type="text" maxlength="1" oninput="moveNext(this)" onkeydown="movePrev(event,this)">
@@ -682,7 +682,7 @@
         const sendOTP=()=>{
             const newPhoneNumber=document.getElementById("newphno").value.trim()
             if (newPhoneNumber=="" || newPhoneNumber.length!=10){
-                alert("Invalid phone number.Only for indian number");
+                showAlert("error","Invalid number","Invalid phone number.Only for indian number");
                 return;
             }
 
@@ -790,7 +790,7 @@
                 console.log(data);
 
                 if (data.status =="success"){
-                    showAlert(data.status,data.title,data.message,"/users/profile/")
+                    showAlert(data.status,data.title,data.message,"reload")
                 }
                 else{
                     showAlert(data.status,data.title,data.message,"ok")

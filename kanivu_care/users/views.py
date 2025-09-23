@@ -4,10 +4,8 @@ import base64
 
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import  redirect, render
-from django.core.files.base import ContentFile
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.hashers import make_password
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
@@ -390,6 +388,7 @@ def verifyPhoneNumber(req):
 def updatePhoneNumber(req):
     if (req.method=="POST"):
         enteredOTP=req.POST.get("num_otp_collection")
+        print("dfsgvagvdfsvsdfd",enteredOTP)
         storedOTP=req.session.get("update_num_otp")
 
         if not storedOTP:
@@ -534,24 +533,25 @@ def updatePassword(req):
 
 def forgotPassworSendCode(req):
     req.session["is_forogot_num_verified"]=False
-    username=req.GET.get("username","")
+    username=req.GET.get("username")
     if not username:
         return JsonResponse({
             "status":"success",
             "title":"Username cannot be blank",
             "message":"Username field is required.because only recognize the account by this"
         })
-    currentUser=User.objects.filter(username=username).first()
-    if currentUser:
+    currentUser=User.objects.filter(username=username)
+    if currentUser.exists():
+        user=currentUser.first()
         req.session["current_user"]=username
-        currentUserNumber=currentUser.userprofile.phone_number
-        print("Current user number",currentUserNumber)
+        user=user.userprofile.phone_number
+        print("Current user number",user)
         otp="".join(str(secrets.randbelow(10)) for _ in range(4))
         print("Your otp is ",otp)
         req.session["reset_password_otp"]=otp
-        stringfiedNumber=str(currentUserNumber)
+        stringfiedNumber=str(user)
         staredNumbers="*" * (len(stringfiedNumber)-3)
-        lastThreeNumbers=currentUserNumber[-3:]
+        lastThreeNumbers=user[-3:]
         maskedNumber=staredNumbers+lastThreeNumbers
         print(maskedNumber)
         return JsonResponse({
@@ -605,49 +605,145 @@ def forgotPasswordVerify(req):
                 "title":"Incorrect OTP,Try again!",
                 "message":"Entered OTP is incorrect.recheck your OTP"
             })
+        
+    else:
+        return JsonResponse({
+            "status":"error",
+            "title":"Invalid method",
+            "message":"Only accepts POST request"
+        })
 
-    return render(req,"users/forgot_password_verify.html")
 
 
 
 def forgotPassword(req):
-    is_forogot_num_verified=req.session.get("is_forogot_num_verified")
-    if not is_forogot_num_verified==True:
-        return redirect("users:forgot_password_verify")
-    if (req.method=="POST"):
-        username=req.session.get("current_user")
-        if not username:
-            return JsonResponse({
-                "status":"error",
-                "title":"Invalid username",
-                "message":"Username not found! Recheck it."
-            })
-        currentUser=User.objects.filter(username=username).first()
-        if not currentUser:
-            return JsonResponse({
-                "status":"error",
-                "title":"Username was not found!",
-                "message":"Account is not founded by this username.Recheck your username and enter correctly"
-            })
-        form=resetPasswordForm(currentUser,req.POST)
-        if form.is_valid():
-            form.save()
-            return JsonResponse({
-                "status":"success",
-                "title":"Password resetted successfully",
-                "message":"Your account's password is resetted successfully.Now you can login with this password"
-            })
+    try:
+        if (req.method=="POST"):
+            is_forogot_num_verified=req.session.get("is_forogot_num_verified")
+            if not is_forogot_num_verified==True:
+                return redirect("users:forgot_password")
+            username=req.session.get("current_user")
+            if not username:
+                return JsonResponse({
+                    "status":"error",
+                    "title":"Invalid username",
+                    "message":"Username not found! Recheck it."
+                })
+            currentUser=User.objects.get(username=username)
+                
+            form=resetPasswordForm(currentUser,req.POST)
+            if form.is_valid():
+                form.save()
+                return JsonResponse({
+                    "status":"success",
+                    "title":"Password resetted successfully",
+                    "message":"Your account's password is resetted successfully.Now you can login with this password"
+                })
+            else:
+                error=form_errors(form)
+                return JsonResponse({
+                    "status":"error",
+                    "title":"Errors occured",
+                    "message":error
+                })
+        
+    
         else:
-            error=form_errors(form)
-            return JsonResponse({
-                "status":"error",
-                "title":"Errors occured",
-                "message":error
-            })
-    else:
-        dummyUser=User(username="",password=make_password("temp"))
-        form=resetPasswordForm(dummyUser)
-    return render(req,"users/forgot_password.html",context={"form":form})
+            method=req.GET.get("method")
+
+            if method and method=="send_code":
+                req.session["is_forogot_num_verified"]=False
+                username=req.GET.get("username")
+                if not username:
+                    return JsonResponse({
+                        "status":"success",
+                        "title":"Username cannot be blank",
+                        "message":"Username field is required.because only recognize the account by this"
+                    })
+                currentUser=User.objects.filter(username=username)
+                if currentUser.exists():
+                    user=currentUser.first()
+                    req.session["current_user"]=username
+                    user_phno=user.userprofile.phone_number
+                    if not user_phno:
+                        return JsonResponse({
+                            "status":"error",
+                            "title":"Phone number is not founded",
+                            "message":"Phone number is not founded on this profile.So you may to visit college office to update your number"
+                        })
+                    print("Current user number",user_phno)
+                    otp="".join(str(secrets.randbelow(10)) for _ in range(4))
+                    print("Your otp is ",otp)
+                    req.session["reset_password_otp"]=otp
+                    stringfiedNumber=str(user_phno)
+                    staredNumbers="*" * (len(stringfiedNumber)-3)
+                    lastThreeNumbers=user_phno[-3:]
+                    maskedNumber=staredNumbers+lastThreeNumbers
+                    print(maskedNumber)
+                    return JsonResponse({
+                        "status":"success",
+                        "title":"OTP Sened Successfully",
+                        "message":f"Your OTP is sended to {maskedNumber}"
+                    })
+                else:
+                    return JsonResponse({
+                        "status":"error",
+                        "title":"No user found!",
+                        "message":"This user is not found in our database.Recheck the username"
+                    })
+            
+            elif method and method=="verify_code":
+                req.session["is_forogot_num_verified"]=False
+                enteredOTP=req.GET.get("entered_otp")
+                storedOTP=req.session.get("reset_password_otp")
+
+
+                if len(enteredOTP)!=4 or not enteredOTP.isdigit():
+                    return JsonResponse({
+                        "status":"error",
+                        "title":"Invalid OTP.Try again",
+                        "message":"Your OTP must be 4 digit and only allowed numbers."
+                    })
+                
+                if not storedOTP:
+                    return JsonResponse({
+                        "status":"error",
+                        "title":"First submit the username",
+                        "message":"You can only proceed with this by submit your username."
+                    })
+                
+                
+
+                if (enteredOTP==storedOTP):
+                    req.session["is_forogot_num_verified"]=True
+                    return JsonResponse({
+                        "status":"success",
+                        "title":"OTP Verified.Now Reset your password",
+                        "message":"Your OTP is successfully verified.Now you can reset your password by click OK button."
+                    })
+                else:
+                    req.session["is_forogot_num_verified"]=False
+                    return JsonResponse({
+                        "status":"error",
+                        "title":"Incorrect OTP,Try again!",
+                        "message":"Entered OTP is incorrect.recheck your OTP"
+                    })
+            else:
+
+                return render(req,"users/forgot_password.html")
+    except User.DoesNotExist:
+        return JsonResponse({
+            "status":"error",
+            "title":"Username was not found!",
+            "message":"Account is not founded by this username.Recheck your username and enter correctly"
+        })
+    
+    except Exception as e:
+        return JsonResponse({
+            "status":"error",
+            "title":"An error occured",
+            "message":str(e)
+        })
 
 @login_required(login_url="/users/login/")
 def editAcademic(req):

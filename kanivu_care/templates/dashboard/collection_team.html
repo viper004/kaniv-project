@@ -891,18 +891,49 @@
             }
         }
 
-        #bell_wrap{
-            position: absolute;
-            top: 10%;
-            right: 10%;
-        }
+            a.bell {
+    position: absolute;
+    top: 5%;
+    right: 5%;
+    display: inline-block;
+    font-size: 24px;   /* size of bell */
+    color: #333;
+    text-decoration: none;
+    }
+
+    /* Badge */
+    a.bell .badge {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    background: #e53935;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    box-shadow: 0 0 0 2px #fff; /* white outline ring */
+    }
+
+    /* Hide if badge is empty or "0" */
+    a.bell .badge:empty,
+    a.bell .badge[data-count="0"] {
+    display: none;
+    }
+
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Notification</h1>
-            <p class="subtitle">Weekly update including fund collection details and upcoming event information.</p>
+            <h1>Collection Team</h1>
+            <p class="subtitle">This section highlights collection amounts from weekly reports, one-time special collections, and event-driven contributions. It provides a clear snapshot of trends, spikes, and key insights to help track performance across different collection periods and activities.</p>
         </header>
         {% if request.user.userprofile.role == "convenier" or request.user.userprofile.role == "coordinator" %}
             <aside>
@@ -910,8 +941,9 @@
             </aside>
         {% endif %}
 
-        <a href="{% url 'dashboard:collection_team_notification' %}" id="bell_wrap">
-            <i class="fas fa-bell"></i>
+        <a href="{% url 'dashboard:collection_team_notification' %}" class="bell" aria-label="3 new notifications" title="3 new notifications">
+            <i class="fa-solid fa-bell"></i>
+            <span class="badge">3</span>
         </a>
 
     

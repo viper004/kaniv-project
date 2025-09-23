@@ -3,11 +3,13 @@ from django.contrib.auth.decorators import login_required
 from django.http.response import HttpResponseRedirect,JsonResponse
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.db.models import Sum
 
 from datetime import datetime
 import requests
 import re
 
+from web.models import DonationModel
 from dashboard.models import NotifyModel,FinanceModel,KitReceiverModel,AnnouncementModel,NotifyModelPriority,CollectionModel,CollectionGalleryModel
 from dashboard.forms import financeModelForm,kitReceiverForm,announcementForm,CollectionModelForm
 
@@ -323,7 +325,7 @@ def Announcement(req):
         }
 
 
-        return render(req,"announcements.html",context=cntx)
+        return render(req,"dashboard/announcements.html",context=cntx)
     
 
     
@@ -991,4 +993,25 @@ def collectionTeamNotification(req):
 def donations(req):
     if req.user.userprofile.role not in ["convenier","coordinator"]:
         return HttpResponseRedirect("/")
-    return render(req,"dashboard/donations.html")
+    
+    donotors=DonationModel.objects.all()
+    total_amt=DonationModel.objects.aggregate(total_amount=Sum("amount"))
+    total_donation_amount=total_amt["total_amount"]
+    total_donors=donotors.count()
+    average_donation=total_donation_amount/total_donors
+    cntx={
+        "donations":donotors,
+        "total_donation_amount":total_donation_amount,
+        "total_donors":total_donors,
+        "average_donation":average_donation
+    }
+    return render(req,"dashboard/donations.html",context=cntx)
+
+
+def viewDonation(req,id):
+    try:
+        donation=DonationModel.objects.get(transaction_id=id)
+    except Exception as e:
+        return HttpResponseRedirect("/")
+    
+    return render(req,"dashboard/view_donation.html",context={"donation":donation})

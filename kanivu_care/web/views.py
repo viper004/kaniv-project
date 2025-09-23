@@ -1,14 +1,32 @@
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http.response import JsonResponse
+from django.db.models import Sum
 
 from web.forms import donationModelForm
+from web.models import DonationModel
+from dashboard.models import AnnouncementModel
+
 from users.functions import form_errors
 
 # Create your views here.
 
 def Home(req):
     return render(req,"index.html")
+
+
+def viewAnnouncement(req):
+    unhided_announcements=AnnouncementModel.objects.filter(is_hidden=False)
+    ongoing_announcements=unhided_announcements.filter(is_completed=False)
+    previous_announcements=unhided_announcements.filter(is_completed=True)
+
+    cntx={
+        "ongoing_announcements":ongoing_announcements,
+        "previous_announcements":previous_announcements
+    }
+
+    return render(req,"announcement.html",context=cntx)
 
 @login_required(login_url="users:login")
 def donation(req):
@@ -35,3 +53,31 @@ def donation(req):
             "form":donationModelForm()
         }
     return render(req,"donation.html",context=cntx)
+
+@login_required(login_url="users:login")
+def myDonations(req):
+    my_donations=DonationModel.objects.filter(user=req.user)
+
+    total_amt=DonationModel.objects.aggregate(total_amount=Sum("amount"))
+    total_donation_amount=total_amt["total_amount"]
+    total_donors=my_donations.count()
+    average_donation=total_donation_amount/total_donors
+    
+    cntx={
+        "my_donations":my_donations,
+        "total_donation_amount":total_donation_amount,
+        "total_donors":total_donors,
+        "average_donation":average_donation
+    }
+    return render(req,"my_donations.html",context=cntx)
+
+@login_required(login_url="users:login")
+def viewMyDonation(req,transaction_id):
+    try:
+        donation=DonationModel.objects.get(user=req.user,transaction_id=transaction_id)
+        cntx={
+            "donation":donation
+        }
+        return render(req,"view_my_donation.html",context=cntx)
+    except Exception:
+        return HttpResponseRedirect("/")

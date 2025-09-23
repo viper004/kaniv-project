@@ -713,7 +713,11 @@ aside .pending_lists{
             {% for i in coordinators %}
             <div class="user-card">
                 <div class="user-header">
-                    <div class="user-avatar"></div>
+                    {% if i.user.userprofile.photo %}
+                        <img src="{{i.user.userprofile.photo.url}}" class="user-avatar">
+                    {% else %}
+                        <div class="user-avatar"></div>
+                    {% endif %}
                     <div class="user-info">
                         <div class="user-name">{{ i.user.username }}</div>
                         <span class="user-role role-coordinator">Coordinator</span>
@@ -768,7 +772,11 @@ aside .pending_lists{
             {% for i in members %}
             <div class="user-card">
                 <div class="user-header">
-                    <div class="user-avatar"></div>
+                    {% if i.user.userprofile.photo %}
+                        <img src="{{i.user.userprofile.photo.url}}" class="user-avatar">
+                    {% else %}
+                        <div class="user-avatar"></div>
+                    {% endif %}
                     <div class="user-info">
                         <div class="user-name">{{ i.user.username }}</div>
                         <span class="user-role role-member">Member</span>

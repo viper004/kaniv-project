@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 
 # Create your models here.
@@ -13,6 +15,8 @@ class DonationModel(models.Model):
     expiry_date=models.CharField()
     cvv=models.CharField(max_length=3)
     note=models.TextField(null=True,blank=True)
+    donated_date=models.DateField(auto_now_add=True)
+    transaction_id=models.UUIDField(default=uuid.uuid4,editable=False,unique=True)
 
     def __str__(self):
         return self.user.username

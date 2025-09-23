@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm,UserChangeForm,PasswordChangeForm,SetPasswordForm
+from django.contrib.auth.forms import UserChangeForm,PasswordChangeForm,SetPasswordForm
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.models import User
 
@@ -105,7 +105,7 @@ class userProfileUpdateForm(forms.ModelForm):
 
     class Meta:
         model=UserProfile
-        fields=["gender","photo"]
+        fields=["gender","photo","address"]
 
 
 class userPasswordChangeForm(PasswordChangeForm):

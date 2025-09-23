@@ -313,9 +313,8 @@
         </div>
         
         <div class="donation-grid">
-            <!-- Donation Record 1 -->
-            {% for i in donations %}
-                <a href="{% url 'dashboard:view_donation' i.transaction_id %}" class="donation-card">
+            {% for i in my_donations %}
+                <a href="{% url 'web:view_my_donation' i.transaction_id %}" class="donation-card">
                     <div class="card-header">
                         <div class="donor-name">{{i.full_name}}</div>
                         <div class="donation-amount">₹{{i.amount}}</div>

@@ -214,7 +214,7 @@
                     
                 </div>
             </div>
-      
+            
             <div class="item" onclick="window.location.href='/dashboard/notification/'">
                 <div class="item-content">
                     <div class="item-icon">
@@ -225,17 +225,20 @@
                     
                 </div>
             </div>
+
+            {% if request.user.userprofile.role == "convenier" or request.user.userprofile.role == "coordinator" or request.user.memberregistration.duty == "Finance" or request.user.memberregistration.duty == "Team Controller" %}
             
-            <div class="item" onclick="window.location.href='/dashboard/finance/'">
-                <div class="item-content">
-                    <div class="item-icon">
-                        <i class="fas fa-chart-line"></i>
+                <div class="item" onclick="window.location.href='/dashboard/finance/'">
+                    <div class="item-content">
+                        <div class="item-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3 class="item-title">Financial Reports</h3>
+                        <p class="item-desc">View and analyze financial data with interactive charts and exports</p>
+                        
                     </div>
-                    <h3 class="item-title">Financial Reports</h3>
-                    <p class="item-desc">View and analyze financial data with interactive charts and exports</p>
-                    
                 </div>
-            </div>
+            {% endif %}
 
             {% if not request.user.userprofile.role == "member" %}
 
@@ -261,7 +264,7 @@
                             <i class="fas fa-hand-holding-dollar"></i>
                         </div>
                         <h3 class="item-title">Collection Team</h3>
-                        <p class="item-desc">View and analyze financial data with interactive charts and exports</p>
+                        <p class="item-desc">This section highlights collection amounts from weekly reports, one-time special collections, and event-driven contributions. It provides a clear snapshot of trends, spikes, and key insights to help track performance across different collection periods and activities.</p>
                         
                     </div>
                 </div>
@@ -275,7 +278,7 @@
                             <i class="fa-solid fa-handshake"></i>
                         </div>
                         <h3 class="item-title">Donations</h3>
-                        <p class="item-desc">View and analyze financial data with interactive charts and exports</p>
+                        <p class="item-desc">View and analyze donation data</p>
                         
                     </div>
                 </div>
