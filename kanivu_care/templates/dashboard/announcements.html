@@ -631,7 +631,7 @@
         {% if previous_announcements %}
             {% for i in previous_announcements %}
 
-                <div class="event-card" data-id="1"  data-thumbnail="{% if i.thumbnail %}{{i.thumbnail.url}}{% endif %}"
+                <div class="event-card" data-id="1"  data-thumbnail="{% if i.thumbnail %}{{i.thumbnail.url}} {% else %} {{i.thumbnail_url}} {% endif %}"
                             data-photo1="{% if i.photo1 %}{{i.photo1.url}}{% endif %}"
                             data-photo2="{% if i.photo2 %}{{i.photo2.url}}{% endif %}"
                             onclick="openModal(this,[`{{i.title}}`,`{{i.description}}`,

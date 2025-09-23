@@ -105,7 +105,7 @@ form {
 
 .forgot-link a {
   font-size: 14.5px;
-  color: #eee;
+  color: #7494ec;
   text-decoration: none;
 }
 
@@ -519,7 +519,7 @@ form {
     {% csrf_token %}
  
   <span class="mainHeading">Enter OTP</span>
-  <p class="otpSubheading">We have sent a verification code to your mobile number</p>
+  <p class="otpSubheading">We have sent a verification code to your email address</p>
   <input type="hidden" name="num-otp" id="num-otp"/>
   <div class="inputContainer otp-inputs">
    <input maxlength="1" type="text" class="otp-input" oninput="moveNext(this)" onkeydown="movePrev(event,this)">

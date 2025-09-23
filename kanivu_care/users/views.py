@@ -97,7 +97,7 @@ def numVerify(req):
         
 
         if (enteredOtp==storedOtp):
-            username=storedUser["username"]
+            username=str(storedUser["username"]).lower()
             password=storedUser["password"]
             email=storedUser["email"]
             user=User.objects.create_user(

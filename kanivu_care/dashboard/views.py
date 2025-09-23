@@ -343,7 +343,7 @@ def updateAnnouncement(req):
         
         form=announcementForm(req.POST,req.FILES,instance=announcement)
 
-        if not req.user==announcement.user or not req.user.userprofile.role == "convenier":
+        if not (req.user==announcement.user or req.user.userprofile.role == "convenier"):
             return JsonResponse({
                 "status":"error",
                 "title":"Request rejected",
@@ -418,7 +418,8 @@ def updateAnnouncement(req):
 
 
             announcement=AnnouncementModel.objects.get(id=id)
-            if not req.user==announcement.user or not req.user.userprofile.role == "convenier":
+            print(not req.user==announcement.user or not req.user.userprofile.role == "convenier")
+            if not (req.user==announcement.user or req.user.userprofile.role == "convenier"):
                 return JsonResponse({
                     "status":"error",
                     "title":"Request rejected",
@@ -440,7 +441,7 @@ def updateAnnouncement(req):
                     is_hidden="Hided"
                 else:
                     is_hidden="Unhided"
-                return JsonResponse({
+                return JsonResponse({   
                     "status":"success",
                     "title":f"Announcement is {is_hidden}.",
                     "message":f"Your announcement is {is_hidden} successfully"
@@ -998,12 +999,10 @@ def donations(req):
     total_amt=DonationModel.objects.aggregate(total_amount=Sum("amount"))
     total_donation_amount=total_amt["total_amount"]
     total_donors=donotors.count()
-    average_donation=total_donation_amount/total_donors
     cntx={
         "donations":donotors,
         "total_donation_amount":total_donation_amount,
-        "total_donors":total_donors,
-        "average_donation":average_donation
+        "total_donors":total_donors
     }
     return render(req,"dashboard/donations.html",context=cntx)
 

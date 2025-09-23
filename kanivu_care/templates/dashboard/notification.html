@@ -861,7 +861,7 @@
                                     <i class="fa-solid fa-circle-check" style="color: #0c0;"></i>
                                 </button>
                                 <button class="announcement_btn eye" data-id="{{i.id}}" type="button" onclick="updateStateAnnouncement(this,'{{i.id}}','toggle_hide')">
-                                    <i class="fas fa-eye" id="eye_icon" style="color: rgb(13, 13, 202);"></i>
+                                    <i class="{% if i.is_hidden %} fas fa-eye-slash {% else %} fas fa-eye {% endif %}" id="eye_icon" style="color: rgb(13, 13, 202);"></i>
                                 </button>
                                 <div class="action-buttons">
                                     <button class="announcement_btn" data-userid="{{i.id}}" onclick="updateStateAnnouncement(this,'{{i.id}}','delete')">
@@ -907,7 +907,7 @@
                             </div>
                             {% if i.user == request.user or request.user.userprofile.role == "convenier" %}
                                 <button class="announcement_btn eye" data-id="{{i.id}}" type="button" onclick="updateStateAnnouncement(this,'{{i.id}}','toggle_hide')">
-                                    <i class="fas fa-eye" style="color: rgb(13, 13, 202);"></i>
+                                    <i class="{% if i.is_hidden %} fas fa-eye-slash {% else %} fas fa-eye {% endif %}" style="color: rgb(13, 13, 202);"></i>
                                 </button>
                                 <div class="action-buttons">
                                     <button class="announcement_btn" data-userid="{{i.id}}" onclick="updateStateAnnouncement(this,'{{i.id}}','delete')">
@@ -973,14 +973,14 @@
                 <textarea id="description" name="description" placeholder="Write a description..." required></textarea>
                 
                 <button type="submit" class="submit-btn" id="modal_submit_btn">Submit</button>
+            </form>
         </div>
 
-            </form>
       </div>
     </div>
-  </div>
 
 </section>
+
 
 
 
@@ -1292,8 +1292,11 @@
             let icon=btn.querySelector("i");
             console.log(icon)
             fetch(url).then(res=>res.json()).then((data)=>{
-                console.log(data)
+                console.log(data);
+
                 if (data.status=="success" && method == "toggle_hide"){
+                    let isHide=data.is_hidden;
+
                     icon?.classList.toggle("fa-eye")
                     icon?.classList.toggle("fa-eye-slash")
                 }

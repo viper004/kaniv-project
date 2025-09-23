@@ -58,16 +58,15 @@ def donation(req):
 def myDonations(req):
     my_donations=DonationModel.objects.filter(user=req.user)
 
-    total_amt=DonationModel.objects.aggregate(total_amount=Sum("amount"))
+    total_amt=DonationModel.objects.filter(user=req.user).aggregate(total_amount=Sum("amount"))
     total_donation_amount=total_amt["total_amount"]
     total_donors=my_donations.count()
-    average_donation=total_donation_amount/total_donors
+
     
     cntx={
         "my_donations":my_donations,
-        "total_donation_amount":total_donation_amount,
-        "total_donors":total_donors,
-        "average_donation":average_donation
+        "total_donation_amount":total_donation_amount if total_donation_amount else 0,
+        "total_donors":total_donors
     }
     return render(req,"my_donations.html",context=cntx)
 
