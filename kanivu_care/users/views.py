@@ -1,6 +1,4 @@
-from operator import truediv
 import secrets
-import base64
 
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import  redirect, render
@@ -529,92 +527,6 @@ def updatePassword(req):
     else:
         form=userPasswordChangeForm(req.user)
     return render(req,"users/update_password.html",context={"form":form})
-
-
-def forgotPassworSendCode(req):
-    req.session["is_forogot_num_verified"]=False
-    username=req.GET.get("username")
-    if not username:
-        return JsonResponse({
-            "status":"success",
-            "title":"Username cannot be blank",
-            "message":"Username field is required.because only recognize the account by this"
-        })
-    currentUser=User.objects.filter(username=username)
-    if currentUser.exists():
-        user=currentUser.first()
-        req.session["current_user"]=username
-        user=user.userprofile.phone_number
-        print("Current user number",user)
-        otp="".join(str(secrets.randbelow(10)) for _ in range(4))
-        print("Your otp is ",otp)
-        req.session["reset_password_otp"]=otp
-        stringfiedNumber=str(user)
-        staredNumbers="*" * (len(stringfiedNumber)-3)
-        lastThreeNumbers=user[-3:]
-        maskedNumber=staredNumbers+lastThreeNumbers
-        print(maskedNumber)
-        return JsonResponse({
-            "status":"success",
-            "title":"OTP Sened Successfully",
-            "message":f"Your OTP is sended to {maskedNumber}"
-        })
-    else:
-        return JsonResponse({
-            "status":"error",
-            "title":"No user found!",
-            "message":"This user is not found in our database.Recheck the username"
-        })
-    
-
-def forgotPasswordVerify(req):
-    if (req.method=="POST"):
-        req.session["is_forogot_num_verified"]=False
-        enteredOTP=req.POST.get("entered_otp")
-        storedOTP=req.session.get("reset_password_otp")
-
-        print(len(enteredOTP))
-
-        if len(enteredOTP)!=4 or not enteredOTP.isdigit():
-            return JsonResponse({
-                "status":"error",
-                "title":"Invalid OTP.Try again",
-                "message":"Your OTP must be 4 digit and only allowed numbers."
-            })
-        
-        if not storedOTP:
-            return JsonResponse({
-                "status":"error",
-                "title":"First submit the username",
-                "message":"You can only proceed with this by submit your username."
-            })
-        
-        
-
-        if (enteredOTP==storedOTP):
-            req.session["is_forogot_num_verified"]=True
-            return JsonResponse({
-                "status":"success",
-                "title":"OTP Verified.Now Reset your password",
-                "message":"Your OTP is successfully verified.Now you can reset your password by click OK button."
-            })
-        else:
-            req.session["is_forogot_num_verified"]=False
-            return JsonResponse({
-                "status":"error",
-                "title":"Incorrect OTP,Try again!",
-                "message":"Entered OTP is incorrect.recheck your OTP"
-            })
-        
-    else:
-        return JsonResponse({
-            "status":"error",
-            "title":"Invalid method",
-            "message":"Only accepts POST request"
-        })
-
-
-
 
 def forgotPassword(req):
     try:

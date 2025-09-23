@@ -13,6 +13,7 @@ class NotifyModel(models.Model):
     description=models.TextField()
     is_completed=models.BooleanField(default=False)
     program_date=models.DateField()
+    announced_time=models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.user.username}'s {self.title}"
