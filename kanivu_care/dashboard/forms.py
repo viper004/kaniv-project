@@ -100,7 +100,7 @@ class CollectionModelForm(forms.ModelForm):
 
     class Meta:
         model = CollectionModel
-        exclude = ["user", "announced_date", "is_completed"]
+        exclude = ["user", "announced_date", "is_completed","images"]
 
 
 class kitReceiverForm(forms.ModelForm):

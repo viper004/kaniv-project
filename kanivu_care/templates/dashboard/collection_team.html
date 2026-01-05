@@ -935,7 +935,7 @@
             <h1>Collection Team</h1>
             <p class="subtitle">This section highlights collection amounts from weekly reports, one-time special collections, and event-driven contributions. It provides a clear snapshot of trends, spikes, and key insights to help track performance across different collection periods and activities.</p>
         </header>
-        {% if request.user.userprofile.role == "convenier" or request.user.userprofile.role == "coordinator" %}
+        {% if request.user.userprofile.role == "convenier" or request.user.userprofile.role == "coordinator" or request.user.memberregistration.duty == "Collection Team" or request.user.memberregistration.duty == "Team Controller" %}
             <aside>
                 <button type="button" id="create_notify" onclick="openModal()">Create Notification</button>
             </aside>
@@ -1085,7 +1085,7 @@
 <div class="carousel_modal_overlay" id="carousel_modal">
         <div class="carousel_modal">
             <div class="modal-header">
-                <h3 class="modal-title">Nature Gallery</h3>
+                <h3 class="modal-title">Gallery</h3>
                 <button class="close-btn" id="closeModal">&times;</button>
             </div>
             <div class="carousel-container" style="height: 80vh;overflow-y: scroll;">
@@ -1159,6 +1159,7 @@ let swiper = new Swiper('.swiper', {
 const openCarouselGalleryModal = (image) => {
     let images = image.querySelectorAll(".img_url");
     let urls = Array.from(images).map(img => img.dataset.img_url);
+
     
     // Destroy the current Swiper instance
     swiper.destroy(true, true);
@@ -1276,7 +1277,7 @@ document.addEventListener('keydown', (e) => {
                 <input type="number" id="total" value="${datas[3]}" name="total" placeholder="Enter Total amount" />
 
                 <label for="image">Image *</label>
-                <input type="file" accept="image/*" name="image" id="image" required/>
+                <input type="file" accept="image/*" name="images" id="image" required multiple/>
 
 
                 <input type="hidden" value="${datas[4]}" name="data_id"/>

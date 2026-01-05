@@ -678,7 +678,7 @@
             <h1>FINANCE</h1>
             <p class="subtitle">Record collections, upload proofs, and track all entries by date and type.</p>
         </header>
-        {% if request.user.userprofile.role == "convenier" or request.user.userprofile.role == "coordinator" %}
+        {% if request.user.userprofile.role == "convenier" or request.user.userprofile.role == "coordinator" or request.user.memberregistration.duty == "Finance" or request.user.memberregistration.duty == "Team Controller" %}
             <aside>
                 <button type="button" id="create_finance" onclick="openModal()">Create</button>
             </aside>

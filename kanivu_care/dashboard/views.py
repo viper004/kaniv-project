@@ -477,6 +477,12 @@ def updateAnnouncement(req):
     
 @login_required(login_url="users:login")
 def Finance(req):
+    if not (req.user.userprofile.role == "convenier" or req.user.userprofile.role == "coordinator" or req.user.memberregistration.duty == "Finance" or req.user.memberregistration.duty == "Team Controller"):
+        return JsonResponse({
+            "status":"error",
+            "title":"Request rejected",
+            "message":"Only convenier or coordinator or finance duty or team controller duty can access finance"
+        })
     if (req.method=="POST"):
         form=financeModelForm(req.POST,req.FILES)
         if form.is_valid():
@@ -865,7 +871,7 @@ def updateCollectionTeam(req):
         if (req.method=="POST"):
             collection_id=req.POST.get("collection_id")
             collection=CollectionModel.objects.get(id=collection_id)
-            if not collection.user==req.user or req.user.userprofile.role not in ["convenier","coordinator"]:
+            if not( collection.user==req.user or req.user.userprofile.role not in ["convenier","coordinator"]):
                 return JsonResponse({
                     "status":"error",
                     "title":"Request rejected",
@@ -873,7 +879,12 @@ def updateCollectionTeam(req):
                 })
             form=CollectionModelForm(req.POST,req.FILES,instance=collection)
             if form.is_valid():
-                form.save()
+                f=form.save()
+                f.images.clear()
+                for file in req.FILES.getlist("images"):
+                    gallery_obj = CollectionGalleryModel.objects.create(image=file)
+                    f.images.add(gallery_obj)
+                
                 return JsonResponse({
                     "status":"success",
                     "title":"Collection updated",
@@ -891,7 +902,7 @@ def updateCollectionTeam(req):
             collection_id=req.GET.get("collection_id")
             collection=CollectionModel.objects.get(id=collection_id)
 
-            if not collection.user==req.user or req.user.userprofile.role not in ["convenier","coordinator"]:
+            if not (collection.user==req.user or req.user.userprofile.role in ["convenier","coordinator"]):
                 return JsonResponse({
                     "status":"error",
                     "title":"Request rejected",
