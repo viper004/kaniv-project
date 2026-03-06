@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="min-h-screen bg-gradient-to-r from-blue-400 to-teal-400 flex items-center justify-center py-16">
+
+    <div class="bg-white shadow-xl rounded-xl p-10 w-full max-w-2xl">
+
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">
+            Join Kanivu as a Volunteer
+        </h2>
+
+        <p class="text-center text-gray-500 mb-8">
+            Be part of our mission to help communities and make a real difference.
+        </p>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <div>
+                    <label class="block font-semibold text-gray-600">Full Name</label>
+                    <input type="text" name="name" required value="{{ request.user.first_name }}" readonly
+                    class="w-full border rounded-lg px-4 py-2 mt-1 focus:ring-2 focus:ring-blue-400 outline-none">
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-gray-600">Email</label>
+                    <input type="email" name="email" required value="{{ request.user.email }}" readonly
+                    class="w-full border rounded-lg px-4 py-2 mt-1 focus:ring-2 focus:ring-blue-400 outline-none">
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-gray-600">Phone Number</label>
+                    <input type="text" name="phone" required value="{{ profile.phone_number }}" readonly
+                    class="w-full border rounded-lg px-4 py-2 mt-1 focus:ring-2 focus:ring-blue-400 outline-none">
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-gray-600">Age</label>
+                    <input type="number" name="age" required
+                    class="w-full border rounded-lg px-4 py-2 mt-1 focus:ring-2 focus:ring-blue-400 outline-none">
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-gray-600">Blood Group</label>
+                    <select name="blood_group"
+                    class="w-full border rounded-lg px-4 py-2 mt-1 focus:ring-2 focus:ring-blue-400 outline-none">
+
+                        <option value="">Select Blood Group</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+
+                    </select>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block font-semibold text-gray-600">Address</label>
+                    <textarea name="address" rows="2"
+                    class="w-full border rounded-lg px-4 py-2 mt-1 focus:ring-2 focus:ring-blue-400 outline-none">{{ profile.address }}</textarea>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block font-semibold text-gray-600">
+                        Why are you interested in becoming a volunteer?
+                    </label>
+                    <textarea name="reason" rows="4"
+                    class="w-full border rounded-lg px-4 py-2 mt-1 focus:ring-2 focus:ring-blue-400 outline-none"></textarea>
+                </div>
+
+            </div>
+
+            <!-- Student Checkbox -->
+
+            <div class="mt-6">
+                <label class="flex items-center space-x-2">
+                    <input type="checkbox" id="studentCheck"
+                    class="w-5 h-5 text-blue-500">
+                    <span class="font-semibold text-gray-700">
+                        Are you a student of CHMM College?
+                    </span>
+                </label>
+            </div>
+
+            <!-- Student Fields -->
+
+            <div id="studentFields" class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 hidden">
+
+                <div>
+                    <label class="block font-semibold text-gray-600">Admission Number</label>
+                    <input type="text" name="admission_no"
+                    class="w-full border rounded-lg px-4 py-2 mt-1">
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-gray-600">Period of Study</label>
+                    <input type="text" name="period"
+                    placeholder="2020-2023"
+                    class="w-full border rounded-lg px-4 py-2 mt-1">
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-gray-600">Batch</label>
+                    <select name="batch"
+                    class="w-full border rounded-lg px-4 py-2 mt-1">
+
+                        <option value="">Select</option>
+                        <option>MCA</option>
+                        <option>BCA</option>
+                        <option>BSc CS</option>
+                        <option>BCom</option>
+
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-gray-600">Current Year</label>
+                    <select name="year"
+                    class="w-full border rounded-lg px-4 py-2 mt-1">
+
+                        <option value="">Select</option>
+                        <option>1st Year</option>
+                        <option>2nd Year</option>
+                        <option>3rd Year</option>
+                        <option>4th Year</option>
+
+                    </select>
+                </div>
+
+            </div>
+
+            <!-- Submit Button -->
+
+            <div class="text-center mt-8">
+                <button type="submit"
+                class="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full font-bold transition duration-300">
+                    Join as Volunteer
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- Already Applied Modal -->
+
+<div id="appliedModal"
+class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+
+    <div class="bg-white px-8 py-6 rounded-lg shadow-lg text-center">
+        <p class="text-red-600 font-bold text-lg">
+            You have already applied as a volunteer
+        </p>
+    </div>
+
+</div>
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function(){
+
+    {% if already_applied %}
+
+        const modal = document.getElementById("appliedModal");
+        modal.classList.remove("hidden");
+
+        setTimeout(function(){
+            modal.classList.add("hidden");
+        },3000);
+
+    {% endif %}
+
+    const check = document.getElementById("studentCheck");
+    const fields = document.getElementById("studentFields");
+
+    check.addEventListener("change", function(){
+
+        if(this.checked){
+            fields.classList.remove("hidden");
+        }else{
+            fields.classList.add("hidden");
+        }
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

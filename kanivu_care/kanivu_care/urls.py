@@ -13,4 +13,5 @@ urlpatterns = [
     path("convenier/",include("convenier.urls",namespace="convenier")),
     path("coordinator/",include("coordinator.urls",namespace="coordinator")),
     path("dashboard/",include("dashboard.urls",namespace="dashboard")),
+    path("volunteer/",include("volunteer.urls",namespace="volunteer")),
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

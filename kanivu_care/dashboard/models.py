@@ -41,7 +41,7 @@ class FinanceModel(models.Model):
         ("Special Collection","Special Collection"),
     )
     user=models.ForeignKey(User,on_delete=models.CASCADE)
-    collection_type=models.CharField(choices=COLLECTION_TYPE_CHOICES)
+    collection_type=models.CharField(choices=COLLECTION_TYPE_CHOICES,max_length=100)
     description=models.TextField()
     collection_date=models.DateField()
     announced_date=models.DateField(auto_now_add=True)
@@ -68,7 +68,7 @@ class CollectionModel(models.Model):
         ("Special Collection","Special Collection"),
     )
     user=models.ForeignKey(User,on_delete=models.CASCADE)
-    collection_type=models.CharField(choices=COLLECTION_TYPE_CHOICES)
+    collection_type=models.CharField(choices=COLLECTION_TYPE_CHOICES,max_length=100)
     description=models.TextField()
     collection_date=models.DateField()
     announced_date=models.DateField(auto_now_add=True)

@@ -34,7 +34,11 @@ INSTALLED_APPS = [
     'coordinator',
     'members',
     'dashboard',
+    'volunteer',
 ]
+
+LOGIN_URL = 'users:login'
+# LOGIN_URL = 'users/login/'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
