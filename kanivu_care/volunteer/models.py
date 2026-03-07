@@ -45,6 +45,15 @@ class Volunteer(models.Model):
 
     address = models.TextField()
     reason = models.TextField()
+    is_approved=models.BooleanField(default=False)
+    approved_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="approved_volunteers"
+    )
+    rejection_reason = models.TextField(blank=True, null=True)
 
     # Student fields
     is_student = models.BooleanField(default=False)

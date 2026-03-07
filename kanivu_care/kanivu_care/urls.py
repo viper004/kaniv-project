@@ -1,6 +1,5 @@
 from django.contrib import admin
-from django.urls import path,include
-
+from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -14,4 +13,8 @@ urlpatterns = [
     path("coordinator/",include("coordinator.urls",namespace="coordinator")),
     path("dashboard/",include("dashboard.urls",namespace="dashboard")),
     path("volunteer/",include("volunteer.urls",namespace="volunteer")),
-]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])

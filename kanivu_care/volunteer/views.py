@@ -9,14 +9,31 @@ def join_volunteer(request):
 
     user_profile = UserProfile.objects.get(user=request.user)
 
-    if request.method == "POST":
+    volunteer = Volunteer.objects.filter(user=request.user).first()
 
-        # Check if user already applied
-        if Volunteer.objects.filter(user=request.user).exists():
+    if volunteer:
+
+        if volunteer.is_approved:
             return render(request, "volunteer/volunteer_join_form.html", {
                 "profile": user_profile,
-                "already_applied": True
+                "status": "approved"
             })
+
+        elif volunteer.rejection_reason:
+            return render(request, "volunteer/volunteer_join_form.html", {
+                "profile": user_profile,
+                "status": "rejected",
+                "reason": volunteer.rejection_reason
+            })
+
+        else:
+            return render(request, "volunteer/volunteer_join_form.html", {
+                "profile": user_profile,
+                "status": "pending"
+            })
+
+
+    if request.method == "POST":
 
         Volunteer.objects.create(
             user=request.user,

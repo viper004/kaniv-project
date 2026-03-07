@@ -27,6 +27,7 @@ urlpatterns=[
     path("collection_team_notification/",views.collectionTeamNotification,name="collection_team_notification"),
     path("donations/",views.donations,name="donations"),
     path("donations/<str:id>/",views.viewDonation,name="view_donation"),
+    path("approve_volunteers/",views.approve_volunteers,name="approve_volunteer")
 
 
 

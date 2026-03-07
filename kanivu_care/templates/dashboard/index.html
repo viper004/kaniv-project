@@ -283,6 +283,18 @@
                     </div>
                 </div>
             {% endif %}
+            {% if request.user.userprofile.role == "convenier" or request.user.userprofile.role == "coordinator" %}
+                <div class="item" onclick="window.location.href='/dashboard/approve_volunteers/'">
+                    <div class="item-content">
+                        <div class="item-icon">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <h3 class="item-title">Volunteer Requests</h3>
+                        <p class="item-desc">Approve new Volunteers</p>
+                        
+                    </div>
+                </div>
+            {% endif %}
             
 
             

@@ -123,9 +123,12 @@
                         <button type="button" onclick="window.location.href='/donation/'" class="bg-white text-blue-500 hover:bg-gray-100 px-6 py-3 rounded-full font-bold transition duration-300">
                             Donate Now
                         </button>
-                        <a href="{% url 'volunteer:join_volunteer' %}" class="border-2 border-white text-white hover:bg-white hover:text-blue-500 px-6 py-3 rounded-full font-bold transition duration-300 inline-block">
-                            Join Kanivu
-                        </a>
+                        {% if request.user.is_authenticated and request.user.userprofile.role != "coordinator" %}
+                            <a href="{% url 'volunteer:join_volunteer' %}" 
+                            class="border-2 border-white text-white hover:bg-white hover:text-blue-500 px-6 py-3 rounded-full font-bold transition duration-300 inline-block">
+                                Join Kanivu
+                            </a>
+                        {% endif %}
                         <button class="border-2 border-white text-white hover:bg-white hover:text-blue-500 px-6 py-3 rounded-full font-bold transition duration-300">
                             Learn More
                         </button>

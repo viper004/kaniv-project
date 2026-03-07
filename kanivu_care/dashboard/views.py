@@ -22,6 +22,8 @@ from coordinator.models import coordinateRegistration
 
 from convenier.models import pendingMemberAddRequest
 
+from volunteer.models import *
+
 
 
 @login_required(login_url="users:login")
@@ -1025,3 +1027,9 @@ def viewDonation(req,id):
         return HttpResponseRedirect("/")
     
     return render(req,"dashboard/view_donation.html",context={"donation":donation})
+
+@login_required
+def approve_volunteers(request):
+    data=Volunteer.objects.filter(is_approved=False)
+    print(data)
+    return render(request,"dashboard/approve_volunteers.html",{"data":data})

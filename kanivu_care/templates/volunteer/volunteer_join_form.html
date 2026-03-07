@@ -153,31 +153,46 @@
 
 <!-- Already Applied Modal -->
 
-<div id="appliedModal"
+<div id="statusModal"
 class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
 
-    <div class="bg-white px-8 py-6 rounded-lg shadow-lg text-center">
-        <p class="text-red-600 font-bold text-lg">
-            You have already applied as a volunteer
-        </p>
+    <div class="bg-white px-8 py-6 rounded-lg shadow-lg text-center max-w-md">
+
+        {% if status == "pending" %}
+            <p class="text-yellow-600 font-bold text-lg mb-4">
+                You already applied to join as Kanivu Volunteer. Please wait for the approval.
+            </p>
+
+        {% elif status == "approved" %}
+            <p class="text-green-600 font-bold text-lg mb-4">
+                You are already a Kanivu Volunteer.
+            </p>
+
+        {% elif status == "rejected" %}
+            <p class="text-red-600 font-bold text-lg mb-2">
+                Your application was rejected.
+            </p>
+
+            <p class="text-gray-600 mb-4">
+                Reason: {{ reason }}
+            </p>
+        {% endif %}
+
+        <button onclick="window.location.href='/'"
+        class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded">
+            OK
+        </button>
+
     </div>
 
 </div>
-
 
 <script>
 
 document.addEventListener("DOMContentLoaded", function(){
 
-    {% if already_applied %}
-
-        const modal = document.getElementById("appliedModal");
-        modal.classList.remove("hidden");
-
-        setTimeout(function(){
-            modal.classList.add("hidden");
-        },3000);
-
+    {% if status %}
+        document.getElementById("statusModal").classList.remove("hidden");
     {% endif %}
 
     const check = document.getElementById("studentCheck");
@@ -194,7 +209,6 @@ document.addEventListener("DOMContentLoaded", function(){
     });
 
 });
-
 </script>
 
 {% endblock %}

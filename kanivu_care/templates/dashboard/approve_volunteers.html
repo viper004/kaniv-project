@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Volunteer Requests</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        .hero-gradient {
+            background: linear-gradient(135deg, #60a5fa, #6ee7b7);
+        }
+    </style>
+
+</head>
+
+<body class="bg-gray-100 font-sans">
+
+    <!-- NAVBAR -->
+
+    <nav class="bg-white shadow-md">
+
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+
+            <div class="flex items-center space-x-3">
+
+                <a href="/" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
+
+                    <i class="fa-solid fa-house text-lg"></i>
+                    <span class="font-semibold">Home</span>
+
+                </a>
+
+            </div>
+
+            <h1 class="text-xl font-bold text-gray-800">
+                Kanivu
+            </h1>
+
+        </div>
+
+    </nav>
+
+
+    <!-- HERO HEADER -->
+
+    <section class="hero-gradient text-white py-16">
+
+        <div class="max-w-6xl mx-auto px-6">
+
+            <h1 class="text-4xl font-bold mb-3">
+                Volunteer Requests
+            </h1>
+
+            <p class="text-lg opacity-90">
+                Approve or reject volunteer applications
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- TABLE SECTION -->
+
+    <div class="max-w-6xl mx-auto px-6 -mt-10">
+
+        <div class="bg-white rounded-xl shadow-xl overflow-hidden">
+
+            <table class="w-full text-left">
+
+                <thead class="bg-gray-100">
+
+                    <tr class="text-gray-700 text-sm uppercase">
+
+                        <th class="p-4">Name</th>
+                        <th class="p-4">Phone</th>
+                        <th class="p-4">Email</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for v in data %}
+
+                    <tr onclick="openModal(this)" data-id="{{v.id}}" data-name="{{v.name}}" data-email="{{v.email}}"
+                        data-phone="{{v.phone}}" data-age="{{v.age}}" data-blood="{{v.blood_group}}"
+                        data-address="{{v.address}}" data-reason="{{v.reason}}" data-student="{{v.is_student}}"
+                        data-admission="{{v.admission_no}}" data-batch="{{v.batch}}" data-year="{{v.year}}"
+                        class="cursor-pointer hover:bg-gray-50 border-b">
+
+                        <td class="p-4 font-semibold text-gray-700">
+                            {{v.name}}
+                        </td>
+
+                        <td class="p-4 text-gray-600">
+                            {{v.phone}}
+                        </td>
+
+                        <td class="p-4 text-gray-600">
+                            {{v.email}}
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="3" class="p-6 text-center text-gray-500">
+                            No volunteer requests
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- DETAILS MODAL -->
+
+    <div id="detailsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-8">
+
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                Volunteer Details
+            </h2>
+
+            <div class="space-y-2 text-gray-700">
+
+                <p><b>Name:</b> <span id="mName"></span></p>
+                <p><b>Email:</b> <span id="mEmail"></span></p>
+                <p><b>Phone:</b> <span id="mPhone"></span></p>
+                <p><b>Age:</b> <span id="mAge"></span></p>
+                <p><b>Blood Group:</b> <span id="mBlood"></span></p>
+                <p><b>Address:</b> <span id="mAddress"></span></p>
+                <p><b>Reason:</b> <span id="mReason"></span></p>
+                <p><b>Student:</b> <span id="mStudent"></span></p>
+                <p><b>Admission No:</b> <span id="mAdmission"></span></p>
+                <p><b>Batch:</b> <span id="mBatch"></span></p>
+                <p><b>Year:</b> <span id="mYear"></span></p>
+
+            </div>
+
+            <div class="flex justify-end space-x-4 mt-8">
+
+                <form method="POST" action="/dashboard/approve-volunteer/">
+                    {% csrf_token %}
+                    <input type="hidden" name="volunteer_id" id="approveId">
+
+                    <button class="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg">
+                        Approve
+                    </button>
+
+                </form>
+
+                <button onclick="openReject()" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg">
+                    Reject
+                </button>
+
+                <button onclick="closeModal()" class="bg-gray-300 hover:bg-gray-400 px-5 py-2 rounded-lg">
+                    Close
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- REJECT MODAL -->
+
+    <div id="rejectModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+
+            <h2 class="text-xl font-bold mb-4 text-gray-800">
+                Reason for Rejection
+            </h2>
+
+            <form method="POST" action="/dashboard/reject-volunteer/">
+
+                {% csrf_token %}
+
+                <input type="hidden" name="volunteer_id" id="rejectId">
+
+                <textarea name="reason" class="w-full border rounded-lg p-3 focus:ring-2 focus:ring-red-400" rows="4"
+                    placeholder="Enter rejection reason"></textarea>
+
+                <div class="flex justify-end space-x-3 mt-6">
+
+                    <button type="button" onclick="closeReject()" class="bg-gray-300 px-4 py-2 rounded-lg">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">
+                        Submit
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        let currentVolunteerId = null
+
+        function openModal(row) {
+
+            currentVolunteerId = row.dataset.id
+
+            document.getElementById("mName").innerText = row.dataset.name
+            document.getElementById("mEmail").innerText = row.dataset.email
+            document.getElementById("mPhone").innerText = row.dataset.phone
+            document.getElementById("mAge").innerText = row.dataset.age
+            document.getElementById("mBlood").innerText = row.dataset.blood
+            document.getElementById("mAddress").innerText = row.dataset.address
+            document.getElementById("mReason").innerText = row.dataset.reason
+            document.getElementById("mAdmission").innerText = row.dataset.admission
+            document.getElementById("mBatch").innerText = row.dataset.batch
+            document.getElementById("mYear").innerText = row.dataset.year
+
+            document.getElementById("mStudent").innerText =
+                row.dataset.student === "True" ? "Yes" : "No"
+
+            document.getElementById("approveId").value = currentVolunteerId
+            document.getElementById("rejectId").value = currentVolunteerId
+
+            document.getElementById("detailsModal").classList.remove("hidden")
+
+        }
+
+        function closeModal() {
+            document.getElementById("detailsModal").classList.add("hidden")
+        }
+
+        function openReject() {
+            document.getElementById("rejectModal").classList.remove("hidden")
+        }
+
+        function closeReject() {
+            document.getElementById("rejectModal").classList.add("hidden")
+        }
+
+    </script>
+
+</body>
+
+</html>
