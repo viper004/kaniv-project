@@ -53,6 +53,7 @@ class Volunteer(models.Model):
         blank=True,
         related_name="approved_volunteers"
     )
+    declined=models.BooleanField(default=False)
     rejection_reason = models.TextField(blank=True, null=True)
 
     # Student fields

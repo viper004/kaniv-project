@@ -38,13 +38,13 @@
 
                 <div>
                     <label class="block font-semibold text-gray-600">Age</label>
-                    <input type="number" name="age" required
+                    <input type="number" name="age" required value="{{age}}"
                     class="w-full border rounded-lg px-4 py-2 mt-1 focus:ring-2 focus:ring-blue-400 outline-none">
                 </div>
 
                 <div>
                     <label class="block font-semibold text-gray-600">Blood Group</label>
-                    <select name="blood_group"
+                    <select name="blood_group" required
                     class="w-full border rounded-lg px-4 py-2 mt-1 focus:ring-2 focus:ring-blue-400 outline-none">
 
                         <option value="">Select Blood Group</option>
@@ -169,15 +169,19 @@ class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hid
             </p>
 
         {% elif status == "rejected" %}
-            <p class="text-red-600 font-bold text-lg mb-2">
-                Your application was rejected.
-            </p>
+    <p class="text-red-600 font-bold text-lg mb-2">
+        Your application was rejected.
+    </p>
 
-            <p class="text-gray-600 mb-4">
-                Reason: {{ reason }}
-            </p>
-        {% endif %}
+    <p class="text-gray-600 mb-4">
+        Reason: {{ reason }}
+    </p>
 
+    <a href="{% url 'volunteer:join_volunteer' %}?reapply=true"
+class="inline-block bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2 rounded-lg font-semibold mb-4">
+    Re-Apply
+</a>
+{% endif %}
         <button onclick="window.location.href='/'"
         class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded">
             OK

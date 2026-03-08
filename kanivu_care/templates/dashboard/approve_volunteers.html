@@ -30,10 +30,10 @@
 
             <div class="flex items-center space-x-3">
 
-                <a href="/" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
+                <a href="{% url 'dashboard:dashboard' %}" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
 
-                    <i class="fa-solid fa-house text-lg"></i>
-                    <span class="font-semibold">Home</span>
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                    <span class="font-semibold">Back</span>
 
                 </a>
 
@@ -82,6 +82,7 @@
                         <th class="p-4">Name</th>
                         <th class="p-4">Phone</th>
                         <th class="p-4">Email</th>
+                        <th class="p-4">Applied At</th>
 
                     </tr>
 
@@ -107,6 +108,10 @@
 
                         <td class="p-4 text-gray-600">
                             {{v.email}}
+                        </td>
+
+                        <td class="p-4 text-gray-600">
+                            {{ v.created_at }}
                         </td>
 
                     </tr>

@@ -1030,6 +1030,35 @@ def viewDonation(req,id):
 
 @login_required
 def approve_volunteers(request):
-    data=Volunteer.objects.filter(is_approved=False)
+    data = Volunteer.objects.filter(is_approved=False, declined=False).order_by("created_at")
     print(data)
     return render(request,"dashboard/approve_volunteers.html",{"data":data})
+
+from django.shortcuts import redirect, get_object_or_404
+
+def approve_volunteer(request):
+
+    if request.method == "POST":
+        volunteer_id = request.POST.get("volunteer_id")
+
+        volunteer = get_object_or_404(Volunteer, id=volunteer_id)
+
+        volunteer.is_approved = True
+        volunteer.save()
+
+    return redirect("dashboard:approve_volunteers")
+
+
+def reject_volunteer(request):
+    if request.method == "POST":
+
+        volunteer_id = request.POST.get("volunteer_id")
+        reason = request.POST.get("reason")
+
+        volunteer = get_object_or_404(Volunteer, id=volunteer_id)
+
+        volunteer.declined = True
+        volunteer.rejection_reason = reason
+        volunteer.save()
+
+    return redirect("dashboard:approve_volunteers")

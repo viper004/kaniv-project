@@ -8,10 +8,12 @@ from django.contrib.auth.decorators import login_required
 def join_volunteer(request):
 
     user_profile = UserProfile.objects.get(user=request.user)
-
     volunteer = Volunteer.objects.filter(user=request.user).first()
 
-    if volunteer:
+    # Detect reapply request
+    reapply = request.GET.get("reapply")
+
+    if volunteer and not reapply:
 
         if volunteer.is_approved:
             return render(request, "volunteer/volunteer_join_form.html", {
@@ -23,7 +25,8 @@ def join_volunteer(request):
             return render(request, "volunteer/volunteer_join_form.html", {
                 "profile": user_profile,
                 "status": "rejected",
-                "reason": volunteer.rejection_reason
+                "reason": volunteer.rejection_reason,
+                "age":volunteer.age
             })
 
         else:
@@ -32,8 +35,10 @@ def join_volunteer(request):
                 "status": "pending"
             })
 
-
     if request.method == "POST":
+
+        # delete old rejected application
+        Volunteer.objects.filter(user=request.user).delete()
 
         Volunteer.objects.create(
             user=request.user,
@@ -51,7 +56,7 @@ def join_volunteer(request):
             is_student=True if request.POST.get("admission_no") else False
         )
 
-        return redirect("dashboard")
+        return redirect("/")
 
     return render(request, "volunteer/volunteer_join_form.html", {
         "profile": user_profile

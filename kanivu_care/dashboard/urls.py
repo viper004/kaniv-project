@@ -27,7 +27,9 @@ urlpatterns=[
     path("collection_team_notification/",views.collectionTeamNotification,name="collection_team_notification"),
     path("donations/",views.donations,name="donations"),
     path("donations/<str:id>/",views.viewDonation,name="view_donation"),
-    path("approve_volunteers/",views.approve_volunteers,name="approve_volunteer")
+    path("approve_volunteers/",views.approve_volunteers,name="approve_volunteers"),
+    path("approve-volunteer/", views.approve_volunteer, name="approve_volunteer"),
+    path("reject-volunteer/", views.reject_volunteer, name="reject_volunteer"),
 
 
 
