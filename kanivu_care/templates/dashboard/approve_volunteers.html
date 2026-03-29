@@ -5,148 +5,264 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Volunteer Requests</title>
-
     <script src="https://cdn.tailwindcss.com"></script>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         .hero-gradient {
             background: linear-gradient(135deg, #60a5fa, #6ee7b7);
         }
-    </style>
 
+        .request-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid #60a5fa;
+        }
+
+        .request-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 16px rgba(0, 0, 0, 0.15);
+            border-left-color: #6ee7b7;
+        }
+
+        .request-card.student {
+            border-left-color: #3b82f6;
+        }
+
+        .request-card.non-student {
+            border-left-color: #8b5cf6;
+        }
+
+        .card-name {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-info {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 0.3rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .grid-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .grid-container::-webkit-scrollbar-track {
+            background: #f3f4f6;
+            border-radius: 10px;
+        }
+
+        .grid-container::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 10px;
+        }
+
+        .grid-container::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-center;
+            padding: 3rem;
+            color: #9ca3af;
+        }
+
+        .search-container {
+            background: white;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: #f3f4f6;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus-within {
+            border-color: #60a5fa;
+            background: white;
+        }
+
+        .search-box input {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            color: #1f2937;
+        }
+
+        .search-box input::placeholder {
+            color: #9ca3af;
+        }
+
+        .split-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .split-container {
+                grid-template-columns: 1fr;
+            }
+
+            .grid-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 
 <body class="bg-gray-100 font-sans">
 
     <!-- NAVBAR -->
-
     <nav class="bg-white shadow-md">
-
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-
             <div class="flex items-center space-x-3">
-
-                <a href="{% url 'dashboard:dashboard' %}" class="flex items-center space-x-2 text-gray-700 hover:text-blue-500">
-
+                <button onclick="history.back()"
+                    class="flex items-center space-x-2 text-gray-700 hover:text-blue-500 bg-transparent border-none cursor-pointer">
                     <i class="fa-solid fa-arrow-left text-lg"></i>
                     <span class="font-semibold">Back</span>
-
-                </a>
-
+                </button>
             </div>
-
-            <h1 class="text-xl font-bold text-gray-800">
-                Kanivu
-            </h1>
-
+            <h1 class="text-xl font-bold text-gray-800">Kanivu</h1>
         </div>
-
     </nav>
 
-
     <!-- HERO HEADER -->
-
     <section class="hero-gradient text-white py-16">
-
-        <div class="max-w-6xl mx-auto px-6">
-
-            <h1 class="text-4xl font-bold mb-3">
-                Volunteer Requests
-            </h1>
-
-            <p class="text-lg opacity-90">
-                Approve or reject volunteer applications
-            </p>
-
+        <div class="max-w-7xl mx-auto px-6">
+            <h1 class="text-4xl font-bold mb-3">Volunteer Requests</h1>
+            <p class="text-lg opacity-90">Approve or reject volunteer applications</p>
         </div>
-
     </section>
 
+    <!-- MAIN CONTENT -->
+    <div class="max-w-7xl mx-auto px-6 py-8">
 
-    <!-- TABLE SECTION -->
-
-    <div class="max-w-6xl mx-auto px-6 -mt-10">
-
-        <div class="bg-white rounded-xl shadow-xl overflow-hidden">
-
-            <table class="w-full text-left">
-
-                <thead class="bg-gray-100">
-
-                    <tr class="text-gray-700 text-sm uppercase">
-
-                        <th class="p-4">Name</th>
-                        <th class="p-4">Phone</th>
-                        <th class="p-4">Email</th>
-                        <th class="p-4">Applied At</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    {% for v in data %}
-
-                    <tr onclick="openModal(this)" data-id="{{v.id}}" data-name="{{v.name}}" data-email="{{v.email}}"
-                        data-phone="{{v.phone}}" data-age="{{v.age}}" data-blood="{{v.blood_group}}"
-                        data-address="{{v.address}}" data-reason="{{v.reason}}" data-student="{{v.is_student}}"
-                        data-admission="{{v.admission_no}}" data-batch="{{v.batch}}" data-year="{{v.year}}"
-                        class="cursor-pointer hover:bg-gray-50 border-b">
-
-                        <td class="p-4 font-semibold text-gray-700">
-                            {{v.name}}
-                        </td>
-
-                        <td class="p-4 text-gray-600">
-                            {{v.phone}}
-                        </td>
-
-                        <td class="p-4 text-gray-600">
-                            {{v.email}}
-                        </td>
-
-                        <td class="p-4 text-gray-600">
-                            {{ v.created_at }}
-                        </td>
-
-                    </tr>
-
-                    {% empty %}
-
-                    <tr>
-                        <td colspan="3" class="p-6 text-center text-gray-500">
-                            No volunteer requests
-                        </td>
-                    </tr>
-
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
-
+        <!-- SEARCH BAR -->
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search text-gray-400"></i>
+                <input type="text" id="searchInput" placeholder="Search by name..." onkeyup="filterCards()">
+            </div>
         </div>
 
+        <!-- SPLIT LAYOUT -->
+        <div class="split-container">
+            <!-- LEFT SECTION - STUDENTS -->
+            <div>
+                <h2 class="section-title">
+                    <i class="fas fa-graduation-cap text-blue-500"></i>
+                    Student Volunteers
+                </h2>
+                <div class="grid-container" id="studentGrid">
+                    {% for v in data %}
+                    {% if v.is_student %}
+                    <div class="request-card student" onclick="openModal(this)" data-id="{{v.id}}"
+                        data-name="{{v.name}}" data-email="{{v.email}}" data-phone="{{v.phone}}" data-age="{{v.age}}"
+                        data-blood="{{v.blood_group}}" data-address="{{v.address}}" data-reason="{{v.reason}}"
+                        data-student="{{v.is_student}}" data-admission="{{v.admission_no}}" data-batch="{{v.batch}}"
+                        data-year="{{v.year}}" data-searchname="{{v.name|lower}}">
+                        <div class="card-name">{{ v.name }}</div>
+                        <div class="card-info"><i class="fas fa-phone text-gray-400 mr-2"></i>{{ v.phone }}</div>
+                        <div class="card-info"><i class="fas fa-envelope text-gray-400 mr-2"></i>{{ v.email }}</div>
+                        <div class="card-info text-xs text-gray-400 mt-2">
+                            Applied: {{ v.created_at|date:"M d, Y" }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    <div class="empty-state" id="emptyStudent" style="display: none;">
+                        <i class="fas fa-inbox text-2xl mb-2 block"></i>
+                        No student requests found
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT SECTION - NON-STUDENTS -->
+            <div>
+                <h2 class="section-title">
+                    <i class="fas fa-users text-purple-500"></i>
+                    Community Volunteers
+                </h2>
+                <div class="grid-container" id="nonStudentGrid">
+                    {% for v in data %}
+                    {% if not v.is_student %}
+                    <div class="request-card non-student" onclick="openModal(this)" data-id="{{v.id}}"
+                        data-name="{{v.name}}" data-email="{{v.email}}" data-phone="{{v.phone}}" data-age="{{v.age}}"
+                        data-blood="{{v.blood_group}}" data-address="{{v.address}}" data-reason="{{v.reason}}"
+                        data-student="{{v.is_student}}" data-admission="{{v.admission_no}}" data-batch="{{v.batch}}"
+                        data-year="{{v.year}}" data-searchname="{{v.name|lower}}">
+                        <div class="card-name">{{ v.name }}</div>
+                        <div class="card-info"><i class="fas fa-phone text-gray-400 mr-2"></i>{{ v.phone }}</div>
+                        <div class="card-info"><i class="fas fa-envelope text-gray-400 mr-2"></i>{{ v.email }}</div>
+                        <div class="card-info text-xs text-gray-400 mt-2">
+                            Applied: {{ v.created_at|date:"M d, Y" }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    <div class="empty-state" id="emptyNonStudent" style="display: none;">
+                        <i class="fas fa-inbox text-2xl mb-2 block"></i>
+                        No community requests found
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-
     <!-- DETAILS MODAL -->
-
     <div id="detailsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-
         <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-8">
-
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">
-                Volunteer Details
-            </h2>
-
-            <div class="space-y-2 text-gray-700">
-
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Volunteer Details</h2>
+            <div class="space-y-3 text-gray-700 mb-6">
                 <p><b>Name:</b> <span id="mName"></span></p>
                 <p><b>Email:</b> <span id="mEmail"></span></p>
                 <p><b>Phone:</b> <span id="mPhone"></span></p>
@@ -155,22 +271,24 @@
                 <p><b>Address:</b> <span id="mAddress"></span></p>
                 <p><b>Reason:</b> <span id="mReason"></span></p>
                 <p><b>Student:</b> <span id="mStudent"></span></p>
-                <p><b>Admission No:</b> <span id="mAdmission"></span></p>
-                <p><b>Batch:</b> <span id="mBatch"></span></p>
-                <p><b>Year:</b> <span id="mYear"></span></p>
-
+                <p id="studentDetails" style="display: none;">
+                    <b>Admission No:</b> <span id="mAdmission"></span>
+                </p>
+                <p id="batchDetails" style="display: none;">
+                    <b>Batch:</b> <span id="mBatch"></span>
+                </p>
+                <p id="yearDetails" style="display: none;">
+                    <b>Year:</b> <span id="mYear"></span>
+                </p>
             </div>
 
-            <div class="flex justify-end space-x-4 mt-8">
-
-                <form method="POST" action="/dashboard/approve-volunteer/">
+            <div class="flex justify-end space-x-4">
+                <form method="POST" action="/dashboard/approve-volunteer/" style="display: inline;">
                     {% csrf_token %}
                     <input type="hidden" name="volunteer_id" id="approveId">
-
                     <button class="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg">
                         Approve
                     </button>
-
                 </form>
 
                 <button onclick="openReject()" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg">
@@ -180,79 +298,58 @@
                 <button onclick="closeModal()" class="bg-gray-300 hover:bg-gray-400 px-5 py-2 rounded-lg">
                     Close
                 </button>
-
             </div>
-
         </div>
-
     </div>
 
-
     <!-- REJECT MODAL -->
-
     <div id="rejectModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-
         <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
-
-            <h2 class="text-xl font-bold mb-4 text-gray-800">
-                Reason for Rejection
-            </h2>
-
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Reason for Rejection</h2>
             <form method="POST" action="/dashboard/reject-volunteer/">
-
                 {% csrf_token %}
-
                 <input type="hidden" name="volunteer_id" id="rejectId">
-
                 <textarea name="reason" class="w-full border rounded-lg p-3 focus:ring-2 focus:ring-red-400" rows="4"
                     placeholder="Enter rejection reason"></textarea>
-
                 <div class="flex justify-end space-x-3 mt-6">
-
                     <button type="button" onclick="closeReject()" class="bg-gray-300 px-4 py-2 rounded-lg">
                         Cancel
                     </button>
-
                     <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">
                         Submit
                     </button>
-
                 </div>
-
             </form>
-
         </div>
-
     </div>
 
-
     <script>
-
         let currentVolunteerId = null
 
-        function openModal(row) {
+        function openModal(card) {
+            currentVolunteerId = card.dataset.id
 
-            currentVolunteerId = row.dataset.id
+            document.getElementById("mName").innerText = card.dataset.name
+            document.getElementById("mEmail").innerText = card.dataset.email
+            document.getElementById("mPhone").innerText = card.dataset.phone
+            document.getElementById("mAge").innerText = card.dataset.age
+            document.getElementById("mBlood").innerText = card.dataset.blood
+            document.getElementById("mAddress").innerText = card.dataset.address
+            document.getElementById("mReason").innerText = card.dataset.reason
+            document.getElementById("mAdmission").innerText = card.dataset.admission
+            document.getElementById("mBatch").innerText = card.dataset.batch
+            document.getElementById("mYear").innerText = card.dataset.year
 
-            document.getElementById("mName").innerText = row.dataset.name
-            document.getElementById("mEmail").innerText = row.dataset.email
-            document.getElementById("mPhone").innerText = row.dataset.phone
-            document.getElementById("mAge").innerText = row.dataset.age
-            document.getElementById("mBlood").innerText = row.dataset.blood
-            document.getElementById("mAddress").innerText = row.dataset.address
-            document.getElementById("mReason").innerText = row.dataset.reason
-            document.getElementById("mAdmission").innerText = row.dataset.admission
-            document.getElementById("mBatch").innerText = row.dataset.batch
-            document.getElementById("mYear").innerText = row.dataset.year
-
-            document.getElementById("mStudent").innerText =
-                row.dataset.student === "True" ? "Yes" : "No"
+            const isStudent = card.dataset.student === "True"
+            document.getElementById("mStudent").innerText = isStudent ? "Yes" : "No"
+            document.getElementById("studentDetails").style.display = isStudent ? "block" : "none"
+            document.getElementById("batchDetails").style.display = isStudent ? "block" : "none"
+            document.getElementById("yearDetails").style.display = isStudent ? "block" : "none"
 
             document.getElementById("approveId").value = currentVolunteerId
             document.getElementById("rejectId").value = currentVolunteerId
 
             document.getElementById("detailsModal").classList.remove("hidden")
-
         }
 
         function closeModal() {
@@ -267,6 +364,37 @@
             document.getElementById("rejectModal").classList.add("hidden")
         }
 
+        function filterCards() {
+            const searchTerm = document.getElementById("searchInput").value.toLowerCase()
+            const studentCards = document.querySelectorAll("#studentGrid .request-card")
+            const nonStudentCards = document.querySelectorAll("#nonStudentGrid .request-card")
+
+            let studentCount = 0
+            let nonStudentCount = 0
+
+            studentCards.forEach(card => {
+                const name = card.dataset.searchname
+                if (name.includes(searchTerm)) {
+                    card.style.display = "block"
+                    studentCount++
+                } else {
+                    card.style.display = "none"
+                }
+            })
+
+            nonStudentCards.forEach(card => {
+                const name = card.dataset.searchname
+                if (name.includes(searchTerm)) {
+                    card.style.display = "block"
+                    nonStudentCount++
+                } else {
+                    card.style.display = "none"
+                }
+            })
+
+            document.getElementById("emptyStudent").style.display = studentCount === 0 ? "block" : "none"
+            document.getElementById("emptyNonStudent").style.display = nonStudentCount === 0 ? "block" : "none"
+        }
     </script>
 
 </body>

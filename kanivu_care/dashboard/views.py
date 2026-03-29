@@ -1062,3 +1062,25 @@ def reject_volunteer(request):
         volunteer.save()
 
     return redirect("dashboard:approve_volunteers")
+
+@login_required
+def manage_volunteers(request):
+    user = Volunteer.objects.filter(is_approved=True,is_student=False)
+    student = Volunteer.objects.filter(is_approved = True, is_student=True)
+    return render(request, "dashboard/manage_volunteers.html", {"members": user,"students":student})
+
+def remove_volunteer(request):
+
+    if request.method == "POST":
+
+        volunteer_id = request.POST.get("volunteer_id")
+
+        volunteer = Volunteer.objects.get(id=volunteer_id)
+
+        volunteer.delete()
+
+    return redirect("dashboard:manage_volunteers")
+
+@login_required
+def volunteer_dashboard(request):
+    return render(request,"dashboard/volunteer_dashboard.html")

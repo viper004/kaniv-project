@@ -468,9 +468,39 @@
       color: black !important;
     }
 
+    .back-btn {
+        position: fixed;
+        top: 2rem;
+        left: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        color: #00c6ff;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 0.7rem 1.5rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        z-index: 100;
+        font-size: 1rem;
+    }
+
+    .back-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: translateX(-2px);
+    }
+
     </style>
 </head>
 <body>
+    <button onclick="history.back()" class="back-btn" title="Go back">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back</span>
+    </button>
+
     <div class="container">
     <div class="edit-header">
         <h1>Edit Profile</h1>

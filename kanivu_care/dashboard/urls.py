@@ -30,6 +30,9 @@ urlpatterns=[
     path("approve_volunteers/",views.approve_volunteers,name="approve_volunteers"),
     path("approve-volunteer/", views.approve_volunteer, name="approve_volunteer"),
     path("reject-volunteer/", views.reject_volunteer, name="reject_volunteer"),
+    path("manage_volunteers/", views.manage_volunteers, name="manage_volunteers"),
+    path("remove_volunteer/", views.remove_volunteer, name="remove_volunteer"),
+    path("volunteer_dashboard/",views.volunteer_dashboard,name="volunteer_dashboard"),
 
 
 

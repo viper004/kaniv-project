@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Role Management Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        :root {
+            --primary: #7c4dff; --primary-light: #b47cff;
+            --secondary: #00e5ff; --secondary-light: #6effff;
+            --accent: #ff4081; --accent-light: #ff79b0;
+            --dark: #263238; --light: #f5f7fa;
+            --card-bg: #ffffff; --body-bg: #f0f2f5;
+            --success: #00c853; --warning: #ffab00;
+            --shadow: 0 15px 35px rgba(0,0,0,0.1); --radius: 16px;
+        }
+        
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--body-bg); color: var(--dark);
+            line-height: 1.7; min-height: 100vh;
+            padding: 2rem 4rem;
+            height: 100vh auto;
+        }
+        aside #create_member {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        z-index: 100;
+    }
+    
+    aside a,strong {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem 1.5rem;
+        background: linear-gradient(135deg, #7c4dff, #b47cff);
+        color: white;
+        font-weight: 600;
+        border-radius: 50px;
+        box-shadow: 0 10px 25px rgba(124, 77, 255, 0.3);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        border: none;
+        cursor: pointer;
+    }
+    
+    aside a:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(124, 77, 255, 0.4);
+        background: linear-gradient(135deg, #b47cff, #7c4dff);
+    }
+    
+    aside a:active {
+        transform: translateY(1px);
+    }
+    
+    /* Optional: Add a plus icon */
+    aside #create_member::before {
+        content: '+';
+        margin-right: 8px;
+        font-size: 1.2rem;
+    }
+
+    aside .pending_lists{
+        position: absolute;
+        background: linear-gradient(135deg, #61E786, #EDCCEC);
+        top:10%;
+        right: 2%;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        aside {
+            bottom: 1.5rem;
+            right: 1.5rem;
+        }
+        
+        aside a {
+            padding: 0.8rem 1.2rem;
+            font-size: 0.9rem;
+        }
+    }
+        .container {
+            max-width: 1600px; margin: 0 auto;
+        }
+        
+        header {
+            text-align: center; margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 2.8rem; font-weight: 700;
+            color: var(--primary); margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem; color: #607d8b;
+            max-width: 700px; margin: 0 auto 2rem;
+        }
+        
+        .section-header {
+            display: flex; align-items: center;
+            margin: 3rem 0 1.5rem;
+        }
+        
+        .section-title {
+            font-size: 1.8rem; font-weight: 600;
+            color: var(--dark); position: relative;
+            padding-left: 1.5rem;
+        }
+        
+        .section-title::before {
+            content: ''; position: absolute;
+            left: 0; top: 50%; transform: translateY(-50%);
+            height: 70%; width: 5px;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            border-radius: 5px;
+        }
+        .dept{
+            text-transform: capitalize;
+        }
+        .user-grid {
+            display: grid; gap: 2rem;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            max-height: 850px;
+            overflow-y: scroll;
+        }
+
+        .user-grid::-webkit-scrollbar{
+            display: none;
+        }
+        
+        .user-card {
+            background: var(--card-bg); border-radius: var(--radius);
+            box-shadow: var(--shadow); padding: 2rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: none; position: relative;
+            overflow: hidden;
+        }
+        
+        .user-card::before {
+            content: ''; position: absolute;
+            top: 0; left: 0; width: 100%; height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+        
+        .user-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .user-header {
+            display: flex; align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .user-avatar {
+            width: 60px; height: 60px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.5rem; font-weight: 600;
+            margin-right: 1.2rem; flex-shrink: 0;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-size: 1.3rem; font-weight: 600;
+            color: var(--dark); margin-bottom: 0.3rem;
+        }
+        
+        .user-role {
+            display: inline-block; padding: 0.3rem 1rem;
+            border-radius: 100px; font-size: 0.75rem;
+            font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .role-member {
+            background: rgba(0, 200, 83, 0.1);
+            color: var(--success);
+        }
+        
+        .role-coordinator {
+            background: rgba(255, 64, 129, 0.1);
+            color: var(--accent);
+        }
+        
+        .user-details {
+            margin: 1.5rem 0;
+        }
+        
+        .detail-row {
+            display: flex; margin-bottom: 0.8rem;
+        }
+        
+        .detail-label {
+            font-weight: 500; color: #78909c;
+            min-width: 120px; font-size: 0.9rem;
+        }
+        
+        .detail-value {
+            font-weight: 500; color: var(--dark);
+        }
+        
+        .action-buttons {
+            display: flex; gap: 1rem;
+            flex-direction: column;
+            margin-top: 1.5rem;
+        }
+        
+        .btn {
+            padding: 0.8rem 1.2rem; border: none;
+            border-radius: var(--radius); font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease;
+            flex: 1; display: flex; align-items: center;
+            justify-content: center; font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary); color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-light); transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(124, 77, 255, 0.3);
+        }
+        
+        .btn-danger {
+            background: var(--accent); color: white;
+        }
+        
+        .btn-danger:hover {
+            background: var(--accent-light); transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 64, 129, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #eceff1; color: var(--dark);
+        }
+        
+        .btn-secondary:hover {
+            background: #cfd8dc; transform: translateY(-2px);
+        }
+        
+        .empty-state {
+            text-align: center; padding: 4rem;
+            background: white; border-radius: var(--radius);
+            box-shadow: var(--shadow); grid-column: 1 / -1;
+            margin-top: 20px;
+        }
+        
+        .empty-icon {
+            font-size: 3rem; color: #cfd8dc;
+            margin-bottom: 1.5rem;
+        }
+        
+        .empty-text {
+            font-size: 1.2rem; color: #78909c;
+            margin-bottom: 1.5rem;
+        }
+        
+        @media (max-width: 1200px) {
+            body { padding: 2rem; }
+        }
+        
+        @media (max-width: 768px) {
+            body { padding: 1.5rem; }
+            h1 { font-size: 2.2rem; }
+            .user-grid { grid-template-columns: 1fr; }
+            .user-header { flex-direction: column; text-align: center; }
+            .user-avatar { margin-right: 0; margin-bottom: 1rem; }
+            .action-buttons { flex-direction: column; }
+        }
+
+
+        .form-container {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%,-50%);
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(15px);
+        border-radius: 20px;
+        padding: 30px 25px;
+        max-width: 400px;
+        margin: auto;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        font-family: 'Outfit', sans-serif;
+        color: #fff;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .form-container select {
+        cursor: pointer;
+        width: 100%;
+        padding: 12px 18px;
+        border: none;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        font-size: 16px;
+        appearance: none;
+        outline: none;
+        transition: 0.2s;
+        backdrop-filter: blur(10px);
+        box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.05);
+    }
+
+    .form-container select:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .form-container select:focus {
+        border: 1px solid #00c6ff;
+        background: rgba(0, 198, 255, 0.15);
+    }
+
+    .form-container option {
+        background: #111;
+        color: #fff;
+    }
+
+    .form-container button {
+        margin-top: 20px;
+        background: linear-gradient(to right, #00c6ff, #0072ff);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 30px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+        width: 100%;
+    }
+
+    .form-container button:hover {
+        transform: scale(1.05);
+    }
+    #change_duty_modal_btn{
+        color: #0a18;
+        cursor: pointer;
+        font-weight: bolder;
+        font-size: 15px;
+    }
+    #exit{
+        width: 200%;
+        justify-content: flex-end;
+        cursor: pointer;
+        color: red;
+    }
+/* Layout */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.main-modal, .nested-modal-content {
+  background: #1a202c;
+  padding: 2rem;
+  border-radius: 20px;
+  width: 50%;
+  box-shadow: 0 0 30px rgba(0,0,0,0.3);
+  color: white;
+  overflow-y: scroll;
+}
+
+.main-modal div{
+    max-width: 500px;
+}
+
+.modal-title {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.info-grid {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Cards */
+.glass-card {
+  background: rgba(255,255,255,0.05);
+  padding: 1.5rem;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  backdrop-filter: blur(8px);
+}
+
+/* Button Groups */
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 0.7rem 1.4rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 12px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+.btn-approve {
+  background: linear-gradient(to right, #00c896, #00a87e);
+  color: white;
+}
+
+.btn-reject {
+  background: linear-gradient(to right, #ff4e4e, #cc3131);
+  color: white;
+}
+
+.btn-approve:hover, .btn-reject:hover {
+  transform: scale(1.05);
+}
+
+/* Modal Buttons (centered) */
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.btn-cancel {
+  padding: 0.6rem 1.6rem;
+  background-color: #e2e8f0;
+  color: #2d3748;
+  border-radius: 50px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: 0.3s ease;
+}
+
+.btn-cancel:hover {
+  background-color: #cbd5e0;
+  transform: scale(1.05);
+}
+
+.btn-confirm {
+  padding: 0.6rem 1.6rem;
+  background: linear-gradient(to right, #f56565, #c53030);
+  color: white;
+  border-radius: 50px;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+  transition: 0.3s ease;
+}
+
+.btn-confirm:hover {
+  transform: scale(1.05);
+}
+
+.btn-close-main {
+  margin-top: 2rem;
+  padding: 0.6rem 1.6rem;
+  background: #4a5568;
+  color: #f7fafc;
+  border-radius: 50px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  transition: 0.3s ease;
+}
+
+.btn-close-main:hover {
+  background: #2d3748;
+  transform: scale(1.05);
+}
+
+/* Textarea */
+.modal-textarea {
+  width: 100%;
+  height: 120px;
+  padding: 1rem;
+  font-size: 1rem;
+  border-radius: 12px;
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: white;
+  resize: none;
+}
+
+aside .pending_lists{
+        position: absolute;
+        background: linear-gradient(135deg, #61E786, #EDCCEC);
+        top:10%;
+        right: 2%;
+    }
+
+
+    .kick-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+  padding: 10px;
+  background: linear-gradient(135deg, #ff6b6b, #d63031);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s ease;
+  box-shadow: 0 4px 10px rgba(255, 107, 107, 0.4);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kick-btn:hover {
+  background: linear-gradient(135deg, #d63031, #c0392b);
+  transform: scale(1.05);
+  box-shadow: 0 6px 14px rgba(255, 107, 107, 0.6);
+}
+
+
+.modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+        }
+        
+        /* Modal container with gradient */
+        .modal-container {
+            background: linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(248,249,252,0.98) 100%);
+            border-radius: 16px;
+            width: 420px;
+            max-width: 90%;
+            box-shadow: 
+                0 12px 28px rgba(0, 0, 0, 0.12),
+                0 8px 20px rgba(0, 0, 0, 0.08);
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        /* Modal content */
+        .modal-content {
+            padding: 32px;
+            text-align: center;
+        }
+        
+        /* Warning icon */
+        .warning-icon {
+            font-size: 64px;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 4px 8px rgba(255, 71, 87, 0.2));
+            animation: pulse 1.8s infinite cubic-bezier(0.4, 0, 0.6, 1);
+        }
+        
+        /* Modal title */
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            letter-spacing: -0.2px;
+        }
+        
+        /* Modal description */
+        .modal-description {
+            color: #666;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 28px;
+            font-weight: 400;
+            max-width: 320px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Button container */
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+        
+        /* Buttons */
+        .modal-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            font-size: 15px;
+            letter-spacing: 0.2px;
+        }
+        
+        .cancel-btn {
+            background-color: rgba(0, 0, 0, 0.04);
+            color: #444;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+        
+        .cancel-btn:hover {
+            background-color: rgba(0, 0, 0, 0.08);
+            transform: translateY(-1px);
+        }
+        
+        .confirm-btn {
+            background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.2);
+        }
+        
+        .confirm-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(255, 71, 87, 0.3);
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+    </style>
+    <style>
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: transparent;
+            border: none;
+            color: #607d8b;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+
+        .back-btn:hover {
+            color: var(--primary);
+            background: rgba(124, 77, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <button onclick="history.back()" class="back-btn">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back</span>
+    </button>
+    <div class="container">
+        <header>
+            <h1>Volunteer Management Dashboard</h1>
+            <p class="subtitle">Easily manage Volunteers role and permissions across Kaniv</p>
+            {% if request.user.userprofile.role == "convenier" %}
+                <aside>
+                    <a href="{% url 'convenier:pending_requests' %}" class="pending_lists">Pending Mem-List</a>
+                </aside>
+            {% endif %}
+
+            {% if request.user.userprofile.role == "coordinator" %}
+            <aside>
+                <a href="{% url 'dashboard:approve_volunteers' %}" class="pending_lists">New Requests</a>
+            </aside>
+            {% endif %}
+
+        </header>
+        {% if request.user.userprofile.role == "convenier" %}
+            <aside>
+                <a href="{% url 'convenier:create_member' %}" id="create_member">Create Member</a>
+            </aside>
+        {% endif %}
+        
+        {% if students %}
+        <div class="section-header">
+            <h2 class="section-title">Student Volunteers</h2>
+        </div>
+        <div class="user-grid">
+            {% for data in students %}
+            <div class="user-card">
+                <div class="user-header">
+                    {% if data.user.userprofile.photo %}
+                        <img src="{{data.user.userprofile.photo.url}}" class="user-avatar">
+                    {% else %}
+                        <div class="user-avatar"></div>
+                    {% endif %}
+                    <div class="user-info">
+                        <div class="user-name">{{ data.user.username }}</div>
+                    </div>
+                </div>
+                <div class="user-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Admission No:</span>
+                        <span class="detail-value">{{ data.admission_no }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Department:</span>
+                        <span class="detail-value dept">{{ data.batch }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Batch:</span>
+                        <span class="detail-value">{{ data.period }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Number:</span>
+                        <span class="detail-value">{{ data.user.userprofile.phone_number }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Email:</span>
+                        <span class="detail-value">{{ data.user.email }}</span>
+                    </div>
+                </div>
+
+                {% if request.user.userprofile.role == "convenier" or request.user.userprofile.role == "coordinator" %}
+                    <div class="action-buttons">
+                        <button data-id="{{data.id}}" class="remove-volunteer btn btn-danger" title="Permanently remove this volunteer">Remove Volunteer</button>
+                    </div>
+                {% endif %}
+                
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="user-grid">
+            <div class="empty-state">
+                <div class="empty-icon">👥</div>
+                <h3 class="empty-text">No Data found</h3>
+            </div>
+        </div>
+        {% endif %}
+        
+    <!-- Volunteers who are not Students of CHMM  -->
+        {% if members %}
+        <div class="section-header">
+            <h2 class="section-title">User Volunteers</h2>
+        </div>
+        <div class="user-grid">
+            {% for data in members %}
+            <div class="user-card">
+                <div class="user-header">
+                    {% if data.user.userprofile.photo %}
+                        <img src="{{data.user.userprofile.photo.url}}" class="user-avatar">
+                    {% else %}
+                        <div class="user-avatar"></div>
+                    {% endif %}
+                    <div class="user-info">
+                        <div class="user-name">{{ data.user.username }}</div>
+                    </div>
+                </div>
+                <div class="user-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Age:</span>
+                        <span class="detail-value">{{ data.age }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Number:</span>
+                        <span class="detail-value">{{ data.user.userprofile.phone_number }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Blood Group:</span>
+                        <span class="detail-value">{{ data.blood_group }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Email:</span>
+                        <span class="detail-value">{{ data.user.email }}</span>
+                    </div>
+                </div>
+                {% if request.user.userprofile.role == "convenier" or request.user.userprofile.role == "coordinator" %}
+                    <div class="action-buttons">
+                        <button data-id="{{data.id}}" class="remove-volunteer btn btn-danger" title="Permanently remove this volunteer">Remove Volunteer</button>
+                    </div>
+                {% endif %}
+            </div>
+            
+
+
+            {% endfor %}
+            
+        </div>
+        {% else %}
+        <div class="user-grid">
+            <div class="empty-state">
+                <div class="empty-icon">👤</div>
+                <h3 class="empty-text">No Data found</h3>
+            </div>
+        </div>
+        {% endif %}
+        
+        
+    </div>
+    <div class="form-container" id="form_container">
+        <i data-feather="x" id="exit"></i>
+        <form action="{% url 'dashboard:change_duty' %}" id="change_duty" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="id" id="userid"/>
+
+
+            <label for="duty" style="display:block; margin-bottom:10px; font-weight:600;">Change Duty:</label>
+            <select name="duty" id="duty">
+                <option value="No Duty">No Duty</option>
+                <option value="Finance">Finance</option>
+                <option value="Collection Team">Collection Team</option>
+                <option value="Event Organizers">Event Organizers</option>
+                <option value="Team Controller">Team Controller</option>
+            </select>
+
+            <button type="submit">Update Duty</button>
+        </form>
+    </div>
+   <section>
+</section>
+
+
+<div class="modal-backdrop" id="confirm_modal">
+        <!-- Modal Container -->
+        <div class="modal-container">
+            <!-- Modal Content -->
+            <div class="modal-content">
+                <div class="warning-icon">
+                    <i class="fas fa-user-slash"></i>
+                </div>
+                <h2 class="modal-title">Kick This Member?</h2>
+                <p class="modal-description">
+                    Are you sure that you wanted to kick this user from member to a public user.
+                </p>
+                <div class="button-container">
+                    <button class="modal-btn cancel-btn" id="cancel">Cancel</button>
+                    <button class="modal-btn confirm-btn" id="confirm">Kick</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+<script type="module">
+    import {showAlert} from "{% static 'scripts/alert.js' %}";
+
+    feather.replace()
+
+    const dept=document.querySelectorAll(".dept");
+    const demote=document.querySelectorAll(".demote");
+    const promote=document.querySelectorAll(".promote");
+    const removeVolunteer=document.querySelectorAll(".remove-volunteer");
+    const formContainer=document.getElementById("form_container");
+    const changeDuty=document.getElementById("change_duty");
+    const exit=document.getElementById("exit");
+    const confirm_modal=document.getElementById("confirm_modal");
+
+    const userId=document.getElementById("userid");
+    const duty=document.getElementById("duty");
+
+
+    demote.forEach((d)=>{
+        d.addEventListener("click",()=>{
+            let userid=d.dataset.id
+            let url=`/dashboard/manage_members/demote/${userid}/`;
+            fetch(url).then(res=>res.json()).then((data)=>{
+                if (data.status=="success"){
+                    showAlert(data.status,data.title,data.message,"reload");
+                }
+                else{
+                    showAlert(data.status,data.title,data.message,"ok");
+
+                }
+            })
+        })
+    })
+
+    promote.forEach((p)=>{
+        p.addEventListener("click",()=>{
+            let userid=p.dataset.id
+            let url=`/dashboard/manage_members/promote/${userid}/`;
+            fetch(url).then(res=>res.json()).then((data)=>{
+                if (data.status=="success"){
+                    showAlert(data.status,data.title,data.message,"reload");
+                }
+                else{
+                    showAlert(data.status,data.title,data.message,"ok");
+                }
+            })
+        })
+    });
+
+    removeVolunteer.forEach((r)=>{
+        r.addEventListener("click",()=>{
+            if(confirm("Are you sure you want to permanently remove this volunteer?")){
+                let volunteerId=r.dataset.id
+                let url=`/dashboard/remove_volunteer/`;
+                fetch(url,{
+                    method:"POST",
+                    headers:{
+                        "Content-Type":"application/json",
+                        "X-CSRFToken":document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body:JSON.stringify({volunteer_id:volunteerId})
+                }).then(res=>res.json()).then((data)=>{
+                    if (data.status=="success"){
+                        showAlert(data.status,data.title,data.message,"reload");
+                    }
+                    else{
+                        showAlert(data.status,data.title,data.message,"ok");
+                    }
+                })
+            }
+        })
+    });
+
+    const selectedUser=(e)=>{
+        
+        formContainer.style.display="block";
+        userId.value=e.dataset.userid;
+        duty.value=e.dataset.duty;
+    }
+
+    const showConfirmation=()=>{
+       
+
+        return new Promise((resolve) => {
+            confirm_modal.style.display="flex";
+            let cancel=document.getElementById("cancel");
+            let confirmReq=document.getElementById("confirm");
+
+            cancel.onclick=()=>{
+                confirm_modal.style.display="none";
+                resolve(false);
+            }
+
+            confirmReq.onclick=()=>{
+                confirm_modal.style.display="none";
+                resolve(true)
+            }
+        })
+    }
+
+    const kick=async(e)=>{
+        let isConfirmed=await showConfirmation();
+        if (isConfirmed){
+            let url=`/dashboard/kick_member/?id=${e.dataset.delid}`;
+
+            fetch(url).then(res=>res.json()).then((data)=>{
+                if (data.status=="success"){
+                    showAlert(data.status,data.title,data.message,"reload");
+                }
+                else{
+                    showAlert(data.status,data.title,data.message,"ok");
+                }
+            })
+            
+        }
+        
+    }
+
+    exit.addEventListener("click",()=>{
+        formContainer.style.display="none";
+
+    })
+    
+
+    changeDuty.addEventListener("submit",(e)=>{
+        e.preventDefault();
+        let formdata=new FormData(e.target);
+        fetch(e.target.action,{
+            "method":"POST",
+            "body":formdata
+        }).then(res=>res.json()).then((data)=>{
+            if (data.status=="success"){
+                showAlert(data.status,data.title,data.message,"reload");
+            }
+            else{
+                showAlert(data.status,data.title,data.message,"ok");
+            }
+        }).catch(error=>{
+            showAlert("error","Duty changed failed",error.message,"ok")
+        })
+    })
+
+
+    dept.forEach((d)=>{
+        d.textContent=d.textContent.replaceAll("_"," ");
+    });
+
+    window.selectedUser=selectedUser;
+    window.kick=kick;
+
+
+
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
+</html>

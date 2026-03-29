@@ -7,13 +7,27 @@ from django.db.models import Sum
 from web.forms import donationModelForm
 from web.models import DonationModel
 from dashboard.models import AnnouncementModel
+from volunteer.models import Volunteer
 
 from users.functions import form_errors
 
 # Create your views here.
 
 def Home(req):
-    return render(req,"index.html")
+    volunteer = None
+    is_active_volunteer = False
+    show_volunteer_cta = False
+
+    if req.user.is_authenticated:
+        volunteer = Volunteer.objects.filter(user=req.user).first()
+        is_active_volunteer = bool(volunteer and volunteer.is_approved and not volunteer.declined)
+        show_volunteer_cta = req.user.userprofile.role not in ["member", "convenier", "coordinator"]
+
+    return render(req, "index.html", {
+        "volunteer": volunteer,
+        "is_active_volunteer": is_active_volunteer,
+        "show_volunteer_cta": show_volunteer_cta,
+    })
 
 
 def viewAnnouncement(req):
