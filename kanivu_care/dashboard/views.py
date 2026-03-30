@@ -1,3 +1,5 @@
+import json
+
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http.response import HttpResponseRedirect,JsonResponse
@@ -1069,18 +1071,56 @@ def manage_volunteers(request):
     student = Volunteer.objects.filter(is_approved = True, is_student=True)
     return render(request, "dashboard/manage_volunteers.html", {"members": user,"students":student})
 
+@login_required
 def remove_volunteer(request):
+    if request.user.userprofile.role not in ["convenier", "coordinator"]:
+        return JsonResponse({
+            "status": "error",
+            "title": "Permission denied",
+            "message": "You are not authorized to remove volunteers."
+        }, status=403)
 
-    if request.method == "POST":
+    if request.method != "POST":
+        return JsonResponse({
+            "status": "error",
+            "title": "Invalid request",
+            "message": "Only POST requests are allowed for volunteer removal."
+        }, status=405)
 
-        volunteer_id = request.POST.get("volunteer_id")
+    volunteer_id = request.POST.get("volunteer_id")
 
-        volunteer = Volunteer.objects.get(id=volunteer_id)
+    if not volunteer_id:
+        try:
+            payload = json.loads(request.body or "{}")
+            volunteer_id = payload.get("volunteer_id")
+        except (json.JSONDecodeError, TypeError):
+            volunteer_id = None
 
-        volunteer.delete()
+    if not volunteer_id:
+        return JsonResponse({
+            "status": "error",
+            "title": "Volunteer not found",
+            "message": "Volunteer id is required to remove a volunteer."
+        }, status=400)
 
-    return redirect("dashboard:manage_volunteers")
+    try:
+        volunteer = Volunteer.objects.get(id=volunteer_id, is_approved=True)
+    except Volunteer.DoesNotExist:
+        return JsonResponse({
+            "status": "error",
+            "title": "Volunteer not found",
+            "message": "This volunteer is no longer available."
+        }, status=404)
+
+    volunteer_name = volunteer.name or volunteer.user.username
+    volunteer.delete()
+
+    return JsonResponse({
+        "status": "success",
+        "title": "Volunteer removed",
+        "message": f"{volunteer_name} has been removed successfully."
+    })
 
 @login_required
 def volunteer_dashboard(request):
-    return render(request,"dashboard/volunteer_dashboard.html")
+    return redirect("volunteer:volunteer_dashboard")

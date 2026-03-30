@@ -144,7 +144,7 @@
                             class="bg-white text-blue-500 hover:bg-gray-100 px-6 py-3 rounded-full font-bold transition duration-300">
                             Donate Now
                         </button>
-                        {% if request.user.is_authenticated and request.user.userprofile.role not in "coordinator,convener,member" %}
+                        {% if request.user.is_authenticated and show_volunteer_cta %}
                         {% if is_active_volunteer %}
                         <a href="{% url 'dashboard:volunteer_dashboard' %}"
                             class="border-2 border-white text-white hover:bg-white hover:text-blue-500 px-6 py-3 rounded-full font-bold transition duration-300 inline-block">

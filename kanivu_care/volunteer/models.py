@@ -79,3 +79,39 @@ class Volunteer(models.Model):
 
     def __str__(self):
         return self.name
+    
+class Campaign(models.Model):
+
+    type_choices = (
+        ('Health', 'Health & Medical'),
+        ('Social', 'Social Service'),
+        ('Environment', 'Environmental'),
+        ('Education', 'Educational'),
+        ('Fundraising', 'Fundraising'),
+        ('Awareness', 'Awareness'),
+        ('Event', 'Event-Based'),
+        ('Skill', 'Skill-Based'),
+    )
+    name = models.CharField(max_length=50)
+    description = models.TextField()
+    type = models.CharField(
+        max_length=50,
+        choices=type_choices
+        )
+    max_volunteers = models.IntegerField(default=0)
+    current_volunteers = models.IntegerField(default=0)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    created_on = models.DateTimeField(auto_now_add=True)
+
+
+class CampaignEnrollment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="campaign_enrollments")
+    campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE, related_name="enrollments")
+    joined_on = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["user", "campaign"], name="unique_campaign_enrollment")
+        ]
+

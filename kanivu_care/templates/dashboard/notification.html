@@ -29,14 +29,26 @@
             padding: 2rem 4rem;
             height: 100vh auto;
         }
-        aside #create_notify {
+        aside #create_notify,
+        aside #create_campaign {
         position: fixed;
-        bottom: 2rem;
         right: 2rem;
         z-index: 100;
     }
+
+    aside #create_notify {
+        bottom: 2rem;
+    }
+
+    aside #create_campaign {
+        bottom: 6.5rem;
+        background: linear-gradient(135deg, #00b894, #00cec9);
+        box-shadow: 0 10px 25px rgba(0, 184, 148, 0.3);
+    }
     
-    aside #create_notify,strong {
+    aside #create_notify,
+    aside #create_campaign,
+    strong {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -53,18 +65,34 @@
         cursor: pointer;
     }
     
-    aside #create_notify:hover {
+    aside #create_notify:hover,
+    aside #create_campaign:hover {
         transform: translateY(-3px);
+    }
+
+    aside #create_notify:hover {
         box-shadow: 0 15px 30px rgba(124, 77, 255, 0.4);
         background: linear-gradient(135deg, #b47cff, #7c4dff);
     }
+
+    aside #create_campaign:hover {
+        box-shadow: 0 15px 30px rgba(0, 184, 148, 0.4);
+        background: linear-gradient(135deg, #00cec9, #00b894);
+    }
     
-    aside #create_notify:active {
+    aside #create_notify:active,
+    aside #create_campaign:active {
         transform: translateY(1px);
     }
     
     /* Optional: Add a plus icon */
     aside #create_notify::before {
+        content: '+';
+        margin-right: 8px;
+        font-size: 1.2rem;
+    }
+
+    aside #create_campaign::before {
         content: '+';
         margin-right: 8px;
         font-size: 1.2rem;
@@ -747,9 +775,34 @@
             cursor: not-allowed;
         }
 
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: transparent;
+            border: none;
+            color: #607d8b;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+
+        .back-btn:hover {
+            color: var(--primary);
+            background: rgba(124, 77, 255, 0.1);
+        }
+
     </style>
 </head>
 <body>
+    <button onclick="window.location.href='{% url 'dashboard:dashboard' %}'" class="back-btn">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back</span>
+    </button>
     <div class="container">
         <header>
             <h1>Notification</h1>

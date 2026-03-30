@@ -714,7 +714,7 @@ aside .pending_lists{
             <p class="subtitle">Easily manage Volunteers role and permissions across Kaniv</p>
             {% if request.user.userprofile.role == "convenier" %}
                 <aside>
-                    <a href="{% url 'convenier:pending_requests' %}" class="pending_lists">Pending Mem-List</a>
+                    <a href="{% url 'dashboard:approve_volunteers' %}" class="pending_lists">View Requests</a>
                 </aside>
             {% endif %}
 
@@ -725,12 +725,6 @@ aside .pending_lists{
             {% endif %}
 
         </header>
-        {% if request.user.userprofile.role == "convenier" %}
-            <aside>
-                <a href="{% url 'convenier:create_member' %}" id="create_member">Create Member</a>
-            </aside>
-        {% endif %}
-        
         {% if students %}
         <div class="section-header">
             <h2 class="section-title">Student Volunteers</h2>
@@ -909,6 +903,17 @@ aside .pending_lists{
     const userId=document.getElementById("userid");
     const duty=document.getElementById("duty");
 
+    const getCookie=(name)=>{
+        const cookies=document.cookie ? document.cookie.split(";") : [];
+        for (const cookie of cookies){
+            const trimmedCookie=cookie.trim();
+            if (trimmedCookie.startsWith(`${name}=`)){
+                return decodeURIComponent(trimmedCookie.substring(name.length + 1));
+            }
+        }
+        return "";
+    }
+
 
     demote.forEach((d)=>{
         d.addEventListener("click",()=>{
@@ -945,12 +950,12 @@ aside .pending_lists{
         r.addEventListener("click",()=>{
             if(confirm("Are you sure you want to permanently remove this volunteer?")){
                 let volunteerId=r.dataset.id
-                let url=`/dashboard/remove_volunteer/`;
+                let url=`{% url 'dashboard:remove_volunteer' %}`;
                 fetch(url,{
                     method:"POST",
                     headers:{
                         "Content-Type":"application/json",
-                        "X-CSRFToken":document.querySelector('[name=csrfmiddlewaretoken]').value
+                        "X-CSRFToken":getCookie("csrftoken")
                     },
                     body:JSON.stringify({volunteer_id:volunteerId})
                 }).then(res=>res.json()).then((data)=>{
