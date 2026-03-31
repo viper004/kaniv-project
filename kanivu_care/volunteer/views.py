@@ -10,6 +10,64 @@ from users.models import UserProfile
 from .models import Volunteer, Campaign, CampaignEnrollment, Volunteer_Notifications
 from django.contrib.auth.decorators import login_required
 
+
+def _validate_campaign_payload(request, campaign_type_choices):
+    name = (request.POST.get("name") or "").strip()
+    description = (request.POST.get("description") or "").strip()
+    campaign_type = (request.POST.get("type") or "").strip()
+    max_volunteers = request.POST.get("max_volunteers")
+    start_date = request.POST.get("start_date")
+    end_date = request.POST.get("end_date")
+
+    if not all([name, description, campaign_type, max_volunteers, start_date, end_date]):
+        return None, {
+            "status": "error",
+            "title": "Missing fields",
+            "message": "All campaign fields are required except current volunteers."
+        }
+
+    if campaign_type not in dict(campaign_type_choices):
+        return None, {
+            "status": "error",
+            "title": "Invalid campaign type",
+            "message": "Please select a valid campaign type from the dropdown."
+        }
+
+    try:
+        max_volunteers = int(max_volunteers)
+    except (TypeError, ValueError):
+        return None, {
+            "status": "error",
+            "title": "Invalid volunteer count",
+            "message": "Maximum volunteers must be a valid number."
+        }
+
+    if max_volunteers < 0:
+        return None, {
+            "status": "error",
+            "title": "Invalid volunteer count",
+            "message": "Maximum volunteers cannot be negative."
+        }
+
+    start_date_obj = datetime.strptime(start_date, "%Y-%m-%d").date()
+    end_date_obj = datetime.strptime(end_date, "%Y-%m-%d").date()
+
+    if end_date_obj < start_date_obj:
+        return None, {
+            "status": "error",
+            "title": "Invalid campaign dates",
+            "message": "End date cannot be earlier than start date."
+        }
+
+    return {
+        "name": name,
+        "description": description,
+        "type": campaign_type,
+        "max_volunteers": max_volunteers,
+        "start_date": start_date_obj,
+        "end_date": end_date_obj,
+    }, None
+
 # Create your views here.
 @login_required
 def join_volunteer(request):
@@ -76,61 +134,18 @@ def new_campaign(request):
 
     if request.method == "POST":
         try:
-            name = (request.POST.get("name") or "").strip()
-            description = (request.POST.get("description") or "").strip()
-            campaign_type = (request.POST.get("type") or "").strip()
-            max_volunteers = request.POST.get("max_volunteers")
-            start_date = request.POST.get("start_date")
-            end_date = request.POST.get("end_date")
-
-            if not all([name, description, campaign_type, max_volunteers, start_date, end_date]):
-                return JsonResponse({
-                    "status": "error",
-                    "title": "Missing fields",
-                    "message": "All campaign fields are required except current volunteers."
-                })
-
-            if campaign_type not in dict(campaign_type_choices):
-                return JsonResponse({
-                    "status": "error",
-                    "title": "Invalid campaign type",
-                    "message": "Please select a valid campaign type from the dropdown."
-                })
-
-            try:
-                max_volunteers = int(max_volunteers)
-            except (TypeError, ValueError):
-                return JsonResponse({
-                    "status": "error",
-                    "title": "Invalid volunteer count",
-                    "message": "Maximum volunteers must be a valid number."
-                })
-
-            if max_volunteers < 0:
-                return JsonResponse({
-                    "status": "error",
-                    "title": "Invalid volunteer count",
-                    "message": "Maximum volunteers cannot be negative."
-                })
-
-            start_date_obj = datetime.strptime(start_date, "%Y-%m-%d").date()
-            end_date_obj = datetime.strptime(end_date, "%Y-%m-%d").date()
-
-            if end_date_obj < start_date_obj:
-                return JsonResponse({
-                    "status": "error",
-                    "title": "Invalid campaign dates",
-                    "message": "End date cannot be earlier than start date."
-                })
+            campaign_data, error_response = _validate_campaign_payload(request, campaign_type_choices)
+            if error_response:
+                return JsonResponse(error_response)
 
             Campaign.objects.create(
-                name=name,
-                description=description,
-                type=campaign_type,
-                max_volunteers=max_volunteers,
+                name=campaign_data["name"],
+                description=campaign_data["description"],
+                type=campaign_data["type"],
+                max_volunteers=campaign_data["max_volunteers"],
                 current_volunteers=0,
-                start_date=start_date_obj,
-                end_date=end_date_obj,
+                start_date=campaign_data["start_date"],
+                end_date=campaign_data["end_date"],
             )
 
             return JsonResponse({
@@ -178,6 +193,7 @@ def new_campaign(request):
             "id": campaign.id,
             "name": campaign.name,
             "type": campaign.get_type_display(),
+            "type_key": campaign.type,
             "description": campaign.description,
             "start_date": campaign.start_date.isoformat(),
             "end_date": campaign.end_date.isoformat(),
@@ -194,6 +210,57 @@ def new_campaign(request):
         "campaign_type_choices": campaign_type_choices,
         "campaign_details": campaign_details,
     })
+
+
+@login_required
+def update_campaign(request, id):
+    if request.method != "POST":
+        return JsonResponse({
+            "status": "error",
+            "title": "Invalid request",
+            "message": "Only POST requests are allowed for updating a campaign."
+        }, status=405)
+
+    campaign_type_choices = Campaign.type_choices
+
+    try:
+        campaign = Campaign.objects.get(id=id)
+        campaign_data, error_response = _validate_campaign_payload(request, campaign_type_choices)
+        if error_response:
+            return JsonResponse(error_response)
+
+        if campaign_data["max_volunteers"] < campaign.current_volunteers:
+            return JsonResponse({
+                "status": "error",
+                "title": "Invalid volunteer limit",
+                "message": "Maximum volunteers cannot be less than the current enrolled volunteers."
+            })
+
+        campaign.name = campaign_data["name"]
+        campaign.description = campaign_data["description"]
+        campaign.type = campaign_data["type"]
+        campaign.max_volunteers = campaign_data["max_volunteers"]
+        campaign.start_date = campaign_data["start_date"]
+        campaign.end_date = campaign_data["end_date"]
+        campaign.save()
+
+        return JsonResponse({
+            "status": "success",
+            "title": "Campaign updated",
+            "message": "The campaign was updated successfully."
+        })
+    except Campaign.DoesNotExist:
+        return JsonResponse({
+            "status": "error",
+            "title": "Campaign not found",
+            "message": "This campaign is no longer available."
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            "status": "error",
+            "title": "Campaign update failed",
+            "message": str(e)
+        })
 
 
 @login_required

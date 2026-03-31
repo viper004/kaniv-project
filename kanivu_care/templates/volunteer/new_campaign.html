@@ -148,6 +148,7 @@
             text-align: right;
         }
         .action-buttons { display: flex; gap: 1rem; margin-top: 1.4rem; }
+        .edit-btn,
         .view-btn,
         .delete-btn {
             width: 100%;
@@ -156,6 +157,10 @@
             padding: 0.85rem 1rem;
             font-weight: 700;
             cursor: pointer;
+        }
+        .edit-btn {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: #fff;
         }
         .view-btn {
             background: linear-gradient(135deg, #0f9d7a, #1cb5e0);
@@ -456,6 +461,7 @@
                 <p class="description">{{ i.description }}</p>
                 <div class="meta">Created on {{ i.created_on }}</div>
                 <div class="action-buttons">
+                    <button class="edit-btn" type="button" data-id="{{ i.id }}" onclick="openEditCampaign(this)">Edit</button>
                     <button class="view-btn" type="button" data-id="{{ i.id }}" onclick="viewCampaignDetails(this)">View Enrolled</button>
                     <button class="delete-btn" type="button" data-id="{{ i.id }}" onclick="deleteCampaign(this)">Delete Campaign</button>
                 </div>
@@ -492,6 +498,7 @@
                 <p class="description">{{ i.description }}</p>
                 <div class="meta">Created on {{ i.created_on }}</div>
                 <div class="action-buttons">
+                    <button class="edit-btn" type="button" data-id="{{ i.id }}" onclick="openEditCampaign(this)">Edit</button>
                     <button class="view-btn" type="button" data-id="{{ i.id }}" onclick="viewCampaignDetails(this)">View Enrolled</button>
                     <button class="delete-btn" type="button" data-id="{{ i.id }}" onclick="deleteCampaign(this)">Delete Campaign</button>
                 </div>
@@ -541,6 +548,41 @@
                 <textarea id="description" name="description" required></textarea>
 
                 <button type="submit" class="submit-btn">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="editCampaignModal">
+        <div class="modal">
+            <span class="close-btn" onclick="closeModal('editCampaignModal')">&times;</span>
+            <h2>Edit Campaign</h2>
+            <p>Update the campaign details below.</p>
+            <form id="editCampaignForm" onsubmit="updateCampaign(event)" method="post">
+                {% csrf_token %}
+                <label for="edit_name">Campaign Name *</label>
+                <input type="text" id="edit_name" name="name" maxlength="50" required>
+
+                <label for="edit_type">Campaign Type *</label>
+                <select id="edit_type" name="type" required>
+                    <option value="">Select campaign type</option>
+                    {% for value, label in campaign_type_choices %}
+                    <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="edit_max_volunteers">Maximum Volunteers *</label>
+                <input type="number" id="edit_max_volunteers" name="max_volunteers" min="0" required>
+
+                <label for="edit_start_date">Start Date *</label>
+                <input type="date" id="edit_start_date" name="start_date" min="{{ today }}" required>
+
+                <label for="edit_end_date">End Date *</label>
+                <input type="date" id="edit_end_date" name="end_date" min="{{ today }}" required>
+
+                <label for="edit_description">Description *</label>
+                <textarea id="edit_description" name="description" required></textarea>
+
+                <button type="submit" class="submit-btn">Update Campaign</button>
             </form>
         </div>
     </div>
@@ -617,6 +659,7 @@
         import {showAlert} from "{% static 'scripts/alert.js' %}";
 
         const modalOverlay = document.getElementById("modalOverlay");
+        const editCampaignModal = document.getElementById("editCampaignModal");
         const confirmModal = document.getElementById("confirm_modal");
         const campaignDetailsModal = document.getElementById("campaignDetailsModal");
         const volunteerDetailsModal = document.getElementById("volunteerDetailsModal");
@@ -632,6 +675,24 @@
         function closeModal(id) {
             document.getElementById(id).style.display = "none";
         }
+
+        const openEditCampaign = (btn) => {
+            const campaign = campaignDetails[btn.dataset.id];
+            if (!campaign) {
+                showAlert("error", "Campaign unavailable", "Unable to load this campaign for editing.", "ok");
+                return;
+            }
+
+            const form = document.getElementById("editCampaignForm");
+            form.action = `{% url 'volunteer:update_campaign' 0 %}`.replace("/0/", `/${btn.dataset.id}/`);
+            document.getElementById("edit_name").value = campaign.name || "";
+            document.getElementById("edit_type").value = campaign.type_key || "";
+            document.getElementById("edit_max_volunteers").value = campaign.max_volunteers ?? 0;
+            document.getElementById("edit_start_date").value = campaign.start_date || "";
+            document.getElementById("edit_end_date").value = campaign.end_date || "";
+            document.getElementById("edit_description").value = campaign.description || "";
+            editCampaignModal.style.display = "flex";
+        };
 
         const renderCandidateCard = (candidate) => {
             const studentStatus = candidate.is_student ? "Student" : "Not Student";
@@ -705,6 +766,31 @@
             });
         };
 
+        const updateCampaign = (e) => {
+            e.preventDefault();
+            loader.style.display = "block";
+            const formData = new FormData(e.target);
+
+            fetch(e.target.action, {
+                method: "POST",
+                body: formData,
+            })
+            .then(res => res.json())
+            .then(data => {
+                loader.style.display = "none";
+                if (data.status === "success") {
+                    closeModal("editCampaignModal");
+                    showAlert(data.status, data.title, data.message, "reload");
+                } else {
+                    showAlert(data.status, data.title, data.message, "ok");
+                }
+            })
+            .catch(err => {
+                loader.style.display = "none";
+                showAlert("error", "Update Failed", err.message, "ok");
+            });
+        };
+
         const showConfirmation = () => {
             return new Promise((resolve) => {
                 confirmModal.style.display = "flex";
@@ -738,6 +824,7 @@
         window.onclick = function(event) {
             if (
                 event.target === modalOverlay ||
+                event.target === editCampaignModal ||
                 event.target === campaignDetailsModal ||
                 event.target === volunteerDetailsModal
             ) {
@@ -748,9 +835,11 @@
         window.openModal = openModal;
         window.closeModal = closeModal;
         window.submitForm = submitForm;
+        window.updateCampaign = updateCampaign;
         window.deleteCampaign = deleteCampaign;
         window.viewCampaignDetails = viewCampaignDetails;
         window.openVolunteerDetails = openVolunteerDetails;
+        window.openEditCampaign = openEditCampaign;
     </script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 </body>
