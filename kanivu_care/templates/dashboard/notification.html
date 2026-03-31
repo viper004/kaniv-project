@@ -232,6 +232,11 @@
             color: var(--accent);
         }
         
+        .role-volunteer {
+            background: rgba(46, 204, 113, 0.12);
+            color: #1e8449;
+        }
+        
         .user-details {
             margin: 1.5rem 0;
         }
@@ -887,6 +892,46 @@
         {% endif %}
 
         {% if request.user.userprofile.role == "convenier" or request.user.userprofile.role == "coordinator" %}
+            {% if volunteer_notifications %}
+                <div class="section-header">
+                    <h2 class="section-title">Volunteer Notifications</h2>
+                </div>
+                <div class="user-grid">
+                    {% for i in volunteer_notifications %}
+                    <div class="user-card">
+                        <div class="user-header">
+                            <div class="user-avatar"></div>
+                            <div class="user-info">
+                                <div class="user-name">
+                                    {% if i.sent_by %}
+                                        {{ i.sent_by.username }}
+                                    {% else %}
+                                        Unknown User
+                                    {% endif %}
+                                </div>
+                                <span class="user-role role-volunteer">Volunteer</span>
+                            </div>
+                        </div>
+                        <div class="user-details">
+                            <b>{{ i.title }}</b>
+                            <pre class="description">{{ i.description }}</pre>
+                            <p>{{ i.date }}</p>
+                            <i class="time">{{ i.send_date }}</i>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="user-grid">
+                    <div class="empty-state">
+                        <div data-feather="bell"></div>
+                        <h3 class="empty-text">No volunteer notifications are available</h3>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        {% if request.user.userprofile.role == "convenier" or request.user.userprofile.role == "coordinator" %}
 
 
             {% if announcements %}
@@ -1005,6 +1050,7 @@
       <select style="cursor: pointer;" id="notify_choice" onchange="toggleNotificationType(this.value)">
         <option value="normal">Normal Notification</option>
         <option value="public">Public Notification</option>
+        <option value="volunteer">Volunteer Notifications</option>
       </select>
       <div id="form-container">
             <form action="{% url 'dashboard:notification' %}" onsubmit="submitForm(event)" id="form" method="post">
@@ -1284,8 +1330,27 @@
       </form>
       `
         }
+        else if (type=="volunteer"){
+            html_form=`
+            <form action="{% url 'dashboard:notification' %}" onsubmit="submitForm(event)" id="form" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="notification_type" value="volunteer" />
+
+        <label for="title">Title *</label>
+        <input type="text" id="title" name="title" placeholder="Enter title..." required />
+
+        <label for="date">Date *</label>
+        <input type="date" name="date" id="date" min="{{today}}" required />
+
+        <label for="description">Description *</label>
+        <textarea id="description" name="description" placeholder="Write a description..." required></textarea>
+
+        <button type="submit" class="submit-btn">Submit</button>
+      </form>
+      `
+        }
         else{
-            showAlert("error","Invalid choice","Only accepts normal or public notification","ok");
+            showAlert("error","Invalid choice","Only accepts normal, public, or volunteer notification","ok");
             return toggleNotificationType("normal")
         }
 

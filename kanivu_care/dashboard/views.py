@@ -42,12 +42,13 @@ def Notification(req):
         if not req.user.userprofile.role in ["convenier","coordinator"]:
             return HttpResponseRedirect("/")
         
-        
+        notification_type = req.POST.get("notification_type")
         title=req.POST.get("title")
         description=req.POST.get("description")
         programDate=req.POST.get("program_date")
         department=req.POST.get("department")
         priorityDuty=req.POST.get("selected_section")
+        volunteer_date = req.POST.get("date")
         
 
         
@@ -62,6 +63,29 @@ def Notification(req):
                     "status":"error",
                     "title":"Both fields are required",
                     "message":"Title and description are required"
+                })
+
+            if notification_type == "volunteer":
+                if not volunteer_date:
+                    return JsonResponse({
+                        "status":"error",
+                        "title":"Date required",
+                        "message":"Date is required for volunteer notifications."
+                    })
+
+                volunteer_date_stripped = datetime.strptime(volunteer_date, "%Y-%m-%d").date()
+
+                Volunteer_Notifications.objects.create(
+                    title=title,
+                    description=description,
+                    date=volunteer_date_stripped,
+                    sent_by=req.user
+                )
+
+                return JsonResponse({
+                    "status":"success",
+                    "title":"Volunteer notification uploaded",
+                    "message":"Your volunteer notification was submitted successfully."
                 })
             
             if not programDate:
@@ -148,6 +172,7 @@ def Notification(req):
         
         pendingNotifications=NotifyModel.objects.filter(is_completed=False).order_by("-program_date")
         completedNotification=NotifyModel.objects.filter(is_completed=True).order_by("-program_date")
+        volunteer_notifications = Volunteer_Notifications.objects.select_related("sent_by").order_by("-date", "-send_date")
 
         annnouncements=AnnouncementModel.objects.filter(is_completed=False).order_by('-event_date')
         previous_announcements=AnnouncementModel.objects.filter(is_completed=True).order_by('-event_date')
@@ -156,6 +181,7 @@ def Notification(req):
         cntx={
             "pending_notifications":pendingNotifications,
             "completed_notifications":completedNotification,
+            "volunteer_notifications":volunteer_notifications,
             "announcements":annnouncements,
             "previous_announcements":previous_announcements,
             "today":today.isoformat(),

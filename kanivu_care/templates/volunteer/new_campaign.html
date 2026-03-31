@@ -148,15 +148,22 @@
             text-align: right;
         }
         .action-buttons { display: flex; gap: 1rem; margin-top: 1.4rem; }
+        .view-btn,
         .delete-btn {
             width: 100%;
             border: none;
             border-radius: 10px;
             padding: 0.85rem 1rem;
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: #fff;
             font-weight: 700;
             cursor: pointer;
+        }
+        .view-btn {
+            background: linear-gradient(135deg, #0f9d7a, #1cb5e0);
+            color: #fff;
+        }
+        .delete-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: #fff;
         }
         .empty-state {
             grid-column: 1 / -1;
@@ -259,6 +266,92 @@
             margin-bottom: 1rem;
             color: #ff5c7c;
         }
+        .campaign-details-modal,
+        .volunteer-details-modal {
+            max-width: 760px;
+        }
+        .candidate-section-title {
+            margin: 1rem 0;
+            font-size: 1.1rem;
+            color: var(--dark);
+        }
+        .candidate-list {
+            display: grid;
+            gap: 1rem;
+        }
+        .candidate-card {
+            border: 1px solid #dce9eb;
+            border-radius: 14px;
+            padding: 1rem;
+            background: #fbfdff;
+        }
+        .candidate-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        .candidate-name-btn {
+            border: none;
+            background: transparent;
+            color: var(--primary);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0;
+            text-align: left;
+        }
+        .candidate-meta {
+            color: #546e7a;
+            font-size: 0.92rem;
+        }
+        .candidate-badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 0.35rem 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .candidate-badge.student {
+            background: rgba(15, 157, 122, 0.14);
+            color: #0f9d7a;
+        }
+        .candidate-badge.non-student {
+            background: rgba(231, 76, 60, 0.14);
+            color: #c0392b;
+        }
+        .volunteer-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem 1rem;
+            margin-top: 1rem;
+        }
+        .volunteer-detail-card {
+            background: #f6fbfb;
+            border: 1px solid #d6ece7;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+        .volunteer-detail-card strong {
+            display: block;
+            color: #607d8b;
+            font-size: 0.85rem;
+            margin-bottom: 0.35rem;
+        }
+        .volunteer-detail-card span {
+            color: var(--dark);
+            font-weight: 600;
+            word-break: break-word;
+        }
+        .candidate-empty {
+            padding: 1rem;
+            border-radius: 12px;
+            background: #f5f8fa;
+            color: #607d8b;
+            text-align: center;
+        }
         .loader {
             display: none;
             width: 60px;
@@ -315,14 +408,21 @@
             .modal form {
                 max-height: calc(100vh - 9rem);
             }
+            .volunteer-detail-grid {
+                grid-template-columns: 1fr;
+            }
+            .candidate-row {
+                align-items: flex-start;
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
-    <a href="{% url 'dashboard:notification' %}" class="back-btn">
+    <button type="button" class="back-btn" onclick="window.history.back()">
         <i class="fas fa-arrow-left"></i>
         <span>Back</span>
-    </a>
+    </button>
 
     <div class="container">
         <header>
@@ -356,6 +456,7 @@
                 <p class="description">{{ i.description }}</p>
                 <div class="meta">Created on {{ i.created_on }}</div>
                 <div class="action-buttons">
+                    <button class="view-btn" type="button" data-id="{{ i.id }}" onclick="viewCampaignDetails(this)">View Enrolled</button>
                     <button class="delete-btn" type="button" data-id="{{ i.id }}" onclick="deleteCampaign(this)">Delete Campaign</button>
                 </div>
             </div>
@@ -391,6 +492,7 @@
                 <p class="description">{{ i.description }}</p>
                 <div class="meta">Created on {{ i.created_on }}</div>
                 <div class="action-buttons">
+                    <button class="view-btn" type="button" data-id="{{ i.id }}" onclick="viewCampaignDetails(this)">View Enrolled</button>
                     <button class="delete-btn" type="button" data-id="{{ i.id }}" onclick="deleteCampaign(this)">Delete Campaign</button>
                 </div>
             </div>
@@ -457,12 +559,69 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="campaignDetailsModal">
+        <div class="modal campaign-details-modal">
+            <span class="close-btn" onclick="closeModal('campaignDetailsModal')">&times;</span>
+            <h2 id="campaignDetailsTitle">Campaign Details</h2>
+            <p id="campaignDetailsSubtitle">View enrolled candidates for this campaign.</p>
+            <h3 class="candidate-section-title">Enrolled Candidates</h3>
+            <div class="candidate-list" id="candidateList"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="volunteerDetailsModal">
+        <div class="modal volunteer-details-modal">
+            <span class="close-btn" onclick="closeModal('volunteerDetailsModal')">&times;</span>
+            <h2 id="volunteerDetailsTitle">Volunteer Details</h2>
+            <p>Full details of the selected volunteer.</p>
+            <div class="volunteer-detail-grid">
+                <div class="volunteer-detail-card">
+                    <strong>Name</strong>
+                    <span id="volunteerName"></span>
+                </div>
+                <div class="volunteer-detail-card">
+                    <strong>Phone</strong>
+                    <span id="volunteerPhone"></span>
+                </div>
+                <div class="volunteer-detail-card">
+                    <strong>Email</strong>
+                    <span id="volunteerEmail"></span>
+                </div>
+                <div class="volunteer-detail-card">
+                    <strong>Student Status</strong>
+                    <span id="volunteerStudentStatus"></span>
+                </div>
+                <div class="volunteer-detail-card">
+                    <strong>Blood Group</strong>
+                    <span id="volunteerBloodGroup"></span>
+                </div>
+                <div class="volunteer-detail-card">
+                    <strong>Batch</strong>
+                    <span id="volunteerBatch"></span>
+                </div>
+                <div class="volunteer-detail-card">
+                    <strong>Year</strong>
+                    <span id="volunteerYear"></span>
+                </div>
+                <div class="volunteer-detail-card">
+                    <strong>Joined On</strong>
+                    <span id="volunteerJoinedOn"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ campaign_details|json_script:"campaign-details-data" }}
+
     <script type="module">
         import {showAlert} from "{% static 'scripts/alert.js' %}";
 
         const modalOverlay = document.getElementById("modalOverlay");
         const confirmModal = document.getElementById("confirm_modal");
+        const campaignDetailsModal = document.getElementById("campaignDetailsModal");
+        const volunteerDetailsModal = document.getElementById("volunteerDetailsModal");
         const loader = document.getElementById("loader");
+        const campaignDetails = JSON.parse(document.getElementById("campaign-details-data").textContent);
 
         feather.replace();
 
@@ -473,6 +632,54 @@
         function closeModal(id) {
             document.getElementById(id).style.display = "none";
         }
+
+        const renderCandidateCard = (candidate) => {
+            const studentStatus = candidate.is_student ? "Student" : "Not Student";
+            const studentClass = candidate.is_student ? "student" : "non-student";
+            return `
+                <div class="candidate-card">
+                    <div class="candidate-row">
+                        <button type="button" class="candidate-name-btn" onclick="openVolunteerDetails('${encodeURIComponent(JSON.stringify(candidate))}')">${candidate.name}</button>
+                        <span class="candidate-meta">${candidate.phone || "N/A"}</span>
+                        <span class="candidate-badge ${studentClass}">${studentStatus}</span>
+                    </div>
+                </div>
+            `;
+        };
+
+        const openVolunteerDetails = (encodedCandidate) => {
+            const candidate = JSON.parse(decodeURIComponent(encodedCandidate));
+            document.getElementById("volunteerDetailsTitle").textContent = candidate.name || "Volunteer Details";
+            document.getElementById("volunteerName").textContent = candidate.name || "N/A";
+            document.getElementById("volunteerPhone").textContent = candidate.phone || "N/A";
+            document.getElementById("volunteerEmail").textContent = candidate.email || "N/A";
+            document.getElementById("volunteerStudentStatus").textContent = candidate.is_student ? "Student" : "Not Student";
+            document.getElementById("volunteerBloodGroup").textContent = candidate.blood_group || "N/A";
+            document.getElementById("volunteerBatch").textContent = candidate.batch || "N/A";
+            document.getElementById("volunteerYear").textContent = candidate.year || "N/A";
+            document.getElementById("volunteerJoinedOn").textContent = candidate.joined_on || "N/A";
+            volunteerDetailsModal.style.display = "flex";
+        };
+
+        const viewCampaignDetails = (btn) => {
+            const campaign = campaignDetails[btn.dataset.id];
+            if (!campaign) {
+                showAlert("error", "Campaign details unavailable", "Unable to load this campaign's enrolled candidates.", "ok");
+                return;
+            }
+
+            document.getElementById("campaignDetailsTitle").textContent = campaign.name;
+            document.getElementById("campaignDetailsSubtitle").textContent = `${campaign.enrolled_candidates.length} enrolled candidate(s) for this campaign.`;
+
+            const candidateList = document.getElementById("candidateList");
+            if (campaign.enrolled_candidates.length) {
+                candidateList.innerHTML = campaign.enrolled_candidates.map(renderCandidateCard).join("");
+            } else {
+                candidateList.innerHTML = '<div class="candidate-empty">No candidates have enrolled in this campaign yet.</div>';
+            }
+
+            campaignDetailsModal.style.display = "flex";
+        };
 
         const submitForm = (e) => {
             e.preventDefault();
@@ -529,8 +736,12 @@
         };
 
         window.onclick = function(event) {
-            if (event.target === modalOverlay) {
-                closeModal("modalOverlay");
+            if (
+                event.target === modalOverlay ||
+                event.target === campaignDetailsModal ||
+                event.target === volunteerDetailsModal
+            ) {
+                closeModal(event.target.id);
             }
         };
 
@@ -538,6 +749,8 @@
         window.closeModal = closeModal;
         window.submitForm = submitForm;
         window.deleteCampaign = deleteCampaign;
+        window.viewCampaignDetails = viewCampaignDetails;
+        window.openVolunteerDetails = openVolunteerDetails;
     </script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 </body>

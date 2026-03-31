@@ -35,6 +35,4 @@ urlpatterns=[
     path("volunteer_dashboard/",views.volunteer_dashboard,name="volunteer_dashboard"),
 
 
-
-
 ]

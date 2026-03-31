@@ -115,3 +115,20 @@ class CampaignEnrollment(models.Model):
             models.UniqueConstraint(fields=["user", "campaign"], name="unique_campaign_enrollment")
         ]
 
+
+
+class Volunteer_Notifications(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    date = models.DateField()
+    send_date = models.DateTimeField(auto_now_add=True)
+    sent_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="volunteer_notifications_sent"
+    )
+
+    def __str__(self):
+        return self.title
