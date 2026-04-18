@@ -18,6 +18,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='memberregistration',
             name='department',
-            field=models.CharField(choices=[('bba', 'BBA'), ('bca', 'BCA'), ('bsc_cs', 'BSC CS'), ('bcom_tax', 'bcom tax'), ('ttm', 'ttm'), ('bcom_ca_and_finance', 'bcom ca and finance'), ('bcom_co-operation', 'bcom co-operation'), ('ba_literature', 'ba literature'), ('ba_communicative_english', 'ba_communicative_english'), ('ba_journalism', 'ba_journalism'), ('electronics', 'electronics'), ('bsw', 'bsw')]),
+            field=models.CharField(choices=[('bba', 'BBA'), ('bca', 'BCA'), ('bsc_cs', 'BSC CS'), ('bcom_tax', 'bcom tax'), ('ttm', 'ttm'), ('bcom_ca_and_finance', 'bcom ca and finance'), ('bcom_co-operation', 'bcom co-operation'), ('ba_literature', 'ba literature'), ('ba_communicative_english', 'ba_communicative_english'), ('ba_journalism', 'ba_journalism'), ('electronics', 'electronics'), ('bsw', 'bsw')], max_length=50),
         ),
     ]

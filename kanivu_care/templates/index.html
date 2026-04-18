@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Helping Hands | Charity Foundation</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'style/home.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .hero-gradient {
@@ -54,6 +55,110 @@
             width: 30px;
             height: 30px;
         }
+
+        .sos-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.55rem 0.9rem;
+            border-radius: 8px;
+            background: #dc2626;
+            color: #ffffff;
+            font-weight: 800;
+            letter-spacing: 0;
+            line-height: 1;
+            box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.55), 0 8px 18px rgba(220, 38, 38, 0.25);
+            transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+            animation: sos-pulse 1.8s infinite;
+        }
+
+        .sos-button:hover,
+        .sos-button:focus {
+            background: #b91c1c;
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 0 0 6px rgba(220, 38, 38, 0.14), 0 10px 22px rgba(220, 38, 38, 0.32);
+            outline: none;
+        }
+
+        .sos-button i {
+            font-size: 0.95rem;
+        }
+
+        .sos-modal-panel {
+            max-height: calc(100vh - 2rem);
+            overflow-y: auto;
+        }
+
+        .sos-input {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: #1f2937;
+            background: #ffffff;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .sos-input:focus {
+            border-color: #dc2626;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+        }
+
+        .sos-input[readonly] {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .sos-submit-button {
+            background: #dc2626;
+            color: #ffffff;
+        }
+
+        .sos-submit-button:hover {
+            background: #b91c1c;
+        }
+
+        .sos-list-item {
+            width: 100%;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 1rem;
+            background: #fff7f7;
+            text-align: left;
+            transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .sos-list-item:hover,
+        .sos-list-item:focus {
+            border-color: #dc2626;
+            background: #ffffff;
+            transform: translateY(-1px);
+            outline: none;
+        }
+
+        .sos-empty-state {
+            border: 1px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        @keyframes sos-pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.5), 0 8px 18px rgba(220, 38, 38, 0.25);
+            }
+
+            70% {
+                box-shadow: 0 0 0 9px rgba(220, 38, 38, 0), 0 8px 18px rgba(220, 38, 38, 0.25);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(220, 38, 38, 0), 0 8px 18px rgba(220, 38, 38, 0.25);
+            }
+        }
     </style>
 </head>
 
@@ -72,7 +177,14 @@
                     <a href="#" class="nav-link text-gray-700 hover:text-blue-500">Home</a>
                     <a href="{% url 'dashboard:announcement' %}"
                         class="nav-link text-gray-700 hover:text-blue-500">Announcements</a>
+                        
                     <a href="{% url 'web:donation' %}" class="nav-link text-gray-700 hover:text-blue-500">Donation</a>
+                    <a href="{% if request.user.is_authenticated %}#{% else %}{% url 'users:login' %}{% endif %}"
+                        class="sos-button sos-trigger"
+                        aria-label="Emergency SOS">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        SOS
+                    </a>
                     {% if request.user.is_authenticated and not request.user.userprofile.role == "public_user" %}
                     <a href="{% url 'dashboard:dashboard' %}"
                         class="nav-link text-gray-700 hover:text-blue-500">Dashboard</a>
@@ -108,6 +220,12 @@
 
                     <a href="{% url 'dashboard:announcement' %}"
                         class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">Announcements</a>
+                    <a href="{% if request.user.is_authenticated %}#{% else %}{% url 'users:login' %}{% endif %}"
+                        class="sos-button sos-trigger w-full justify-center"
+                        aria-label="Emergency SOS">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        SOS
+                    </a>
                     {% if not request.user.userprofile.role == "public_user" %}
                     <a href="{% url 'dashboard:dashboard' %}"
                         class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">Dashboard</a>
@@ -507,6 +625,103 @@
         <i class="fas fa-arrow-up"></i>
     </button>
 
+    {% if request.user.is_authenticated %}
+    <!-- SOS Modal -->
+    <div id="sosModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+        <div class="sos-modal-panel bg-white rounded-lg shadow-xl w-full max-w-2xl p-8">
+            <div class="flex items-start justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">SOS Messages</h2>
+                    <p class="text-gray-600 mt-1">Newest emergency messages from Kanivu.</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button type="button" onclick="showSosForm()" class="sos-submit-button font-semibold px-4 py-2 rounded-lg transition">
+                        Send SOS
+                    </button>
+                    <button type="button" onclick="closeSosModal()" class="text-gray-500 hover:text-red-500 text-2xl">
+                        &times;
+                    </button>
+                </div>
+            </div>
+
+            <div id="sosListView" class="space-y-4">
+                {% if sos_messages %}
+                    {% for sos in sos_messages %}
+                    <button type="button"
+                        class="sos-list-item"
+                        data-title="{{ sos.title|escapejs }}"
+                        data-sender="{{ sos.user.get_full_name|default:sos.user.username|escapejs }}"
+                        data-contact="{{ sos.contact|default:''|escapejs }}"
+                        data-time="{{ sos.created_at|date:'M d, Y h:i A'|escapejs }}"
+                        data-message="{{ sos.message|escapejs }}">
+                        <div class="flex justify-between items-start gap-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800">{{ sos.title }}</h3>
+                                <p class="text-sm text-gray-600 mt-1">Sent by {{ sos.user.get_full_name|default:sos.user.username }}</p>
+                            </div>
+                            <span class="text-sm text-red-600 font-semibold">{{ sos.created_at|date:"M d, h:i A" }}</span>
+                        </div>
+                    </button>
+                    {% endfor %}
+                {% else %}
+                    <div class="sos-empty-state">
+                        No SOS messages yet.
+                    </div>
+                {% endif %}
+            </div>
+
+            <div id="sosDetailView" class="hidden space-y-4">
+                <button type="button" onclick="showSosList()" class="text-red-600 font-semibold">
+                    Back to messages
+                </button>
+                <div class="border border-red-200 rounded-lg p-6">
+                    <h3 id="sosDetailTitle" class="text-2xl font-bold text-gray-800"></h3>
+                    <p id="sosDetailMeta" class="text-sm text-gray-600 mt-2"></p>
+                    <p id="sosDetailContact" class="text-sm text-gray-700 mt-4"></p>
+                    <p id="sosDetailMessage" class="text-gray-800 mt-4 whitespace-pre-line"></p>
+                </div>
+            </div>
+
+            <form id="sosForm" class="hidden space-y-4">
+                {% csrf_token %}
+                <button type="button" onclick="showSosList()" class="text-red-600 font-semibold">
+                    Back to messages
+                </button>
+                <div>
+                    <label for="sosName" class="block text-sm font-semibold text-gray-700 mb-2">Name</label>
+                    <input id="sosName" type="text" class="sos-input" value="{{ request.user.get_full_name|default:request.user.username }}" readonly required>
+                </div>
+
+                <div>
+                    <label for="sosContact" class="block text-sm font-semibold text-gray-700 mb-2">Contact Number</label>
+                    <input id="sosContact" name="contact" type="tel" class="sos-input" value="{{ request.user.userprofile.phone_number|default:'' }}" required>
+                </div>
+
+                <div>
+                    <label for="sosTitle" class="block text-sm font-semibold text-gray-700 mb-2">Title</label>
+                    <input id="sosTitle" name="title" type="text" class="sos-input" maxlength="50" placeholder="Need urgent help" required>
+                </div>
+
+                <div>
+                    <label for="sosMessage" class="block text-sm font-semibold text-gray-700 mb-2">Message</label>
+                    <textarea id="sosMessage" name="message" class="sos-input" rows="5" placeholder="Describe the emergency..." required></textarea>
+                </div>
+
+                <p id="sosFormMessage" class="hidden text-sm font-medium"></p>
+
+                <div class="flex gap-4 pt-2">
+                    <button type="button" onclick="showSosList()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-3 rounded-lg transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="sos-submit-button flex-1 font-semibold py-3 rounded-lg transition">
+                        Send SOS
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Profile Incomplete Modal -->
     <div id="profileModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-8 text-center">
@@ -573,7 +788,177 @@
             document.getElementById('profileModal').classList.add('hidden');
         }
 
+        function openSosModal() {
+            const sosModal = document.getElementById('sosModal');
+            if (sosModal) {
+                sosModal.classList.remove('hidden');
+                showSosList();
+            }
+        }
+
+        function closeSosModal() {
+            const sosModal = document.getElementById('sosModal');
+            const sosFormMessage = document.getElementById('sosFormMessage');
+            if (sosModal) {
+                sosModal.classList.add('hidden');
+            }
+            if (sosFormMessage) {
+                sosFormMessage.classList.add('hidden');
+                sosFormMessage.textContent = '';
+            }
+        }
+
+        function showSosSection(sectionId) {
+            ['sosListView', 'sosDetailView', 'sosForm'].forEach(id => {
+                const section = document.getElementById(id);
+                if (section) {
+                    section.classList.toggle('hidden', id !== sectionId);
+                }
+            });
+        }
+
+        function showSosList() {
+            const sosFormMessage = document.getElementById('sosFormMessage');
+            if (sosFormMessage) {
+                sosFormMessage.classList.add('hidden');
+                sosFormMessage.textContent = '';
+            }
+            showSosSection('sosListView');
+        }
+
+        function showSosForm() {
+            showSosSection('sosForm');
+        }
+
+        function showSosDetail(button) {
+            document.getElementById('sosDetailTitle').textContent = button.dataset.title || '';
+            document.getElementById('sosDetailMeta').textContent = `Sent by ${button.dataset.sender || 'Unknown'} on ${button.dataset.time || ''}`;
+            document.getElementById('sosDetailContact').textContent = `Contact: ${button.dataset.contact || 'Not provided'}`;
+            document.getElementById('sosDetailMessage').textContent = button.dataset.message || '';
+            showSosSection('sosDetailView');
+        }
+
+        function addSosMessageToList(sos) {
+            const sosListView = document.getElementById('sosListView');
+            if (!sosListView || !sos) {
+                return;
+            }
+
+            const emptyState = sosListView.querySelector('.sos-empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+
+            const item = document.createElement('button');
+            item.type = 'button';
+            item.className = 'sos-list-item';
+            item.dataset.title = sos.title || '';
+            item.dataset.sender = sos.sender || '';
+            item.dataset.contact = sos.contact || '';
+            item.dataset.time = sos.time || '';
+            item.dataset.message = sos.message || '';
+
+            const row = document.createElement('div');
+            row.className = 'flex justify-between items-start gap-4';
+
+            const textWrap = document.createElement('div');
+            const title = document.createElement('h3');
+            title.className = 'text-lg font-bold text-gray-800';
+            title.textContent = sos.title || '';
+
+            const sender = document.createElement('p');
+            sender.className = 'text-sm text-gray-600 mt-1';
+            sender.textContent = `Sent by ${sos.sender || 'Unknown'}`;
+
+            const time = document.createElement('span');
+            time.className = 'text-sm text-red-600 font-semibold';
+            time.textContent = sos.short_time || sos.time || '';
+
+            textWrap.appendChild(title);
+            textWrap.appendChild(sender);
+            row.appendChild(textWrap);
+            row.appendChild(time);
+            item.appendChild(row);
+            item.addEventListener('click', function () {
+                showSosDetail(this);
+            });
+
+            sosListView.prepend(item);
+        }
+
+        function showSosFormMessage(type, message) {
+            const sosFormMessage = document.getElementById('sosFormMessage');
+            if (!sosFormMessage) {
+                return;
+            }
+
+            sosFormMessage.textContent = message;
+            sosFormMessage.classList.remove('hidden', 'text-red-600', 'text-green-600');
+            sosFormMessage.classList.add(type === 'success' ? 'text-green-600' : 'text-red-600');
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
+            const sosTriggers = document.querySelectorAll('.sos-trigger');
+            sosTriggers.forEach(trigger => {
+                trigger.addEventListener('click', function (event) {
+                    const sosModal = document.getElementById('sosModal');
+                    if (!sosModal) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    openSosModal();
+                });
+            });
+
+            const sosForm = document.getElementById('sosForm');
+            if (sosForm) {
+                document.querySelectorAll('.sos-list-item').forEach(item => {
+                    item.addEventListener('click', function () {
+                        showSosDetail(this);
+                    });
+                });
+
+                sosForm.addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    const submitButton = sosForm.querySelector('button[type="submit"]');
+                    const formData = new FormData(sosForm);
+                    if (submitButton) {
+                        submitButton.disabled = true;
+                        submitButton.textContent = 'Sending...';
+                    }
+
+                    fetch('{% url "dashboard:sos_message" %}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            showSosFormMessage(data.status, data.message);
+                            if (data.status === 'success') {
+                                addSosMessageToList(data.sos);
+                                sosForm.reset();
+                                document.getElementById('sosName').value = '{{ request.user.get_full_name|default:request.user.username|escapejs }}';
+                                document.getElementById('sosContact').value = '{{ request.user.userprofile.phone_number|default:""|escapejs }}';
+                                setTimeout(showSosList, 900);
+                            }
+                        })
+                        .catch(() => {
+                            showSosFormMessage('error', 'Could not send SOS message. Please try again.');
+                        })
+                        .finally(() => {
+                            if (submitButton) {
+                                submitButton.disabled = false;
+                                submitButton.textContent = 'Send SOS';
+                            }
+                        });
+                });
+            }
+
             // Mobile menu functionality
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');

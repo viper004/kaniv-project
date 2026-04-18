@@ -12,7 +12,7 @@ import requests
 import re
 
 from web.models import DonationModel
-from dashboard.models import NotifyModel,FinanceModel,KitReceiverModel,AnnouncementModel,NotifyModelPriority,CollectionModel,CollectionGalleryModel
+from dashboard.models import NotifyModel,FinanceModel,KitReceiverModel,AnnouncementModel,NotifyModelPriority,CollectionModel,CollectionGalleryModel,SosMessages
 from dashboard.forms import financeModelForm,kitReceiverForm,announcementForm,CollectionModelForm
 
 from users.functions import form_errors
@@ -34,6 +34,50 @@ def Dashboard(req):
         HttpResponseRedirect("/")
 
     return render(req,"dashboard/index.html")
+
+
+@login_required(login_url="users:login")
+def submitSosMessage(req):
+    if req.method != "POST":
+        return JsonResponse({
+            "status": "error",
+            "title": "Invalid request",
+            "message": "Only POST requests are allowed."
+        }, status=405)
+
+    contact = req.POST.get("contact", "").strip()
+    title = req.POST.get("title", "").strip()
+    message = req.POST.get("message", "").strip()
+
+    if not contact or not title or not message:
+        return JsonResponse({
+            "status": "error",
+            "title": "Missing details",
+            "message": "Contact number, title, and message are required."
+        }, status=400)
+
+    sos_message = SosMessages.objects.create(
+        user=req.user,
+        contact=contact,
+        title=title,
+        message=message
+    )
+    sent_at = timezone.localtime(sos_message.created_at)
+    sender_name = req.user.get_full_name() or req.user.username
+
+    return JsonResponse({
+        "status": "success",
+        "title": "SOS message sent",
+        "message": "Your SOS message has been submitted successfully.",
+        "sos": {
+            "title": sos_message.title,
+            "sender": sender_name,
+            "contact": sos_message.contact,
+            "time": sent_at.strftime("%b %d, %Y %I:%M %p"),
+            "short_time": sent_at.strftime("%b %d, %I:%M %p"),
+            "message": sos_message.message,
+        }
+    })
 
 
 @login_required(login_url="/users/login/")

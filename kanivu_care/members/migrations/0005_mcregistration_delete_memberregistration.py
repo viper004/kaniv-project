@@ -18,9 +18,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('adno', models.CharField(max_length=255)),
-                ('department', models.CharField(choices=[('bba', 'BBA'), ('bca', 'BCA'), ('bsc_cs', 'BSC CS'), ('bcom_tax', 'bcom tax'), ('ttm', 'ttm'), ('bcom_ca_and_finance', 'bcom ca and finance'), ('bcom_co-operation', 'bcom co-operation'), ('ba_literature', 'ba literature'), ('ba_communicative_english', 'ba_communicative_english'), ('ba_journalism', 'ba_journalism'), ('electronics', 'electronics'), ('bsw', 'bsw')])),
+                ('department', models.CharField(choices=[('bba', 'BBA'), ('bca', 'BCA'), ('bsc_cs', 'BSC CS'), ('bcom_tax', 'bcom tax'), ('ttm', 'ttm'), ('bcom_ca_and_finance', 'bcom ca and finance'), ('bcom_co-operation', 'bcom co-operation'), ('ba_literature', 'ba literature'), ('ba_communicative_english', 'ba_communicative_english'), ('ba_journalism', 'ba_journalism'), ('electronics', 'electronics'), ('bsw', 'bsw')], max_length=50)),
                 ('batch', models.CharField(max_length=10)),
-                ('duty', models.CharField(choices=[('No Duty', 'No Duty'), ('Finance', 'Finance'), ('Collection Team', 'Collection Team'), ('Event Oraganaizers', 'Event Oraganaizers'), ('Mini Coordination', 'Mini Coordination')])),
+                ('duty', models.CharField(choices=[('No Duty', 'No Duty'), ('Finance', 'Finance'), ('Collection Team', 'Collection Team'), ('Event Oraganaizers', 'Event Oraganaizers'), ('Mini Coordination', 'Mini Coordination')], max_length=50)),
                 ('current_year', models.CharField(choices=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4')], max_length=5)),
                 ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],

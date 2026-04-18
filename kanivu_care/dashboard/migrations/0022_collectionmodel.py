@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             name='CollectionModel',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('collection_type', models.CharField(choices=[('Weekly Collection', 'Weekly Collection'), ('Event Based Collection', 'Event Based Collection'), ('Special Collection', 'Special Collection')])),
+                ('collection_type', models.CharField(choices=[('Weekly Collection', 'Weekly Collection'), ('Event Based Collection', 'Event Based Collection'), ('Special Collection', 'Special Collection')], max_length=100)),
                 ('description', models.TextField()),
                 ('collection_date', models.DateField()),
                 ('announced_date', models.DateField(auto_now_add=True)),

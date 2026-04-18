@@ -6,7 +6,7 @@ from django.db.models import Sum
 
 from web.forms import donationModelForm
 from web.models import DonationModel
-from dashboard.models import AnnouncementModel
+from dashboard.models import AnnouncementModel, SosMessages
 from volunteer.models import Volunteer
 
 from users.functions import form_errors
@@ -22,11 +22,15 @@ def Home(req):
         volunteer = Volunteer.objects.filter(user=req.user).first()
         is_active_volunteer = bool(volunteer and volunteer.is_approved and not volunteer.declined)
         show_volunteer_cta = req.user.userprofile.role not in ["member", "convenier", "coordinator"]
+        sos_messages = SosMessages.objects.select_related("user").order_by("-created_at")[:20]
+    else:
+        sos_messages = []
 
     return render(req, "index.html", {
         "volunteer": volunteer,
         "is_active_volunteer": is_active_volunteer,
         "show_volunteer_cta": show_volunteer_cta,
+        "sos_messages": sos_messages,
     })
 
 

@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=255)),
                 ('description', models.TextField()),
                 ('collection_date', models.DateField()),
-                ('collection_type', models.CharField(choices=[('Weekly Collection', 'Weekly Collection'), ('Monthly Collection', 'Monthly Collection'), ('Special Collection', 'Special Collection')])),
+                ('collection_type', models.CharField(choices=[('Weekly Collection', 'Weekly Collection'), ('Monthly Collection', 'Monthly Collection'), ('Special Collection', 'Special Collection')], max_length=100)),
                 ('image', models.ImageField(upload_to='media/finance/')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],

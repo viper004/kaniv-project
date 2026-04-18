@@ -6,6 +6,7 @@ app_name="dashboard"
 
 urlpatterns=[
     path("",views.Dashboard,name="dashboard"),
+    path("sos-message/", views.submitSosMessage, name="sos_message"),
     path("notification/",views.Notification,name="notification"),
     path("notification/delete/<int:id>/",views.deleteNotification,name="delete_notification"),
     path("notification/end/<int:id>/",views.endNotify,name="end_notification"),

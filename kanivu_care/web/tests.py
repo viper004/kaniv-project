@@ -1,7 +1,9 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
+from dashboard.models import SosMessages
 from users.models import UserProfile
 from volunteer.models import Volunteer
 
@@ -20,7 +22,7 @@ class HomeVolunteerCtaTests(TestCase):
 
         response = self.client.get(reverse("web:home"))
 
-        self.assertContains(response, reverse("volunteer:join_volunteer"))
+        self.assertContains(response, "Join Kanivu")
         self.assertNotContains(response, reverse("dashboard:volunteer_dashboard"))
 
     def test_home_shows_dashboard_for_approved_volunteer(self):
@@ -39,7 +41,7 @@ class HomeVolunteerCtaTests(TestCase):
         response = self.client.get(reverse("web:home"))
 
         self.assertContains(response, reverse("dashboard:volunteer_dashboard"))
-        self.assertNotContains(response, reverse("volunteer:join_volunteer"))
+        self.assertNotContains(response, "Join Kanivu")
 
     def test_home_shows_join_button_again_after_volunteer_is_removed(self):
         volunteer = Volunteer.objects.create(
@@ -57,5 +59,45 @@ class HomeVolunteerCtaTests(TestCase):
 
         response = self.client.get(reverse("web:home"))
 
-        self.assertContains(response, reverse("volunteer:join_volunteer"))
+        self.assertContains(response, "Join Kanivu")
         self.assertNotContains(response, reverse("dashboard:volunteer_dashboard"))
+
+    def test_logged_out_sos_button_redirects_to_login_without_modal(self):
+        response = self.client.get(reverse("web:home"))
+
+        self.assertContains(response, reverse("users:login"))
+        self.assertNotContains(response, 'id="sosModal"')
+
+    def test_logged_in_home_shows_newest_sos_messages_in_modal(self):
+        older = SosMessages.objects.create(
+            user=self.user,
+            contact="1111111111",
+            title="Older SOS",
+            message="Older emergency details",
+        )
+        newest = SosMessages.objects.create(
+            user=self.user,
+            contact="2222222222",
+            title="Newest SOS",
+            message="Newest emergency details",
+        )
+        SosMessages.objects.filter(id=older.id).update(
+            created_at=timezone.now() - timezone.timedelta(hours=1)
+        )
+        SosMessages.objects.filter(id=newest.id).update(
+            created_at=timezone.now()
+        )
+        self.client.login(username="tester", password="secret123")
+
+        response = self.client.get(reverse("web:home"))
+        content = response.content.decode()
+
+        self.assertContains(response, 'id="sosModal"')
+        self.assertContains(response, "SOS Messages")
+        self.assertContains(response, "Send SOS")
+        self.assertContains(response, "Newest SOS")
+        self.assertContains(response, "Older SOS")
+        self.assertContains(response, "Sent by tester")
+        self.assertContains(response, 'data-contact="2222222222"')
+        self.assertContains(response, 'data-message="Newest emergency details"')
+        self.assertLess(content.index("Newest SOS"), content.index("Older SOS"))
