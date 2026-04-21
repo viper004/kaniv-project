@@ -423,15 +423,27 @@ def updateAnnouncement(req):
                 "title":"Request rejected",
                 "message":"Only convenier or the owner of announcement can be update"
             })
-        thumbnail_clear=req.POST.get("thumbnail_clear")
+        thumbnail_clear=req.POST.get("thumbnail_clear") == "1"
+        photo1_clear=req.POST.get("photo1_clear") == "1"
+        photo2_clear=req.POST.get("photo2_clear") == "1"
         if form.is_valid():
             announce=form.save(commit=False)
             announce.is_completed=announcement.is_completed
+            if thumbnail_clear and announcement.thumbnail:
+                announcement.thumbnail.delete(save=False)
+                announce.thumbnail=None
+            if photo1_clear and announcement.photo1:
+                announcement.photo1.delete(save=False)
+                announce.photo1=None
+            if photo2_clear and announcement.photo2:
+                announcement.photo2.delete(save=False)
+                announce.photo2=None
             if (req.POST.get("video_url")):
                 videoUrl=req.POST.get("video_url")
                 thumbnail=req.FILES.get("thumbnail")
                 if (thumbnail):
                     announce.thumbnail=thumbnail
+                    announce.thumbnail_url=None
                     announce.save()
                     return JsonResponse({
                         "status":"success",
@@ -439,10 +451,8 @@ def updateAnnouncement(req):
                         "message":"This announcement is updated successfully"
                     })
                 else:
-                    get_thumbnail=getThumbnail(videoUrl)
-                    if thumbnail_clear is not None:
-                        announce.thumbnail.delete(save=False)
-                        announce.thumbnail=None
+                    if not announce.thumbnail:
+                        get_thumbnail=getThumbnail(videoUrl)
                         if get_thumbnail is not False:
                             announce.thumbnail_url=get_thumbnail
                             announce.save()
@@ -457,21 +467,18 @@ def updateAnnouncement(req):
                                 "title":"Thumbnail is required",
                                 "message":"Cannot find thumbnail of the video.So add the thumbnail"
                             })
-                    if get_thumbnail is not False:
-                        announce.thumbnail_url=get_thumbnail
+                    else:
+                        if announcement.thumbnail_url and thumbnail_clear:
+                            announce.thumbnail_url=None
                         announce.save()
                         return JsonResponse({
                             "status":"success",
                             "title":"Successfully updated",
                             "message":"This announcement is updated successfully"
                         })
-                    else:
-                        return JsonResponse({
-                            "status":"error",
-                            "title":"Thumbnail is required",
-                            "message":"Cannot find thumbnail of the video.So add the thumbnail"
-                        })
-                    
+            elif thumbnail_clear:
+                announce.thumbnail_url=None
+
             announce.save()
             return JsonResponse({
                 "status":"success",

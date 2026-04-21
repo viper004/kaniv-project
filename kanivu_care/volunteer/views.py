@@ -146,6 +146,7 @@ def new_campaign(request):
                 current_volunteers=0,
                 start_date=campaign_data["start_date"],
                 end_date=campaign_data["end_date"],
+                image=request.FILES.get("image"),
             )
 
             return JsonResponse({
@@ -242,6 +243,8 @@ def update_campaign(request, id):
         campaign.max_volunteers = campaign_data["max_volunteers"]
         campaign.start_date = campaign_data["start_date"]
         campaign.end_date = campaign_data["end_date"]
+        if request.FILES.get("image"):
+            campaign.image = request.FILES.get("image")
         campaign.save()
 
         return JsonResponse({

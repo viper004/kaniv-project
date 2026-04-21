@@ -462,6 +462,71 @@
       resize: vertical;
     }
 
+    .file-field {
+      margin-top: 0.35rem;
+    }
+
+    .file-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .file-input-wrap input[type="file"] {
+      flex: 1;
+    }
+
+    .file-clear-btn {
+      width: 28px;
+      height: 28px;
+      border: none;
+      border-radius: 999px;
+      background: #ffe7eb;
+      color: #d63031;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .file-clear-btn:hover {
+      transform: scale(1.05);
+      background: #ffd5dc;
+    }
+
+    .file-preview {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.55rem;
+      font-size: 0.9rem;
+      color: #5c6b73;
+      flex-wrap: wrap;
+    }
+
+    .file-preview a {
+      color: #2d6bb3;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .file-preview a:hover {
+      text-decoration: underline;
+    }
+
+    .file-preview-note {
+      padding: 0.18rem 0.55rem;
+      border-radius: 999px;
+      background: #edf5ff;
+      color: #3b5bdb;
+      font-size: 0.76rem;
+      font-weight: 600;
+    }
+
     .submit-btn {
       width: 100%;
       margin-top: 20px;
@@ -965,8 +1030,17 @@
                                     <button class="announcement_btn" data-userid="{{i.id}}" onclick="updateStateAnnouncement(this,'{{i.id}}','delete')">
                                         <i class="fas fa-trash" style="color: red;"></i>
                                     </button>
-                                    <button class="announcement_btn" data-id="{{i.id}}" type="button" onclick="openEditModal([`{{i.title}}`,`{{i.description}}`,
-                            `{{i.event_date}}`,`{{i.video_url}}`,`{{i.id}}`])">
+                                    <button class="announcement_btn"
+                                        data-id="{{ i.id }}"
+                                        data-title="{{ i.title }}"
+                                        data-description="{{ i.description }}"
+                                        data-event-date="{{ i.event_date|date:'Y-m-d' }}"
+                                        data-video-url="{{ i.video_url|default:'' }}"
+                                        data-thumbnail-url="{% if i.thumbnail %}{{ i.thumbnail.url }}{% elif i.thumbnail_url %}{{ i.thumbnail_url }}{% endif %}"
+                                        data-thumbnail-uploaded="{% if i.thumbnail %}1{% else %}0{% endif %}"
+                                        data-photo1-url="{% if i.photo1 %}{{ i.photo1.url }}{% endif %}"
+                                        data-photo2-url="{% if i.photo2 %}{{ i.photo2.url }}{% endif %}"
+                                        type="button" onclick="openEditModal(this)">
                                         <i class="fas fa-edit" style="color: rgb(1, 243, 1);"></i>
                                     </button>
                                 </div>
@@ -1011,9 +1085,17 @@
                                     <button class="announcement_btn" data-userid="{{i.id}}" onclick="updateStateAnnouncement(this,'{{i.id}}','delete')">
                                         <i class="fas fa-trash" style="color: red;"></i>
                                     </button>
-                                    <button class="announcement_btn" type="button"
-                                onclick="openEditModal([`{{i.title}}`,`{{i.description}}`,
-                            `{{i.event_date}}`,`{{i.video_url}}`,`{{i.id}}`])">
+                                    <button class="announcement_btn"
+                                        data-id="{{ i.id }}"
+                                        data-title="{{ i.title }}"
+                                        data-description="{{ i.description }}"
+                                        data-event-date="{{ i.event_date|date:'Y-m-d' }}"
+                                        data-video-url="{{ i.video_url|default:'' }}"
+                                        data-thumbnail-url="{% if i.thumbnail %}{{ i.thumbnail.url }}{% elif i.thumbnail_url %}{{ i.thumbnail_url }}{% endif %}"
+                                        data-thumbnail-uploaded="{% if i.thumbnail %}1{% else %}0{% endif %}"
+                                        data-photo1-url="{% if i.photo1 %}{{ i.photo1.url }}{% endif %}"
+                                        data-photo2-url="{% if i.photo2 %}{{ i.photo2.url }}{% endif %}"
+                                        type="button" onclick="openEditModal(this)">
                                         <i class="fas fa-edit" style="color: rgb(1, 243, 1);"></i>
                                     </button>
                                 </div>
@@ -1113,10 +1195,126 @@
 
     const formContainer=document.getElementById("form-container");
     const editModalOverlay=document.getElementById("edit_modal_overlay");
+
+    const escapeHtml = (value) => String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
     
-    const openEditModal=(datas)=>{
-        let dateObj=new Date(datas[2])
-        let formattedDate=dateObj.toLocaleDateString("en-CA");
+    const buildFileFieldMarkup = (config) => {
+        const previewUrl = escapeHtml(config.previewUrl || "");
+        const previewLabel = escapeHtml(config.previewLabel || "Current file");
+        const previewTag = escapeHtml(config.previewTag || "");
+        const label = escapeHtml(config.label || "");
+        const id = escapeHtml(config.id || "");
+        const name = escapeHtml(config.name || "");
+        const canRemoveExisting = config.canRemoveExisting ? "1" : "0";
+        const clearButtonStyle = config.canRemoveExisting ? "" : 'style="display:none;"';
+        const previewStyle = previewUrl ? 'style="display:flex;"' : "";
+        const previewLinkStyle = previewUrl ? "" : 'style="display:none;"';
+
+        return `
+            <label for="${id}">${label}</label>
+            <div class="file-field">
+                <div class="file-input-wrap">
+                    <input type="file" accept="image/*" name="${name}" id="${id}"/>
+                    <button type="button" class="file-clear-btn" data-target="${id}" ${clearButtonStyle}>&times;</button>
+                </div>
+                <input type="hidden" name="${name}_clear" id="${id}_clear" value="0"/>
+                <div class="file-preview" id="${id}_preview" ${previewStyle}>
+                    <a href="${previewUrl}" target="_blank" rel="noopener" ${previewLinkStyle}>${previewLabel}</a>
+                    <span class="file-preview-name"></span>
+                    <span class="file-preview-note">${previewTag}</span>
+                </div>
+                <input type="hidden" id="${id}_existing_url" value="${previewUrl}">
+                <input type="hidden" id="${id}_existing_removable" value="${canRemoveExisting}">
+                <input type="hidden" id="${id}_preview_label" value="${previewLabel}">
+                <input type="hidden" id="${id}_preview_tag" value="${previewTag}">
+            </div>
+        `;
+    };
+
+    const setupFileFieldControls = (root, fieldId) => {
+        const input = root.querySelector(`#${fieldId}`);
+        const clearInput = root.querySelector(`#${fieldId}_clear`);
+        const clearBtn = root.querySelector(`.file-clear-btn[data-target="${fieldId}"]`);
+        const preview = root.querySelector(`#${fieldId}_preview`);
+        const previewLink = preview?.querySelector("a");
+        const previewName = preview?.querySelector(".file-preview-name");
+        const previewNote = preview?.querySelector(".file-preview-note");
+
+        if (!input || !clearBtn || !preview || !previewLink || !previewName || !previewNote) {
+            return;
+        }
+
+        const originalUrl = root.querySelector(`#${fieldId}_existing_url`)?.value || "";
+        const originalRemovable = root.querySelector(`#${fieldId}_existing_removable`)?.value === "1";
+        const previewLabel = root.querySelector(`#${fieldId}_preview_label`)?.value || "Current file";
+        const previewTag = root.querySelector(`#${fieldId}_preview_tag`)?.value || "";
+        let removedExisting = false;
+
+        const renderState = () => {
+            if (input.files && input.files.length > 0) {
+                clearInput.value = "0";
+                preview.style.display = "flex";
+                previewLink.style.display = "none";
+                previewName.textContent = input.files[0].name;
+                previewNote.textContent = "Selected file";
+                clearBtn.style.display = "inline-flex";
+                return;
+            }
+
+            if (!removedExisting && originalUrl) {
+                preview.style.display = "flex";
+                previewLink.style.display = "inline-flex";
+                previewLink.href = originalUrl;
+                previewLink.textContent = previewLabel;
+                previewName.textContent = "";
+                previewNote.textContent = previewTag;
+                clearBtn.style.display = originalRemovable ? "inline-flex" : "none";
+                return;
+            }
+
+            preview.style.display = "none";
+            previewLink.style.display = "none";
+            previewName.textContent = "";
+            previewNote.textContent = "";
+            clearBtn.style.display = "none";
+        };
+
+        input.addEventListener("change", () => {
+            clearInput.value = "0";
+            renderState();
+        });
+
+        clearBtn.addEventListener("click", () => {
+            if (input.files && input.files.length > 0) {
+                input.value = "";
+                renderState();
+                return;
+            }
+
+            if (!removedExisting && originalUrl && originalRemovable) {
+                removedExisting = true;
+                clearInput.value = "1";
+                renderState();
+            }
+        });
+
+        renderState();
+    };
+
+    const initializeMediaFields = (root) => {
+        ["thumbnail", "photo1", "photo2"].forEach((fieldId) => setupFileFieldControls(root, fieldId));
+    };
+
+    const openEditModal=(button)=>{
+        const eventDate = button.dataset.eventDate || "";
+        const title = escapeHtml(button.dataset.title || "");
+        const description = escapeHtml(button.dataset.description || "");
+        const videoUrl = escapeHtml(button.dataset.videoUrl || "");
         editModalOverlay.style.display="flex";
         editModalOverlay.innerHTML=`<div class="modal">
         <span class="close-btn" onclick="closeModal('edit_modal_overlay')">&times;</span>
@@ -1128,32 +1326,54 @@
 
 
                 <label for="title">Title *</label>
-                <input type="text" id="title" value="${datas[0]}" name="title" placeholder="Enter title..." required />
+                <input type="text" id="title" value="${title}" name="title" placeholder="Enter title..." required />
 
                 <label for="description">Description *</label>
-                <textarea id="description" name="description" placeholder="Write a description..." required>${datas[1]}</textarea>
+                <textarea id="description" name="description" placeholder="Write a description..." required>${description}</textarea>
 
                 <label for="event_date">Program Date *</label>
-                <input type="date" value="${formattedDate}" name="event_date" id="event_date" required/>
+                <input type="date" value="${eventDate}" name="event_date" id="event_date" required/>
 
                 <label for="video_url">Video URL</label>
-                <input type="url" id="video_url" value="${datas[3]}" name="video_url" placeholder="Enter URL of video" />
+                <input type="url" id="video_url" value="${videoUrl}" name="video_url" placeholder="Enter URL of video" />
 
-                <label for="thumbnail">Thumbnail of video</label>
-                <input type="file" accept="image/*" name="thumbnail" id="thumbnail"/>
+                ${buildFileFieldMarkup({
+                    label: "Thumbnail of video",
+                    name: "thumbnail",
+                    id: "thumbnail",
+                    previewUrl: button.dataset.thumbnailUrl || "",
+                    previewLabel: "Current thumbnail",
+                    previewTag: button.dataset.thumbnailUploaded === "1" ? "Uploaded file" : "Video thumbnail",
+                    canRemoveExisting: button.dataset.thumbnailUploaded === "1",
+                })}
 
-                <label for="photo1">Photo 1</label>
-                <input type="file" accept="image/*" name="photo1" id="photo1"/>
+                ${buildFileFieldMarkup({
+                    label: "Photo 1",
+                    name: "photo1",
+                    id: "photo1",
+                    previewUrl: button.dataset.photo1Url || "",
+                    previewLabel: "Current photo 1",
+                    previewTag: button.dataset.photo1Url ? "Uploaded file" : "",
+                    canRemoveExisting: Boolean(button.dataset.photo1Url),
+                })}
                 
-                <label for="photo2">Photo 2</label>
-                <input type="file" accept="image/*" name="photo2" id="photo2"/>
+                ${buildFileFieldMarkup({
+                    label: "Photo 2",
+                    name: "photo2",
+                    id: "photo2",
+                    previewUrl: button.dataset.photo2Url || "",
+                    previewLabel: "Current photo 2",
+                    previewTag: button.dataset.photo2Url ? "Uploaded file" : "",
+                    canRemoveExisting: Boolean(button.dataset.photo2Url),
+                })}
 
 
-                <input type="hidden" value="${datas[4]}" name="data_id"/>
+                <input type="hidden" value="${button.dataset.id}" name="data_id"/>
 
                 <button type="submit" class="submit-btn">Submit</button>
             </form>
         </div>`
+        initializeMediaFields(editModalOverlay);
     }
 
     feather.replace()
@@ -1316,14 +1536,23 @@
         <label for="video_url">Video URL</label>
         <input type="url" id="video_url" name="video_url" placeholder="Enter URL of video" />
 
-        <label for="thumbnail">Thumbnail of video</label>
-        <input type="file" accept="image/*" name="thumbnail" id="thumbnail"/>
+        ${buildFileFieldMarkup({
+            label: "Thumbnail of video",
+            name: "thumbnail",
+            id: "thumbnail",
+        })}
 
-        <label for="photo1">Photo 1</label>
-        <input type="file" accept="image/*" name="photo1" id="photo1"/>
+        ${buildFileFieldMarkup({
+            label: "Photo 1",
+            name: "photo1",
+            id: "photo1",
+        })}
         
-        <label for="photo2">Photo 2</label>
-        <input type="file" accept="image/*" name="photo2" id="photo2"/>
+        ${buildFileFieldMarkup({
+            label: "Photo 2",
+            name: "photo2",
+            id: "photo2",
+        })}
         
 
         <button type="submit" class="submit-btn">Submit</button>
@@ -1355,6 +1584,9 @@
         }
 
         formContainer.innerHTML=html_form;
+        if (type=="public"){
+            initializeMediaFields(formContainer);
+        }
 
     }
 

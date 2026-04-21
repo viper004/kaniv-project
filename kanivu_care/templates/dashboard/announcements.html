@@ -578,20 +578,30 @@
 
                     </div>
                     
-                    {% if i.video_url %}
+                    {% if i.thumbnail or i.thumbnail_url %}
+                        {% if i.video_url %}
                         <a href="{{i.video_url}}" target="_blank" class="thumbnail-container">
+                        {% else %}
+                        <div class="thumbnail-container">
+                        {% endif %}
                             {% if i.thumbnail %}
-                                <img src="{{i.thumbnail.url}}" alt="Tech Conference" class="thumbnail">
+                                <img src="{{i.thumbnail.url}}" alt="{{ i.title }}" class="thumbnail">
                             {% else %}
-                                <img src="{{i.thumbnail_url}}" alt="Tech Conference" class="thumbnail">
+                                <img src="{{i.thumbnail_url}}" alt="{{ i.title }}" class="thumbnail">
                             {% endif %}
+                            {% if i.video_url %}
                             <div class="play-btn">
                                 <i class="fas fa-play"></i>
                             </div>
+                            {% endif %}
+                        {% if i.video_url %}
                         </a>
+                        {% else %}
+                        </div>
+                        {% endif %}
                     {% endif %}
                     
-                    <div class="card-content" data-thumbnail="{% if i.thumbnail %}{{i.thumbnail.url}} {% else %} {{i.thumbnail_url}} {% endif %}"
+                    <div class="card-content" data-thumbnail="{% if i.thumbnail %}{{ i.thumbnail.url }}{% elif i.thumbnail_url %}{{ i.thumbnail_url }}{% endif %}"
                             data-photo1="{% if i.photo1 %}{{i.photo1.url}}{% endif %}"
                             data-photo2="{% if i.photo2 %}{{i.photo2.url}}{% endif %}"
                             onclick="openModal(this,[`{{i.title}}`,`{{i.description}}`,
@@ -634,7 +644,7 @@
         {% if previous_announcements %}
             {% for i in previous_announcements %}
 
-                <div class="event-card" data-id="1"  data-thumbnail="{% if i.thumbnail %}{{i.thumbnail.url}} {% else %} {{i.thumbnail_url}} {% endif %}"
+                <div class="event-card" data-id="1"  data-thumbnail="{% if i.thumbnail %}{{ i.thumbnail.url }}{% elif i.thumbnail_url %}{{ i.thumbnail_url }}{% endif %}"
                             data-photo1="{% if i.photo1 %}{{i.photo1.url}}{% endif %}"
                             data-photo2="{% if i.photo2 %}{{i.photo2.url}}{% endif %}"
                             onclick="openModal(this,[`{{i.title}}`,`{{i.description}}`,
@@ -645,17 +655,27 @@
                 
                     </div>
                     
-                    {% if i.video_url %}
+                    {% if i.thumbnail or i.thumbnail_url %}
+                        {% if i.video_url %}
                         <a href="{{i.video_url}}" target="_blank" class="thumbnail-container">
+                        {% else %}
+                        <div class="thumbnail-container">
+                        {% endif %}
                             {% if i.thumbnail %}
-                                <img src="{{i.thumbnail.url}}" alt="Tech Conference" class="thumbnail">
+                                <img src="{{i.thumbnail.url}}" alt="{{ i.title }}" class="thumbnail">
                             {% else %}
-                                <img src="{{i.thumbnail_url}}" alt="Tech Conference" class="thumbnail">
+                                <img src="{{i.thumbnail_url}}" alt="{{ i.title }}" class="thumbnail">
                             {% endif %}
+                            {% if i.video_url %}
                             <div class="play-btn">
                                 <i class="fas fa-play"></i>
                             </div>
+                            {% endif %}
+                        {% if i.video_url %}
                         </a>
+                        {% else %}
+                        </div>
+                        {% endif %}
                     {% endif %}
                     
                     <div class="card-content">

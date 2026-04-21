@@ -85,7 +85,7 @@
             background: var(--card-bg);
             border-radius: var(--radius);
             box-shadow: var(--shadow);
-            padding: 2rem;
+            padding: 0 2rem 2rem;
             position: relative;
             overflow: hidden;
         }
@@ -97,6 +97,32 @@
             width: 100%;
             height: 5px;
             background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+        .campaign-banner {
+            width: calc(100% + 4rem);
+            height: 180px;
+            margin: 0 -2rem 1.4rem;
+            background: linear-gradient(135deg, rgba(15, 157, 122, 0.95), rgba(28, 181, 224, 0.9));
+            overflow: hidden;
+            position: relative;
+        }
+        .campaign-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .campaign-banner-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 2.2rem;
+            background:
+                linear-gradient(135deg, rgba(15, 157, 122, 0.92), rgba(28, 181, 224, 0.88)),
+                radial-gradient(circle at top right, rgba(255,255,255,0.22), transparent 30%);
         }
         .user-header {
             display: flex;
@@ -447,6 +473,15 @@
         <div class="user-grid">
             {% for i in active_campaigns %}
             <div class="user-card">
+                <div class="campaign-banner">
+                    {% if i.image %}
+                    <img src="{{ i.image.url }}" alt="{{ i.name }}">
+                    {% else %}
+                    <div class="campaign-banner-placeholder">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    {% endif %}
+                </div>
                 <div class="user-header">
                     <div class="user-avatar"><i class="fas fa-bullhorn"></i></div>
                     <div>
@@ -484,6 +519,15 @@
         <div class="user-grid">
             {% for i in completed_campaigns %}
             <div class="user-card">
+                <div class="campaign-banner">
+                    {% if i.image %}
+                    <img src="{{ i.image.url }}" alt="{{ i.name }}">
+                    {% else %}
+                    <div class="campaign-banner-placeholder">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    {% endif %}
+                </div>
                 <div class="user-header">
                     <div class="user-avatar"><i class="fas fa-flag-checkered"></i></div>
                     <div>
@@ -522,7 +566,7 @@
             <span class="close-btn" onclick="closeModal('modalOverlay')">&times;</span>
             <h2>Create New Campaign</h2>
             <p>Fill out the details below to add a campaign.</p>
-            <form action="{% url 'volunteer:new_campaign' %}" onsubmit="submitForm(event)" method="post">
+            <form action="{% url 'volunteer:new_campaign' %}" onsubmit="submitForm(event)" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <label for="name">Campaign Name *</label>
                 <input type="text" id="name" name="name" maxlength="50" required>
@@ -547,6 +591,9 @@
                 <label for="description">Description *</label>
                 <textarea id="description" name="description" required></textarea>
 
+                <label for="image">Campaign Image</label>
+                <input type="file" id="image" name="image" accept="image/*">
+
                 <button type="submit" class="submit-btn">Submit</button>
             </form>
         </div>
@@ -557,7 +604,7 @@
             <span class="close-btn" onclick="closeModal('editCampaignModal')">&times;</span>
             <h2>Edit Campaign</h2>
             <p>Update the campaign details below.</p>
-            <form id="editCampaignForm" onsubmit="updateCampaign(event)" method="post">
+            <form id="editCampaignForm" onsubmit="updateCampaign(event)" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <label for="edit_name">Campaign Name *</label>
                 <input type="text" id="edit_name" name="name" maxlength="50" required>
@@ -581,6 +628,9 @@
 
                 <label for="edit_description">Description *</label>
                 <textarea id="edit_description" name="description" required></textarea>
+
+                <label for="edit_image">Campaign Image</label>
+                <input type="file" id="edit_image" name="image" accept="image/*">
 
                 <button type="submit" class="submit-btn">Update Campaign</button>
             </form>
@@ -691,6 +741,7 @@
             document.getElementById("edit_start_date").value = campaign.start_date || "";
             document.getElementById("edit_end_date").value = campaign.end_date || "";
             document.getElementById("edit_description").value = campaign.description || "";
+            document.getElementById("edit_image").value = "";
             editCampaignModal.style.display = "flex";
         };
 

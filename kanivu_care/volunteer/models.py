@@ -93,6 +93,7 @@ class Campaign(models.Model):
         ('Skill', 'Skill-Based'),
     )
     name = models.CharField(max_length=50)
+    image = models.ImageField(upload_to="campaign/", null=True, blank=True)
     description = models.TextField()
     type = models.CharField(
         max_length=50,
