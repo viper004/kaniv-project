@@ -586,11 +586,12 @@ form {
             }).then(res=>res.json()).then((data)=>{
                 console.log(data);
                 loader.style.display="none";
+                const redirectUrl = data.redirect_url || "ok";
                 if (data.status=="success"){
-                    showAlert(data.status,data.title,data.message,"/")
+                    showAlert(data.status,data.title,data.message,data.redirect_url || "/")
                 }
                 else{
-                    showAlert(data.status,data.title,data.message,"ok")
+                    showAlert(data.status,data.title,data.message,redirectUrl)
                 }
             })
         })

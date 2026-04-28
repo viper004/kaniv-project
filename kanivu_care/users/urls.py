@@ -20,6 +20,8 @@ urlpatterns=[
     path("update_password/",views.updatePassword,name="update_password"),
     path("delete_account/",views.deleteAccount,name="delete_account"),
     path("academic_edit/",views.editAcademic,name="academic_edit"),
+    path("membership-status/", views.membershipStatus, name="membership_status"),
+    path("membership-status/resolve/", views.resolveMembershipStatus, name="resolve_membership_status"),
 
 
 

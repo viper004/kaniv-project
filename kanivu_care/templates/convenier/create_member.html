@@ -198,6 +198,15 @@
   <script type="module">
     import { showAlert } from "{% static 'scripts/alert.js' %}";
     const loader=document.getElementById("loader");
+    const startYear=document.getElementById("start_year");
+    const endYear=document.getElementById("end_year");
+
+    const limitYearInput = (event) => {
+      event.target.value = event.target.value.replace(/\D/g, "").slice(0, 4);
+    };
+
+    if (startYear) startYear.addEventListener("input", limitYearInput);
+    if (endYear) endYear.addEventListener("input", limitYearInput);
 
     const form = document.getElementById("form");
     form.addEventListener("submit", (e) => {
@@ -212,16 +221,23 @@
           "X-Requested-With": "XMLHttpRequest",
         },
       })
-        .then(res => res.json())
+        .then(async (res) => {
+          const contentType = res.headers.get("content-type") || "";
+          if (!contentType.includes("application/json")) {
+            throw new Error("The server returned an unexpected response.");
+          }
+          return res.json();
+        })
         .then(data => {
           console.log(data);
           showAlert(data.status, data.title, data.message, "/convenier/create/member/");
         })
         .catch(err => {
           showAlert("error", "Submission Failed", err.message, "ok");
+        })
+        .finally(() => {
+          loader.style.display="none";
         });
-
-        loader.style.display="none";
     });
   </script>
 </body>

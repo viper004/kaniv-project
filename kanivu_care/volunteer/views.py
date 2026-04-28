@@ -279,22 +279,24 @@ def volunteer_dashboard(request):
         end_date__gte=today
     ).order_by("end_date", "start_date", "-created_on")
 
-    upcoming_campaigns = Campaign.objects.filter(
-        start_date__gt=today
-    ).order_by("start_date", "end_date", "-created_on")
-
     enrolled_campaign_ids = set(
         CampaignEnrollment.objects.filter(user=request.user).values_list("campaign_id", flat=True)
     )
-    enrolled_campaigns = Campaign.objects.filter(
-        id__in=enrolled_campaign_ids
+    enrolled_upcoming_campaigns = Campaign.objects.filter(
+        id__in=enrolled_campaign_ids,
+        start_date__gt=today
     ).order_by("start_date", "end_date", "-created_on")
+
+    older_campaigns = Campaign.objects.filter(
+        end_date__lt=today
+    ).order_by("-end_date", "-created_on")
+
     volunteer_notifications = Volunteer_Notifications.objects.order_by("-date", "-send_date")
 
     return render(request, "dashboard/volunteer_dashboard.html", {
         "active_campaigns": active_campaigns,
-        "upcoming_campaigns": upcoming_campaigns,
-        "enrolled_campaigns": enrolled_campaigns,
+        "enrolled_upcoming_campaigns": enrolled_upcoming_campaigns,
+        "older_campaigns": older_campaigns,
         "enrolled_campaign_ids": enrolled_campaign_ids,
         "volunteer_notifications": volunteer_notifications,
     })

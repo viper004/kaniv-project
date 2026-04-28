@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Member Registration</title>
+    <title>Edit Academic Details</title>
     <style>
         * {
             box-sizing: border-box;
@@ -157,7 +157,7 @@
 <body>
 <div class="container">
 
-    <h2>Member Registration</h2>
+    <h2>Edit Academic Details</h2>
     <form action="{% url 'users:academic_edit' %}" method="post" id="form">
         {% csrf_token %}
 
@@ -165,11 +165,6 @@
         <div class="form-group">
             <label for="adno">Admission Number</label>
             <input type="text" name="adno" id="adno" value="{{request.user.memberregistration.adno}}" required>
-        </div>
-
-        <div class="form-group">
-            <label for="batch">Batch</label>
-            <input type="text" name="batch" maxlength="9" id="batch" value="{{request.user.memberregistration.batch}}" placeholder="e.g., 2022-2025" required>
         </div>
 
         <div class="form-group">
@@ -182,7 +177,7 @@
                 <option value="bcom_tax">BCOM Tax</option>
                 <option value="ttm">TTM</option>
                 <option value="bcom_ca_and_finance">BCOM CA and Finance</option>
-                <option value="bcom_co-operation">BCOM Co-operation</option>
+                <option value="bcom_co_operation">BCOM Co-operation</option>
                 <option value="ba_literature">BA Literature</option>
                 <option value="ba_communicative_english">BA Communicative English</option>
                 <option value="ba_journalism">BA Journalism</option>
@@ -191,15 +186,28 @@
             </select>
         </div>
 
-        
+        <div class="form-group">
+            <label for="start_year">Start Year</label>
+            <input type="text" name="start_year" maxlength="4" id="start_year" value="{{request.user.memberregistration.start_year}}" placeholder="e.g., 2022" inputmode="numeric" required>
+        </div>
 
         <div class="form-group">
-            <label for="current_year">Current Year</label>
-            <select name="current_year" id="year" required>
-                <option value="First Year">First Year</option>
-                <option value="Second Year">Second Year</option>
-                <option value="Third Year">Third Year</option>
-                <option value="Fourth Year">Fourth Year</option>
+            <label for="end_year">End Year</label>
+            <input type="text" name="end_year" maxlength="4" id="end_year" value="{{request.user.memberregistration.end_year}}" placeholder="e.g., 2025" inputmode="numeric" required>
+        </div>
+
+        <div class="form-group">
+            <label for="blood_group">Blood Group</label>
+            <select name="blood_group" id="blood_group" required>
+                <option value="">Select Blood Group</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
             </select>
         </div>
 
@@ -211,18 +219,18 @@
 <script type="module">
     import {showAlert} from "{% static 'scripts/alert.js' %}"
     const department=document.getElementById("department");
-    const year=document.getElementById("year");
+    const bloodGroup=document.getElementById("blood_group");
     const form=document.getElementById("form");
     const loader=document.getElementById("loader");
-    const batch=document.getElementById("batch");
+    const startYear=document.getElementById("start_year");
+    const endYear=document.getElementById("end_year");
 
-    batch.addEventListener("keydown",(e)=>{
-        if(e.key=="Backspace") return;
+    const allowOnlyYearInput = (event) => {
+        event.target.value = event.target.value.replace(/\D/g, "").slice(0, 4);
+    };
 
-        if (e.target.value.length===4){
-            e.target.value+="-"
-        }
-    })
+    startYear.addEventListener("input", allowOnlyYearInput);
+    endYear.addEventListener("input", allowOnlyYearInput);
 
     window.addEventListener("contextmenu",(e)=>{
         e.preventDefault();
@@ -230,7 +238,7 @@
     })
 
     department.value="{{request.user.memberregistration.department}}";
-    year.value="{{request.user.memberregistration.current_year}}";
+    bloodGroup.value="{{request.user.memberregistration.blood_group}}";
 
     form.addEventListener("submit",(e)=>{
         e.preventDefault();

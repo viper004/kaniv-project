@@ -27,11 +27,49 @@ from convenier.models import pendingMemberAddRequest
 from volunteer.models import *
 
 
+def _is_member_profile_incomplete(user):
+    profile = getattr(user, "userprofile", None)
+    member = memberRegistration.objects.filter(user=user).first()
+
+    if not user.first_name.strip():
+        return True
+
+    if not profile or not profile.phone_number or not profile.gender:
+        return True
+
+    if not member:
+        return True
+
+    required_member_fields = [
+        member.adno,
+        member.department,
+        member.start_year,
+        member.end_year,
+        member.blood_group,
+    ]
+    return any(not str(value).strip() for value in required_member_fields)
+
+
+def _has_membership_action_pending(user):
+    member = memberRegistration.objects.filter(user=user).first()
+    return bool(member and member.is_membership_expired())
+
+
 
 @login_required(login_url="users:login")
 def Dashboard(req):
     if (req.user.userprofile.role=="public_user"):
-        HttpResponseRedirect("/")
+        return HttpResponseRedirect("/")
+
+    if req.user.userprofile.role == "member" and _is_member_profile_incomplete(req.user):
+        return render(req, "users/profile_incomplete_alert.html", {
+            "redirect_url": "/users/profile/",
+            "alert_title": "Complete Your Profile First",
+            "alert_message": "Complete your profile first to access dashboard.",
+        })
+
+    if req.user.userprofile.role == "member" and _has_membership_action_pending(req.user):
+        return HttpResponseRedirect("/users/membership-status/")
 
     return render(req,"dashboard/index.html")
 
@@ -839,7 +877,7 @@ def manageMembers(req):
 
     pending_users = pendingMemberAddRequest.objects.filter(isApproved=False).values_list('user', flat=True)
 
-    members = memberRegistration.objects.exclude(user__in=pending_users)
+    members = memberRegistration.objects.exclude(user__in=pending_users).filter(membership_status="active")
     coordinators=UserProfile.objects.filter(role="coordinator")
     pending_requests=pendingMemberAddRequest.objects.filter(isPending=True)
 

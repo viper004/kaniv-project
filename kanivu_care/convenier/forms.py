@@ -31,7 +31,6 @@ class convenierMemberLoginForm(UserCreationForm):
 
     duty=forms.ChoiceField(choices=memberRegistration.DUTY_CHOICES,required=True,error_messages={'required':"Only can be select the given duties"},
         widget=forms.Select(attrs={"id":"duty"}))
-    
 
     class Meta:
         model=User
@@ -50,9 +49,12 @@ class convenierMemberLoginForm(UserCreationForm):
             profile.save()
 
             
-            member, _ = memberRegistration.objects.get_or_create(user=user)
-            member.duty = duty
-            member.save()
+            memberRegistration.objects.update_or_create(
+                user=user,
+                defaults={
+                    "duty": duty,
+                }
+            )
 
             reqmember,_=pendingMemberAddRequest.objects.get_or_create(user=user)
             reqmember.isApproved=True

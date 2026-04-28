@@ -4,6 +4,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.models import User
 
 from users.models import UserProfile
+from members.models import memberRegistration
 from django import forms
 from django.contrib.auth.models import User
 
@@ -148,50 +149,33 @@ class resetPasswordForm(SetPasswordForm):
         fields=("new_password1","new_password2")
 
 
-class MCUpdateForm(UserChangeForm):
-
-    DEPARTMENT_CHOICES = (
-        ("bba", "BBA"),
-        ("bca", "BCA"),
-        ("bsc_cs", "BSc CS"),
-        ("bcom_tax", "BCom Tax"),
-        ("ttm", "TTM"),
-        ("bcom_ca_and_finance", "BCom CA and Finance"),
-        ("bcom_co_operation", "BCom Co-operation"),
-        ("ba_literature", "BA Literature"),
-        ("ba_communicative_english", "BA Communicative English"),
-        ("ba_journalism", "BA Journalism"),
-        ("electronics", "Electronics"),
-        ("bsw", "BSW"),
-    )
-
-    YEAR_CHOICES = (
-        ("First Year", "First Year"),
-        ("Second Year", "Second Year"),
-        ("Third Year", "Third Year"),
-        ("Fourth Year", "Fourth Year"),
-    )
-
-
-    adno=forms.CharField(label="Admission number",max_length=150,widget=forms.NumberInput(attrs={
-        "id":"adno"
+class MCUpdateForm(forms.ModelForm):
+    adno = forms.CharField(label="Admission Number", max_length=255, widget=forms.TextInput(attrs={
+        "id": "adno"
     }))
 
-    batch=forms.CharField(label="Name",max_length=15,widget=forms.TextInput(attrs={
-        "id":"batch"
+    department = forms.ChoiceField(label="Department", choices=memberRegistration.DEPARTMENT_CHOICES, widget=forms.Select(attrs={
+        "id": "department"
     }))
 
-    department=forms.ChoiceField(label="Department",choices=DEPARTMENT_CHOICES,widget=forms.Select(attrs={
-        "id":"department"
+    start_year = forms.CharField(label="Start Year", max_length=5, widget=forms.TextInput(attrs={
+        "id": "start_year",
+        "maxlength": "4",
+        "inputmode": "numeric",
+        "placeholder": "e.g., 2022",
     }))
 
-    current_year=forms.ChoiceField(label="Current Year",choices=YEAR_CHOICES,widget=forms.Select(attrs={
-        "id":"year"
+    end_year = forms.CharField(label="End Year", max_length=5, widget=forms.TextInput(attrs={
+        "id": "end_year",
+        "maxlength": "4",
+        "inputmode": "numeric",
+        "placeholder": "e.g., 2025",
     }))
-    
-    
-    password=None
+
+    blood_group = forms.ChoiceField(label="Blood Group", choices=memberRegistration.BLOOD_GROUP_CHOICES, widget=forms.Select(attrs={
+        "id": "blood_group"
+    }))
 
     class Meta:
-        model=User
-        fields=('adno','batch',"department","current_year")
+        model = memberRegistration
+        fields = ("adno", "department", "start_year", "end_year", "blood_group")

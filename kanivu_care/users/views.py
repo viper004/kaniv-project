@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 from members.models import memberRegistration
 
@@ -19,6 +20,34 @@ from users.models import UserProfile
 
 
 # Create your views here.
+
+
+def _is_member_profile_incomplete(user):
+    profile = getattr(user, "userprofile", None)
+    member = memberRegistration.objects.filter(user=user).first()
+
+    if not user.first_name.strip():
+        return True
+
+    if not profile or not profile.phone_number or not profile.gender:
+        return True
+
+    if not member:
+        return True
+
+    required_member_fields = [
+        member.adno,
+        member.department,
+        member.start_year,
+        member.end_year,
+        member.blood_group,
+    ]
+    return any(not str(value).strip() for value in required_member_fields)
+
+
+def _has_membership_action_pending(user):
+    member = memberRegistration.objects.filter(user=user).first()
+    return bool(member and member.is_membership_expired())
 
 def Register(req):
     if req.user.is_authenticated:
@@ -177,6 +206,13 @@ def Login(req):
                 "title":"Invalid password",
                 "message":"Make sure that your password is correct.if you couldn't find it you can forgot your password by username"
             })
+
+        if not isUserNameExist.is_active:
+            return JsonResponse({
+                "status": "error",
+                "title": "Access Disabled",
+                "message": "Your access to Kaniv has been disabled. Please contact the team if you think this is a mistake."
+            })
         
         if user is not None:
             
@@ -191,6 +227,23 @@ def Login(req):
         
 
             login(req,user)
+
+            if user.userprofile.role == "member" and _is_member_profile_incomplete(user):
+                return JsonResponse({
+                    "status": "error",
+                    "title": "Complete Your Profile First",
+                    "message": "Complete your profile first to access dashboard.",
+                    "redirect_url": "/users/profile/"
+                })
+
+            if user.userprofile.role == "member" and _has_membership_action_pending(user):
+                return JsonResponse({
+                    "status": "error",
+                    "title": "Membership Ended",
+                    "message": "Your membership has ended. Please choose whether to continue as a volunteer or quit Kaniv.",
+                    "redirect_url": "/users/membership-status/"
+                })
+
             return JsonResponse({
                 "status": "success",
                 "title":"Login successful",
@@ -686,6 +739,122 @@ def editAcademic(req):
     }
         
     return render(req,"users/academic_edit.html",context=cntx)
+
+
+@login_required(login_url="/users/login/")
+def membershipStatus(req):
+    if req.user.userprofile.role != "member":
+        return redirect("/")
+
+    member = memberRegistration.objects.filter(user=req.user).first()
+    if not member or not member.is_membership_expired():
+        return redirect("/")
+
+    return render(req, "users/membership_status.html", {
+        "member": member,
+    })
+
+
+@login_required(login_url="/users/login/")
+def resolveMembershipStatus(req):
+    if req.method != "POST":
+        return JsonResponse({
+            "status": "error",
+            "title": "Invalid request",
+            "message": "Only POST requests are allowed."
+        }, status=405)
+
+    if req.user.userprofile.role != "member":
+        return JsonResponse({
+            "status": "error",
+            "title": "Access denied",
+            "message": "Only members can perform this action."
+        }, status=403)
+
+    member = memberRegistration.objects.filter(user=req.user).first()
+    if not member or not member.is_membership_expired():
+        return JsonResponse({
+            "status": "error",
+            "title": "No action needed",
+            "message": "Your membership does not need an expiry decision right now."
+        }, status=400)
+
+    action = (req.POST.get("action") or "").strip()
+
+    if action == "volunteer":
+        from volunteer.models import Volunteer
+
+        profile = req.user.userprofile
+        volunteer_name = req.user.first_name.strip() or req.user.username
+        period = ""
+        if member.start_year and member.end_year:
+            period = f"{member.start_year}-{member.end_year}"
+
+        Volunteer.objects.update_or_create(
+            user=req.user,
+            defaults={
+                "name": volunteer_name,
+                "email": req.user.email or "",
+                "phone": profile.phone_number or "",
+                "age": 18,
+                "blood_group": member.blood_group or None,
+                "address": profile.address or "",
+                "reason": "Former member continuing as a volunteer after course completion.",
+                "is_approved": True,
+                "approved_by": None,
+                "declined": False,
+                "rejection_reason": None,
+                "is_student": False,
+                "admission_no": None,
+                "period": period or None,
+                "batch": None,
+                "year": None,
+            }
+        )
+
+        member.membership_status = "volunteer"
+        member.membership_decided_on = timezone.now()
+        member.save(update_fields=["membership_status", "membership_decided_on"])
+
+        profile.role = "public_user"
+        profile.save(update_fields=["role"])
+
+        return JsonResponse({
+            "status": "success",
+            "title": "Moved To Volunteer",
+            "message": "Your member account has been closed and you will continue with Kaniv as a volunteer.",
+            "redirect_url": "/"
+        })
+
+    if action == "quit":
+        confirmed = (req.POST.get("confirmed") or "").strip().lower() == "true"
+        if not confirmed:
+            return JsonResponse({
+                "status": "error",
+                "title": "Confirmation Required",
+                "message": "Please confirm that you want to quit Kaniv. This action cannot be undone."
+            }, status=400)
+
+        member.membership_status = "inactive"
+        member.membership_decided_on = timezone.now()
+        member.save(update_fields=["membership_status", "membership_decided_on"])
+
+        req.user.is_active = False
+        req.user.save(update_fields=["is_active"])
+        logout(req)
+
+        return JsonResponse({
+            "status": "success",
+            "title": "Membership Closed",
+            "message": "Your Kaniv access has been disabled. Your past records are still safely kept in the database.",
+            "redirect_url": "/"
+        })
+
+    return JsonResponse({
+        "status": "error",
+        "title": "Invalid action",
+        "message": "Please choose a valid membership action."
+    }, status=400)
 
 
 

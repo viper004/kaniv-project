@@ -1,0 +1,291 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Membership Update</title>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        :root {
+            --bg-1: #f4efe6;
+            --bg-2: #d9efe5;
+            --card: rgba(255, 255, 255, 0.92);
+            --text: #24343a;
+            --muted: #64757c;
+            --primary: #0f9d7a;
+            --primary-dark: #08745b;
+            --danger: #c44b4b;
+            --danger-dark: #9d3434;
+            --border: rgba(36, 52, 58, 0.08);
+            --shadow: 0 24px 70px rgba(36, 52, 58, 0.12);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Poppins", "Segoe UI", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(15, 157, 122, 0.12), transparent 30%),
+                radial-gradient(circle at bottom right, rgba(38, 122, 255, 0.1), transparent 30%),
+                linear-gradient(135deg, var(--bg-1), var(--bg-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .panel {
+            width: 100%;
+            max-width: 720px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+        }
+
+        .eyebrow {
+            display: inline-block;
+            padding: 0.35rem 0.8rem;
+            border-radius: 999px;
+            background: rgba(15, 157, 122, 0.12);
+            color: var(--primary-dark);
+            font-weight: 700;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        h1 {
+            margin: 1rem 0 0.75rem;
+            font-size: 2.2rem;
+            line-height: 1.1;
+        }
+
+        .intro {
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary {
+            background: rgba(15, 157, 122, 0.06);
+            border: 1px solid rgba(15, 157, 122, 0.1);
+            border-radius: 18px;
+            padding: 1rem 1.1rem;
+            margin-bottom: 1.6rem;
+        }
+
+        .summary strong {
+            display: block;
+            margin-bottom: 0.35rem;
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+        }
+
+        .action-card {
+            border-radius: 22px;
+            padding: 1.35rem;
+            border: 1px solid var(--border);
+            background: #fff;
+        }
+
+        .action-card h2 {
+            margin: 0.9rem 0 0.5rem;
+            font-size: 1.25rem;
+        }
+
+        .action-card p {
+            color: var(--muted);
+            line-height: 1.6;
+            min-height: 96px;
+        }
+
+        .action-icon {
+            width: 54px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            background: rgba(15, 157, 122, 0.1);
+            color: var(--primary-dark);
+        }
+
+        .danger-card .action-icon {
+            background: rgba(196, 75, 75, 0.12);
+            color: var(--danger-dark);
+        }
+
+        .action-btn {
+            width: 100%;
+            border: none;
+            border-radius: 14px;
+            padding: 0.95rem 1rem;
+            color: #fff;
+            font-size: 0.96rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .volunteer-btn {
+            background: linear-gradient(135deg, var(--primary), #22c29a);
+        }
+
+        .quit-btn {
+            background: linear-gradient(135deg, var(--danger), #d96d6d);
+        }
+
+        .confirm-panel {
+            display: none;
+            margin-top: 1rem;
+            padding: 0.95rem;
+            background: rgba(196, 75, 75, 0.08);
+            border: 1px solid rgba(196, 75, 75, 0.18);
+            border-radius: 14px;
+        }
+
+        .confirm-panel.active {
+            display: block;
+        }
+
+        .confirm-panel p {
+            min-height: auto;
+            color: var(--text);
+            margin-top: 0;
+        }
+
+        .confirm-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .secondary-btn,
+        .confirm-btn {
+            flex: 1;
+            border: none;
+            border-radius: 12px;
+            padding: 0.85rem 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .secondary-btn {
+            background: #e9eef0;
+            color: var(--text);
+        }
+
+        .confirm-btn {
+            background: linear-gradient(135deg, var(--danger-dark), var(--danger));
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .panel { padding: 1.35rem; }
+            .action-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <section class="panel">
+        <span class="eyebrow">Membership Update</span>
+        <h1>Your membership currently ends</h1>
+        <p class="intro">
+            Thank you for your contribution to Kaniv during your course period. Since your end year is
+            <strong>{{ member.end_year }}</strong>, please choose how you would like to continue from here.
+        </p>
+
+        <div class="summary">
+            <strong>What happens next?</strong>
+            If you continue as a volunteer, we will copy your member details into the volunteer system as a non-student volunteer.
+            If you quit Kaniv, we will keep your reports and history in the database, but your access will be disabled.
+        </div>
+
+        <div class="action-grid">
+            <article class="action-card">
+                <div class="action-icon"><i data-feather="heart"></i></div>
+                <h2>Stay As Volunteer</h2>
+                <p>Move forward with Kaniv as a non-student volunteer. Your account will stop being a member account and continue through the volunteer side.</p>
+                <button type="button" class="action-btn volunteer-btn" id="volunteer-btn">I Want To Stay As Volunteer</button>
+            </article>
+
+            <article class="action-card danger-card">
+                <div class="action-icon"><i data-feather="log-out"></i></div>
+                <h2>Quit Kaniv</h2>
+                <p>Close your Kaniv access. This will not remove your reports or records from the database, but you will no longer be able to use the account.</p>
+                <button type="button" class="action-btn quit-btn" id="quit-btn">Quit Kaniv</button>
+
+                <div class="confirm-panel" id="quit-confirm-panel">
+                    <p>Do you want to continue? This action cannot be undone.</p>
+                    <div class="confirm-actions">
+                        <button type="button" class="secondary-btn" id="cancel-quit-btn">Cancel</button>
+                        <button type="button" class="confirm-btn" id="confirm-quit-btn">Yes, Disable My Access</button>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <script type="module">
+        import {showAlert} from "{% static 'scripts/alert.js' %}";
+
+        if (window.feather) {
+            window.feather.replace();
+        }
+
+        const resolveUrl = "{% url 'users:resolve_membership_status' %}";
+        const csrfToken = "{{ csrf_token }}";
+        const quitPanel = document.getElementById("quit-confirm-panel");
+
+        const submitAction = (action, confirmed = false) => {
+            const formData = new FormData();
+            formData.append("action", action);
+            if (confirmed) {
+                formData.append("confirmed", "true");
+            }
+
+            fetch(resolveUrl, {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-CSRFToken": csrfToken,
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            })
+            .then(res => res.json())
+            .then(data => {
+                showAlert(data.status, data.title, data.message, data.redirect_url || "ok");
+            })
+            .catch(error => {
+                showAlert("error", "Request Failed", error.message, "ok");
+            });
+        };
+
+        document.getElementById("volunteer-btn").addEventListener("click", () => {
+            submitAction("volunteer");
+        });
+
+        document.getElementById("quit-btn").addEventListener("click", () => {
+            quitPanel.classList.add("active");
+        });
+
+        document.getElementById("cancel-quit-btn").addEventListener("click", () => {
+            quitPanel.classList.remove("active");
+        });
+
+        document.getElementById("confirm-quit-btn").addEventListener("click", () => {
+            submitAction("quit", true);
+        });
+    </script>
+</body>
+</html>

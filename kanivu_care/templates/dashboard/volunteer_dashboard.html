@@ -176,6 +176,54 @@
             margin-top: 2rem;
         }
 
+        .campaign-filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: end;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem 1.1rem;
+            background: rgba(15, 157, 122, 0.06);
+            border: 1px solid rgba(15, 157, 122, 0.1);
+            border-radius: 16px;
+        }
+
+        .campaign-filter-copy {
+            max-width: 560px;
+        }
+
+        .campaign-filter-copy p {
+            color: var(--muted);
+            font-size: 0.92rem;
+            margin-top: 0.3rem;
+        }
+
+        .campaign-filter-control label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--muted);
+            margin-bottom: 0.45rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .campaign-filter-control select {
+            min-width: 250px;
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(38, 50, 56, 0.12);
+            font: inherit;
+            color: var(--dark);
+            background: #fff;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.04);
+        }
+
+        .campaign-section[hidden] {
+            display: none;
+        }
+
         .section-header {
             margin-bottom: 1rem;
         }
@@ -476,74 +524,25 @@
             </aside>
 
             <main class="main-panel">
-                <section class="campaign-section">
-                    <div class="section-header">
-                        <h2 class="section-title">Enrolled Campaigns</h2>
-                        <p class="section-copy">Campaigns you are already part of and can still manage.</p>
+                <div class="campaign-filter-bar">
+                    <div class="campaign-filter-copy">
+                        <h2 class="panel-title">Campaigns</h2>
+                        <p>Choose a campaign view to switch between active work, campaigns you already joined ahead of time, and older campaigns that have already ended.</p>
                     </div>
-
-                    {% if enrolled_campaigns %}
-                    <div class="campaign-grid">
-                        {% for campaign in enrolled_campaigns %}
-                        <div class="campaign-card">
-                            <div class="campaign-banner">
-                                {% if campaign.image %}
-                                <img src="{{ campaign.image.url }}" alt="{{ campaign.name }}">
-                                {% else %}
-                                <div class="campaign-banner-placeholder">
-                                    <i class="fas fa-image"></i>
-                                </div>
-                                {% endif %}
-                            </div>
-                            <div class="campaign-header">
-                                <div class="campaign-avatar"><i class="fas fa-user-check"></i></div>
-                                <div>
-                                    <div class="campaign-name">{{ campaign.name }}</div>
-                                    <span class="campaign-role">{{ campaign.get_type_display }}</span>
-                                </div>
-                            </div>
-
-                            <div class="detail-row">
-                                <span class="detail-label">Start Date</span>
-                                <span class="detail-value">{{ campaign.start_date }}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">End Date</span>
-                                <span class="detail-value">{{ campaign.end_date }}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Maximum Volunteers</span>
-                                <span class="detail-value">{{ campaign.max_volunteers }}</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Current Volunteers</span>
-                                <span class="detail-value">{{ campaign.current_volunteers }}</span>
-                            </div>
-
-                            <p class="description">{{ campaign.description }}</p>
-
-                            <div class="action-buttons">
-                                <button type="button" class="status-btn enrolled-btn" data-campaign-id="{{ campaign.id }}" data-start-date="{{ campaign.start_date }}">Enrolled</button>
-                                <button type="button" class="unenroll-action-btn" data-campaign-id="{{ campaign.id }}" data-start-date="{{ campaign.start_date }}">
-                                    <span class="unenroll-btn-text">Unenroll</span>
-                                </button>
-                                <div class="warning-text" style="display: none;"></div>
-                            </div>
-                        </div>
-                        {% endfor %}
+                    <div class="campaign-filter-control">
+                        <label for="campaign-view-select">Show campaigns</label>
+                        <select id="campaign-view-select">
+                            <option value="active">Active Campaigns</option>
+                            <option value="upcoming-enrolled">Enrolled Upcoming Campaigns</option>
+                            <option value="older">Older Campaigns</option>
+                        </select>
                     </div>
-                    {% else %}
-                    <div class="empty-state">
-                        <i class="fas fa-user-check"></i>
-                        <h3>You have not enrolled in any campaigns yet</h3>
-                    </div>
-                    {% endif %}
-                </section>
+                </div>
 
-                <section class="campaign-section">
+                <section class="campaign-section" data-campaign-view="active">
                     <div class="section-header">
                         <h2 class="section-title">Active Campaigns</h2>
-                        <p class="section-copy">Join ongoing campaigns that still have open volunteer slots.</p>
+                        <p class="section-copy">These campaigns are currently running. If you already joined one, it stays here until its end date and then moves to older campaigns.</p>
                     </div>
 
                     {% if active_campaigns %}
@@ -609,15 +608,15 @@
                     {% endif %}
                 </section>
 
-                <section class="campaign-section">
+                <section class="campaign-section" data-campaign-view="upcoming-enrolled" hidden>
                     <div class="section-header">
-                        <h2 class="section-title">Upcoming Campaigns</h2>
-                        <p class="section-copy">See what is coming next and enroll early where seats are still available.</p>
+                        <h2 class="section-title">Enrolled Upcoming Campaigns</h2>
+                        <p class="section-copy">These are future campaigns you already enrolled in. You can still unenroll until the 24-hour restriction window begins.</p>
                     </div>
 
-                    {% if upcoming_campaigns %}
+                    {% if enrolled_upcoming_campaigns %}
                     <div class="campaign-grid">
-                        {% for campaign in upcoming_campaigns %}
+                        {% for campaign in enrolled_upcoming_campaigns %}
                         <div class="campaign-card">
                             <div class="campaign-banner">
                                 {% if campaign.image %}
@@ -656,15 +655,74 @@
                             <p class="description">{{ campaign.description }}</p>
 
                             <div class="action-buttons">
-                                {% if campaign.id in enrolled_campaign_ids %}
-                                <button type="button" class="status-btn">Already Enrolled</button>
-                                {% elif campaign.current_volunteers < campaign.max_volunteers %}
-                                <form action="{% url 'volunteer:enroll_campaign' campaign.id %}" method="post" onsubmit="enrollCampaign(event)">
-                                    {% csrf_token %}
-                                    <button type="submit" class="enroll-btn">Enroll Early</button>
-                                </form>
+                                <button type="button" class="status-btn enrolled-btn" data-campaign-id="{{ campaign.id }}" data-start-date="{{ campaign.start_date }}">Enrolled</button>
+                                <button type="button" class="unenroll-action-btn" data-campaign-id="{{ campaign.id }}" data-start-date="{{ campaign.start_date }}">
+                                    <span class="unenroll-btn-text">Unenroll</span>
+                                </button>
+                                <div class="warning-text" style="display: none;"></div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-user-clock"></i>
+                        <h3>You are not enrolled in any upcoming campaigns right now</h3>
+                    </div>
+                    {% endif %}
+                </section>
+
+                <section class="campaign-section" data-campaign-view="older" hidden>
+                    <div class="section-header">
+                        <h2 class="section-title">Older Campaigns</h2>
+                        <p class="section-copy">Campaigns move here automatically after their end date so volunteers can still look back on them.</p>
+                    </div>
+
+                    {% if older_campaigns %}
+                    <div class="campaign-grid">
+                        {% for campaign in older_campaigns %}
+                        <div class="campaign-card">
+                            <div class="campaign-banner">
+                                {% if campaign.image %}
+                                <img src="{{ campaign.image.url }}" alt="{{ campaign.name }}">
                                 {% else %}
-                                <button type="button" class="status-btn full-btn">Campaign Full</button>
+                                <div class="campaign-banner-placeholder">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="campaign-header">
+                                <div class="campaign-avatar"><i class="fas fa-clock-rotate-left"></i></div>
+                                <div>
+                                    <div class="campaign-name">{{ campaign.name }}</div>
+                                    <span class="campaign-role">{{ campaign.get_type_display }}</span>
+                                </div>
+                            </div>
+
+                            <div class="detail-row">
+                                <span class="detail-label">Start Date</span>
+                                <span class="detail-value">{{ campaign.start_date }}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">End Date</span>
+                                <span class="detail-value">{{ campaign.end_date }}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Maximum Volunteers</span>
+                                <span class="detail-value">{{ campaign.max_volunteers }}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Current Volunteers</span>
+                                <span class="detail-value">{{ campaign.current_volunteers }}</span>
+                            </div>
+
+                            <p class="description">{{ campaign.description }}</p>
+
+                            <div class="action-buttons">
+                                {% if campaign.id in enrolled_campaign_ids %}
+                                <button type="button" class="status-btn">Previously Enrolled</button>
+                                {% else %}
+                                <button type="button" class="status-btn">Campaign Ended</button>
                                 {% endif %}
                             </div>
                         </div>
@@ -672,8 +730,8 @@
                     </div>
                     {% else %}
                     <div class="empty-state">
-                        <i class="fas fa-calendar-plus"></i>
-                        <h3>No upcoming campaigns are scheduled right now</h3>
+                        <i class="fas fa-clock-rotate-left"></i>
+                        <h3>No older campaigns to show yet</h3>
                     </div>
                     {% endif %}
                 </section>
@@ -731,6 +789,17 @@
             });
         };
 
+        const campaignViewSelect = document.getElementById('campaign-view-select');
+        const campaignSections = document.querySelectorAll('[data-campaign-view]');
+
+        const updateCampaignView = () => {
+            const selectedView = campaignViewSelect.value;
+
+            campaignSections.forEach(section => {
+                section.hidden = section.dataset.campaignView !== selectedView;
+            });
+        };
+
         const unenrollCampaign = (event) => {
             const btn = event.currentTarget;
             const campaignId = btn.getAttribute('data-campaign-id');
@@ -766,6 +835,8 @@
             btn.addEventListener('click', unenrollCampaign);
         });
 
+        campaignViewSelect.addEventListener('change', updateCampaignView);
+        updateCampaignView();
         updateUnenrollButtons();
         setInterval(updateUnenrollButtons, 60000);
 
