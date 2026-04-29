@@ -274,6 +274,9 @@ def volunteer_dashboard(request):
     if not volunteer:
         return redirect("volunteer:join_volunteer")
 
+    if volunteer.is_student_academic_period_over():
+        return redirect("users:volunteer_status")
+
     active_campaigns = Campaign.objects.filter(
         start_date__lte=today,
         end_date__gte=today

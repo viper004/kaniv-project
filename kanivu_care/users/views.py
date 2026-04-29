@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from members.models import memberRegistration
+from volunteer.models import Volunteer
 
 
 from convenier.models import pendingMemberAddRequest
@@ -48,6 +49,18 @@ def _is_member_profile_incomplete(user):
 def _has_membership_action_pending(user):
     member = memberRegistration.objects.filter(user=user).first()
     return bool(member and member.is_membership_expired())
+
+
+def _get_student_volunteer_pending_transition(user):
+    volunteer = Volunteer.objects.filter(
+        user=user,
+        is_approved=True,
+        declined=False,
+        is_student=True,
+    ).first()
+    if volunteer and volunteer.is_student_academic_period_over():
+        return volunteer
+    return None
 
 def Register(req):
     if req.user.is_authenticated:
@@ -244,6 +257,15 @@ def Login(req):
                     "redirect_url": "/users/membership-status/"
                 })
 
+            pending_volunteer = _get_student_volunteer_pending_transition(user)
+            if pending_volunteer:
+                return JsonResponse({
+                    "status": "error",
+                    "title": "Academic Period Completed",
+                    "message": "Your academic period as a student volunteer has ended. Please choose whether to continue as a normal volunteer or quit Kaniv.",
+                    "redirect_url": "/users/volunteer-status/"
+                })
+
             return JsonResponse({
                 "status": "success",
                 "title":"Login successful",
@@ -355,7 +377,8 @@ def Profile(req):
 
 @login_required(login_url="/users/login/")
 def UpdateProfile(req):
-    
+    volunteer = Volunteer.objects.filter(user=req.user).first() if req.user.is_authenticated else None
+
     if req.method=="POST":
         if req.user.is_authenticated:
             user_form=userUpdateForm(req.POST,instance=req.user)
@@ -366,6 +389,13 @@ def UpdateProfile(req):
             if user_form.is_valid() and profile_form.is_valid():
                 user_form.save()
                 profile_form.save()
+
+                if volunteer and volunteer.is_student:
+                    volunteer.admission_no = (req.POST.get("admission_no") or "").strip() or None
+                    volunteer.batch = (req.POST.get("batch") or "").strip() or None
+                    volunteer.start_year = (req.POST.get("start_year") or "").strip()
+                    volunteer.end_year = (req.POST.get("end_year") or "").strip()
+                    volunteer.save(update_fields=["admission_no", "batch", "start_year", "end_year"])
                 
 
                 req.session.flush()
@@ -397,7 +427,9 @@ def UpdateProfile(req):
 
     cntx={
         "user_form":user_form,
-        "profile_form":profile_form
+        "profile_form":profile_form,
+        "volunteer": volunteer,
+        "volunteer_batch_choices": Volunteer.BATCH_CHOICES,
     }
     
     return render(req,"users/updation.html",context=cntx)
@@ -854,6 +886,75 @@ def resolveMembershipStatus(req):
         "status": "error",
         "title": "Invalid action",
         "message": "Please choose a valid membership action."
+    }, status=400)
+
+
+@login_required(login_url="/users/login/")
+def volunteerStatus(req):
+    volunteer = _get_student_volunteer_pending_transition(req.user)
+    if not volunteer:
+        return redirect("/")
+
+    return render(req, "users/volunteer_status.html", {
+        "volunteer": volunteer,
+    })
+
+
+@login_required(login_url="/users/login/")
+def resolveVolunteerStatus(req):
+    if req.method != "POST":
+        return JsonResponse({
+            "status": "error",
+            "title": "Invalid request",
+            "message": "Only POST requests are allowed."
+        }, status=405)
+
+    volunteer = _get_student_volunteer_pending_transition(req.user)
+    if not volunteer:
+        return JsonResponse({
+            "status": "error",
+            "title": "No action needed",
+            "message": "Your volunteer account does not need an academic transition right now."
+        }, status=400)
+
+    action = (req.POST.get("action") or "").strip()
+
+    if action == "volunteer":
+        volunteer.is_student = False
+        volunteer.was_student = True
+        volunteer.save(update_fields=["is_student", "was_student"])
+
+        return JsonResponse({
+            "status": "success",
+            "title": "Volunteer Status Updated",
+            "message": "Thank you for your coordination as a student Kaniv volunteer. Your account now continues as a normal volunteer.",
+            "redirect_url": "/"
+        })
+
+    if action == "quit":
+        confirmed = (req.POST.get("confirmed") or "").strip().lower() == "true"
+        if not confirmed:
+            return JsonResponse({
+                "status": "error",
+                "title": "Confirmation Required",
+                "message": "Please confirm that you want to quit Kaniv. This action cannot be undone."
+            }, status=400)
+
+        req.user.is_active = False
+        req.user.save(update_fields=["is_active"])
+        logout(req)
+
+        return JsonResponse({
+            "status": "success",
+            "title": "Access Disabled",
+            "message": "Your Kaniv access has been disabled. Your volunteer record is still kept safely in the database.",
+            "redirect_url": "/"
+        })
+
+    return JsonResponse({
+        "status": "error",
+        "title": "Invalid action",
+        "message": "Please choose a valid volunteer action."
     }, status=400)
 
 

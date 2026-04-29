@@ -20,6 +20,8 @@ def Home(req):
 
     if req.user.is_authenticated:
         volunteer = Volunteer.objects.filter(user=req.user).first()
+        if volunteer and volunteer.is_student_academic_period_over():
+            return HttpResponseRedirect("/users/volunteer-status/")
         is_active_volunteer = bool(volunteer and volunteer.is_approved and not volunteer.declined)
         show_volunteer_cta = req.user.userprofile.role not in ["member", "convenier", "coordinator"]
         sos_messages = SosMessages.objects.select_related("user").order_by("-created_at")[:20]

@@ -555,6 +555,33 @@
             </select>
         </div>
 
+        {% if volunteer and volunteer.is_student %}
+        <div class="form-group">
+            <label for="admission_no" class="form-label">Admission Number</label>
+            <input type="text" id="admission_no" name="admission_no" class="form-control" value="{{ volunteer.admission_no|default_if_none:'' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="batch" class="form-label">Batch</label>
+            <select name="batch" id="batch" class="form-control">
+                <option value="">Select Batch</option>
+                {% for value, label in volunteer_batch_choices %}
+                    <option value="{{ value }}" {% if volunteer.batch == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="start_year" class="form-label">Start Year</label>
+            <input type="text" id="start_year" name="start_year" class="form-control" maxlength="4" inputmode="numeric" placeholder="e.g., 2022" value="{{ volunteer.start_year|default_if_none:'' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="end_year" class="form-label">End Year</label>
+            <input type="text" id="end_year" name="end_year" class="form-control" maxlength="4" inputmode="numeric" placeholder="e.g., 2025" value="{{ volunteer.end_year|default_if_none:'' }}">
+        </div>
+        {% endif %}
+
         <div class="form-group" id="academic_edit">
             {% if request.user.userprofile.role == "member" or request.user.userprofile.role == "coordinator" %}
                 <a href="{% url 'users:academic_edit' %}" class="btn btn-outline" style="text-decoration: none;">
@@ -688,8 +715,17 @@
         const changePasswordForm=document.getElementById("change_password_form");
 
         const gender=document.getElementById("gender");
+        const startYear=document.getElementById("start_year");
+        const endYear=document.getElementById("end_year");
 
         gender.value="{{request.user.userprofile.gender}}";
+
+        const allowOnlyYearInput=(event)=>{
+            event.target.value = event.target.value.replace(/\D/g, "").slice(0, 4);
+        };
+
+        if (startYear) startYear.addEventListener("input", allowOnlyYearInput);
+        if (endYear) endYear.addEventListener("input", allowOnlyYearInput);
 
 
         form.addEventListener("submit",(e)=>{

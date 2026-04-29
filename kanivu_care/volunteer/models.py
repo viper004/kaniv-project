@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class Volunteer(models.Model):
@@ -20,14 +21,10 @@ class Volunteer(models.Model):
         ("BCA", "BCA"),
         ("BSc CS", "BSc CS"),
         ("BCom", "BCom"),
+        ("BA","BA"),
+        ("BSW","BSW")
     )
 
-    YEAR_CHOICES = (
-        ("1st Year", "1st Year"),
-        ("2nd Year", "2nd Year"),
-        ("3rd Year", "3rd Year"),
-        ("4th Year", "4th Year"),
-    )
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
@@ -58,8 +55,11 @@ class Volunteer(models.Model):
 
     # Student fields
     is_student = models.BooleanField(default=False)
+    was_student = models.BooleanField(default=False)
     admission_no = models.CharField(max_length=50, blank=True, null=True)
-    period = models.CharField(max_length=20, blank=True, null=True)
+    start_year = models.CharField(max_length=5,null=False)
+    end_year = models.CharField(max_length=5,null=False)
+    
 
     batch = models.CharField(
         max_length=20,
@@ -68,17 +68,25 @@ class Volunteer(models.Model):
         null=True
     )
 
-    year = models.CharField(
-        max_length=20,
-        choices=YEAR_CHOICES,
-        blank=True,
-        null=True
-    )
-
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
+
+    def is_student_academic_period_over(self, on_date=None):
+        if not self.is_student:
+            return False
+
+        if not self.end_year or not str(self.end_year).isdigit():
+            return False
+
+        current_date = on_date or timezone.localdate()
+        end_year = int(self.end_year)
+
+        if current_date.year > end_year:
+            return True
+
+        return current_date.year == end_year and current_date.month >= 4
     
 class Campaign(models.Model):
 

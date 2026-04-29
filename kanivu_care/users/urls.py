@@ -22,6 +22,8 @@ urlpatterns=[
     path("academic_edit/",views.editAcademic,name="academic_edit"),
     path("membership-status/", views.membershipStatus, name="membership_status"),
     path("membership-status/resolve/", views.resolveMembershipStatus, name="resolve_membership_status"),
+    path("volunteer-status/", views.volunteerStatus, name="volunteer_status"),
+    path("volunteer-status/resolve/", views.resolveVolunteerStatus, name="resolve_volunteer_status"),
 
 
 
