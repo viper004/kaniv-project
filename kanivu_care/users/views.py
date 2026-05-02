@@ -8,7 +8,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
-from members.models import memberRegistration
+from members.models import memberRegistration, Donor
 from volunteer.models import Volunteer
 
 
@@ -378,17 +378,40 @@ def Profile(req):
 @login_required(login_url="/users/login/")
 def UpdateProfile(req):
     volunteer = Volunteer.objects.filter(user=req.user).first() if req.user.is_authenticated else None
+    member = None
+    donor = None
+    if req.user.is_authenticated and req.user.userprofile.role in {"member", "coordinator"}:
+        member, _ = memberRegistration.objects.get_or_create(user=req.user)
+        donor, _ = Donor.objects.get_or_create(user=member)
 
     if req.method=="POST":
         if req.user.is_authenticated:
             user_form=userUpdateForm(req.POST,instance=req.user)
             profile, created = UserProfile.objects.get_or_create(user=req.user)
             profile_form = userProfileUpdateForm(req.POST,req.FILES, instance=profile)
+            blood_group = (req.POST.get("blood_group") or "").strip()
+            is_a_donor = req.POST.get("is_a_donor") == "on"
 
             
             if user_form.is_valid() and profile_form.is_valid():
+                if member and not blood_group:
+                    return JsonResponse({
+                        "status": "error",
+                        "title":"Errors occured.",
+                        "message":"Blood Group is required"
+                    })
+
                 user_form.save()
                 profile_form.save()
+
+                if member:
+                    member.blood_group = blood_group
+                    member.save(update_fields=["blood_group"])
+                    
+                    # Update donor status
+                    if donor:
+                        donor.is_a_donor = is_a_donor
+                        donor.save(update_fields=["is_a_donor"])
 
                 if volunteer and volunteer.is_student:
                     volunteer.admission_no = (req.POST.get("admission_no") or "").strip() or None
@@ -428,6 +451,8 @@ def UpdateProfile(req):
     cntx={
         "user_form":user_form,
         "profile_form":profile_form,
+        "member": member,
+        "donor": donor,
         "volunteer": volunteer,
         "volunteer_batch_choices": Volunteer.BATCH_CHOICES,
     }

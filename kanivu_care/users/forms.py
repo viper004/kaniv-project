@@ -172,10 +172,6 @@ class MCUpdateForm(forms.ModelForm):
         "placeholder": "e.g., 2025",
     }))
 
-    blood_group = forms.ChoiceField(label="Blood Group", choices=memberRegistration.BLOOD_GROUP_CHOICES, widget=forms.Select(attrs={
-        "id": "blood_group"
-    }))
-
     class Meta:
         model = memberRegistration
-        fields = ("adno", "department", "start_year", "end_year", "blood_group")
+        fields = ("adno", "department", "start_year", "end_year")

@@ -183,6 +183,51 @@
             background: #009ee3;
         }
 
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #555;
+            transition: 0.4s;
+            border-radius: 26px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #00c6ff;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
     select{
         cursor: pointer;
         color: black !important;
@@ -555,6 +600,18 @@
             </select>
         </div>
 
+        {% if request.user.userprofile.role == "member" or request.user.userprofile.role == "coordinator" %}
+        <div class="form-group">
+            <label for="blood_group" class="form-label">Blood Group</label>
+            <select name="blood_group" id="blood_group" class="form-control" required>
+                <option value="">Select Blood Group</option>
+                {% for value, label in member.BLOOD_GROUP_CHOICES %}
+                    <option value="{{ value }}" {% if member.blood_group == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+
         {% if volunteer and volunteer.is_student %}
         <div class="form-group">
             <label for="admission_no" class="form-label">Admission Number</label>
@@ -589,6 +646,18 @@
                 </a>
             {% endif %}
         </div>
+
+        {% if request.user.userprofile.role == "member" or request.user.userprofile.role == "coordinator" %}
+        <div class="form-group">
+            <label class="form-label" style="display: flex; align-items: center; gap: 10px;">
+                <span>Do you want to become a donor?</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="is_a_donor" name="is_a_donor" {% if donor.is_a_donor %}checked{% endif %}>
+                    <span class="toggle-slider"></span>
+                </label>
+            </label>
+        </div>
+        {% endif %}
 
         <div class="action-buttons">
            

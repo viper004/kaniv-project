@@ -337,6 +337,19 @@
                 </div>
             {% endif %}
 
+             {% if request.user.userprofile.role == "convenier" or request.user.userprofile.role == "coordinator" %}
+                <div class="item" onclick="window.location.href='{% url "members:blood_donors" %}'">
+                    <div class="item-content">
+                        <div class="item-icon">
+                            <i class="fa-solid fa-droplet"></i>
+                        </div>
+                        <h3 class="item-title">Donors</h3>
+                        <p class="item-desc">View and connect with blood donors</p>
+                        
+                    </div>
+                </div>
+            {% endif %}
+
            
             
 

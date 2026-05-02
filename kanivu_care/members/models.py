@@ -93,3 +93,7 @@ class memberRegistration(models.Model):
 
         return current_date.year == end_year and current_date.month >= 4
 
+
+class Donor(models.Model):
+    user = models.ForeignKey(memberRegistration,on_delete=models.CASCADE)
+    is_a_donor = models.BooleanField(default=False)

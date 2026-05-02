@@ -25,5 +25,8 @@ class UserProfile(models.Model):
     created_at=models.DateTimeField(auto_now_add=True)
     photo=models.ImageField(upload_to="profile_pics/",null=True,blank=True)
 
+
     def __str__(self):
         return self.user.username
+    
+
