@@ -21,6 +21,7 @@ def blood_donors(request):
         )
     )
 
+
     donor_data = []
 
     for donor in donors:
