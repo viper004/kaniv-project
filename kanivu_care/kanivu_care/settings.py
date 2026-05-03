@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'members',
     'dashboard',
     'volunteer',
+    'officials',
 ]
 
 LOGIN_URL = 'users:login'

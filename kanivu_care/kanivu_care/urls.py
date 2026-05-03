@@ -15,6 +15,7 @@ urlpatterns = [
     path("coordinator/",include("coordinator.urls",namespace="coordinator")),
     path("dashboard/",include("dashboard.urls",namespace="dashboard")),
     path("volunteer/",include("volunteer.urls",namespace="volunteer")),
+    path("officials/", include("officials.urls", namespace="officials")),
 ]
 
 if settings.DEBUG:
