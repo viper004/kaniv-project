@@ -115,9 +115,9 @@ def join_volunteer(request):
             address=request.POST.get("address"),
             reason=request.POST.get("reason"),
             admission_no=request.POST.get("admission_no"),
-            period=request.POST.get("period"),
             batch=request.POST.get("batch"),
-            year=request.POST.get("year"),
+            start_year=request.POST.get("start_year"),
+            end_year=request.POST.get("end_year"),
             is_student=True if request.POST.get("admission_no") else False
         )
 
@@ -185,7 +185,8 @@ def new_campaign(request):
             "blood_group": volunteer.blood_group if volunteer and volunteer.blood_group else "N/A",
             "is_student": bool(volunteer and volunteer.is_student),
             "batch": volunteer.batch if volunteer and volunteer.batch else "N/A",
-            "year": volunteer.year if volunteer and volunteer.year else "N/A",
+            "start_year": volunteer.start_year if volunteer and volunteer.start_year else "N/A",
+            "end_year": volunteer.end_year if volunteer and volunteer.end_year else "N/A",
             "joined_on": date_format(timezone.localtime(enrollment.joined_on), "M j, Y, P"),
         })
 
