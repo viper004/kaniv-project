@@ -389,29 +389,10 @@ def UpdateProfile(req):
             user_form=userUpdateForm(req.POST,instance=req.user)
             profile, created = UserProfile.objects.get_or_create(user=req.user)
             profile_form = userProfileUpdateForm(req.POST,req.FILES, instance=profile)
-            blood_group = (req.POST.get("blood_group") or "").strip()
-            is_a_donor = req.POST.get("is_a_donor") == "on"
 
-            
             if user_form.is_valid() and profile_form.is_valid():
-                if member and not blood_group:
-                    return JsonResponse({
-                        "status": "error",
-                        "title":"Errors occured.",
-                        "message":"Blood Group is required"
-                    })
-
                 user_form.save()
                 profile_form.save()
-
-                if member:
-                    member.blood_group = blood_group
-                    member.save(update_fields=["blood_group"])
-                    
-                    # Update donor status
-                    if donor:
-                        donor.is_a_donor = is_a_donor
-                        donor.save(update_fields=["is_a_donor"])
 
                 if volunteer and volunteer.is_student:
                     volunteer.admission_no = (req.POST.get("admission_no") or "").strip() or None

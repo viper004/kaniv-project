@@ -104,9 +104,27 @@ class userProfileUpdateForm(forms.ModelForm):
 
     address=forms.TextInput()
 
+    blood=forms.ChoiceField(
+        label="Blood Group",
+        choices=UserProfile.BLOOD_GROUP_CHOICES,
+        required=False,
+        widget=forms.Select(attrs={
+            "id":"blood_group"
+        })
+    )
+
+    is_donor=forms.BooleanField(
+        label="I am a blood donor",
+        required=False,
+        widget=forms.CheckboxInput(attrs={
+            "id":"is_donor",
+            "class":"toggle-checkbox"
+        })
+    )
+
     class Meta:
         model=UserProfile
-        fields=["gender","photo","address"]
+        fields=["gender","photo","address","blood","is_donor"]
 
 
 class userPasswordChangeForm(PasswordChangeForm):

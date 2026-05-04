@@ -17,6 +17,18 @@ class UserProfile(models.Model):
         ("convenier","convenier"),
     )
 
+    BLOOD_GROUP_CHOICES = [
+        ('', 'Select Blood Group'),
+        ('A+', 'A+'),
+        ('A-', 'A-'),
+        ('B+', 'B+'),
+        ('B-', 'B-'),
+        ('AB+', 'AB+'),
+        ('AB-', 'AB-'),
+        ('O+', 'O+'),
+        ('O-', 'O-'),
+    ]
+
     user=models.OneToOneField(User,on_delete=models.CASCADE)
     phone_number=models.CharField(max_length=10,null=True,blank=True)
     role=models.CharField(max_length=20,choices=ROLE_CHOICE,default="public_user")
@@ -24,6 +36,9 @@ class UserProfile(models.Model):
     address=models.TextField(null=True,blank=True)
     created_at=models.DateTimeField(auto_now_add=True)
     photo=models.ImageField(upload_to="profile_pics/",null=True,blank=True)
+    blood=models.CharField(max_length=3,default="",choices=BLOOD_GROUP_CHOICES)
+    is_donor = models.BooleanField(default=False)
+    
 
 
     def __str__(self):

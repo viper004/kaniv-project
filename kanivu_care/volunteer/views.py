@@ -105,6 +105,8 @@ def join_volunteer(request):
         # delete old rejected application
         Volunteer.objects.filter(user=request.user).delete()
 
+        is_student = True if request.POST.get("admission_no") else False
+        
         Volunteer.objects.create(
             user=request.user,
             name=request.POST.get("name"),
@@ -114,11 +116,11 @@ def join_volunteer(request):
             blood_group=request.POST.get("blood_group"),
             address=request.POST.get("address"),
             reason=request.POST.get("reason"),
-            admission_no=request.POST.get("admission_no"),
-            batch=request.POST.get("batch"),
-            start_year=request.POST.get("start_year"),
-            end_year=request.POST.get("end_year"),
-            is_student=True if request.POST.get("admission_no") else False
+            admission_no=request.POST.get("admission_no") if is_student else None,
+            batch=request.POST.get("batch") if is_student else None,
+            start_year=request.POST.get("start_year") if is_student else None,
+            end_year=request.POST.get("end_year") if is_student else None,
+            is_student=is_student
         )
 
         return redirect("/")

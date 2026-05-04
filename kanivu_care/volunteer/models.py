@@ -57,8 +57,8 @@ class Volunteer(models.Model):
     is_student = models.BooleanField(default=False)
     was_student = models.BooleanField(default=False)
     admission_no = models.CharField(max_length=50, blank=True, null=True)
-    start_year = models.CharField(max_length=5,null=False)
-    end_year = models.CharField(max_length=5,null=False)
+    start_year = models.CharField(max_length=5, blank=True, null=True)
+    end_year = models.CharField(max_length=5, blank=True, null=True)
     
 
     batch = models.CharField(
