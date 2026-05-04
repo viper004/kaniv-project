@@ -36,14 +36,12 @@ def _is_member_profile_incomplete(user):
     if not member:
         return True
 
-    required_member_fields = [
-        member.adno,
-        member.department,
-        member.start_year,
-        member.end_year,
-        member.blood_group,
-    ]
-    return any(not str(value).strip() for value in required_member_fields)
+    # Only require blood group to be complete (synced from UserProfile)
+    # Academic fields (adno, department, start_year, end_year) are optional and managed separately
+    if not member.blood_group or not str(member.blood_group).strip():
+        return True
+
+    return False
 
 
 def _has_membership_action_pending(user):
@@ -393,6 +391,11 @@ def UpdateProfile(req):
             if user_form.is_valid() and profile_form.is_valid():
                 user_form.save()
                 profile_form.save()
+
+                # Update member blood group if member
+                if member:
+                    member.blood_group = (req.POST.get("blood") or "").strip() or None
+                    member.save(update_fields=["blood_group"])
 
                 if volunteer and volunteer.is_student:
                     volunteer.admission_no = (req.POST.get("admission_no") or "").strip() or None
@@ -824,9 +827,6 @@ def resolveMembershipStatus(req):
 
         profile = req.user.userprofile
         volunteer_name = req.user.first_name.strip() or req.user.username
-        period = ""
-        if member.start_year and member.end_year:
-            period = f"{member.start_year}-{member.end_year}"
 
         Volunteer.objects.update_or_create(
             user=req.user,
@@ -844,9 +844,9 @@ def resolveMembershipStatus(req):
                 "rejection_reason": None,
                 "is_student": False,
                 "admission_no": None,
-                "period": period or None,
+                "start_year": member.start_year or None,
+                "end_year": member.end_year or None,
                 "batch": None,
-                "year": None,
             }
         )
 

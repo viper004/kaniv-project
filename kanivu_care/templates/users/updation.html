@@ -619,18 +619,6 @@
             </label>
         </div>
 
-        {% if request.user.userprofile.role == "member" or request.user.userprofile.role == "coordinator" %}
-        <div class="form-group">
-            <label for="blood_group" class="form-label">Blood Group (Member)</label>
-            <select name="blood_group" id="blood_group" class="form-control" required>
-                <option value="">Select Blood Group</option>
-                {% for value, label in member.BLOOD_GROUP_CHOICES %}
-                    <option value="{{ value }}" {% if member.blood_group == value %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        {% endif %}
-
         {% if volunteer and volunteer.is_student %}
         <div class="form-group">
             <label for="admission_no" class="form-label">Admission Number</label>
