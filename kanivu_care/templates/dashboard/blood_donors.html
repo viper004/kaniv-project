@@ -184,6 +184,16 @@
             font-size:.92rem;
         }
 
+        .donor-type{
+            display:inline-block;
+            padding:7px 14px;
+            border-radius:50px;
+            background:rgba(108,92,231,0.15);
+            color:#6c5ce7;
+            font-weight:600;
+            font-size:.92rem;
+        }
+
         .call-btn{
             border:none;
             outline:none;
@@ -314,6 +324,7 @@
                     <th>Name</th>
                     <th>Phone Number</th>
                     <th>Blood Type</th>
+                    <th>Type</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -335,6 +346,10 @@
                         <span class="blood-group">
                             {{ donor.blood_type }}
                         </span>
+                    </td>
+
+                    <td>
+                        <span class="donor-type">{{ donor.type }}</span>
                     </td>
 
                     <td>

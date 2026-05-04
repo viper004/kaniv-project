@@ -10,8 +10,12 @@ from .models import Donor
 
 
 def blood_donors(request):
+    from users.models import UserProfile
+    
+    donor_data = []
 
-    donors = (
+    # Get member donors from Donor model
+    member_donors = (
         Donor.objects
         .filter(is_a_donor=True)
         .select_related(
@@ -21,20 +25,31 @@ def blood_donors(request):
         )
     )
 
-
-    donor_data = []
-
-    for donor in donors:
-
+    for donor in member_donors:
         member = donor.user
         django_user = member.user
 
         donor_data.append({
             "name": django_user.get_full_name() if django_user.get_full_name() else django_user.username,
-
             "phone": django_user.userprofile.phone_number,
-
             "blood_type": member.blood_group,
+            "type": "Member",
+        })
+
+    # Get user donors from UserProfile (exclude members and coordinators)
+    user_donors = (
+        UserProfile.objects
+        .filter(is_donor=True)
+        .exclude(role__in=["member", "coordinator"])
+        .select_related("user")
+    )
+
+    for user_profile in user_donors:
+        donor_data.append({
+            "name": user_profile.user.get_full_name() if user_profile.user.get_full_name() else user_profile.user.username,
+            "phone": user_profile.phone_number,
+            "blood_type": user_profile.blood,
+            "type": "User",
         })
 
     context = {
