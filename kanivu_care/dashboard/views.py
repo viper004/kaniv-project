@@ -878,7 +878,7 @@ def manageMembers(req):
     pending_users = pendingMemberAddRequest.objects.filter(isApproved=False).values_list('user', flat=True)
 
     members = memberRegistration.objects.exclude(user__in=pending_users).filter(membership_status="active")
-    coordinators=UserProfile.objects.filter(role="coordinator")
+    coordinators = coordinateRegistration.objects.all()
     pending_requests=pendingMemberAddRequest.objects.filter(isPending=True)
 
 

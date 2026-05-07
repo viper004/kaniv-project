@@ -10,6 +10,7 @@ from django.utils import timezone
 
 from members.models import memberRegistration, Donor
 from volunteer.models import Volunteer
+from coordinator.models import coordinateRegistration
 
 
 from convenier.models import pendingMemberAddRequest
@@ -378,9 +379,12 @@ def UpdateProfile(req):
     volunteer = Volunteer.objects.filter(user=req.user).first() if req.user.is_authenticated else None
     member = None
     donor = None
-    if req.user.is_authenticated and req.user.userprofile.role in {"member", "coordinator"}:
+    coordinator = None
+    if req.user.is_authenticated and req.user.userprofile.role == "member":
         member, _ = memberRegistration.objects.get_or_create(user=req.user)
         donor, _ = Donor.objects.get_or_create(user=member)
+    elif req.user.is_authenticated and req.user.userprofile.role == "coordinator":
+        coordinator, _ = coordinateRegistration.objects.get_or_create(user=req.user)
 
     if req.method=="POST":
         if req.user.is_authenticated:
@@ -438,6 +442,7 @@ def UpdateProfile(req):
         "member": member,
         "donor": donor,
         "volunteer": volunteer,
+        "coordinator": coordinator,
         "volunteer_batch_choices": Volunteer.BATCH_CHOICES,
     }
     

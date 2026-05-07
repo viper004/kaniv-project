@@ -11,10 +11,12 @@ from .models import Donor
 
 def blood_donors(request):
     from users.models import UserProfile
+    from coordinator.models import coordinateRegistration
+    from volunteer.models import Volunteer
     
     donor_data = []
 
-    # Get member donors from Donor model
+    # 1. Get member donors from Donor model
     member_donors = (
         Donor.objects
         .filter(is_a_donor=True)
@@ -36,15 +38,60 @@ def blood_donors(request):
             "type": "Member",
         })
 
-    # Get user donors from UserProfile (exclude members and coordinators)
-    user_donors = (
+    # 2. Get coordinator donors from UserProfile
+    coordinator_donors = (
         UserProfile.objects
-        .filter(is_donor=True)
-        .exclude(role__in=["member", "coordinator"])
+        .filter(role="coordinator", is_donor=True)
         .select_related("user")
     )
 
-    for user_profile in user_donors:
+    for user_profile in coordinator_donors:
+        donor_data.append({
+            "name": user_profile.user.get_full_name() if user_profile.user.get_full_name() else user_profile.user.username,
+            "phone": user_profile.phone_number,
+            "blood_type": user_profile.blood,
+            "type": "Coordinator",
+        })
+
+    # 3. Get convenier donors from UserProfile
+    convenier_donors = (
+        UserProfile.objects
+        .filter(role="convenier", is_donor=True)
+        .select_related("user")
+    )
+
+    for user_profile in convenier_donors:
+        donor_data.append({
+            "name": user_profile.user.get_full_name() if user_profile.user.get_full_name() else user_profile.user.username,
+            "phone": user_profile.phone_number,
+            "blood_type": user_profile.blood,
+            "type": "Convenier",
+        })
+
+    # 4. Get volunteer donors (approved volunteers with blood_group set)
+    approved_volunteers = (
+        Volunteer.objects
+        .filter(is_approved=True, declined=False, blood_group__isnull=False)
+        .exclude(blood_group="")
+        .select_related("user", "user__userprofile")
+    )
+
+    for volunteer in approved_volunteers:
+        donor_data.append({
+            "name": volunteer.name if volunteer.name else volunteer.user.username,
+            "phone": volunteer.phone,
+            "blood_type": volunteer.blood_group,
+            "type": "Volunteer",
+        })
+
+    # 5. Get public user donors from UserProfile
+    public_user_donors = (
+        UserProfile.objects
+        .filter(role="public_user", is_donor=True)
+        .select_related("user")
+    )
+
+    for user_profile in public_user_donors:
         donor_data.append({
             "name": user_profile.user.get_full_name() if user_profile.user.get_full_name() else user_profile.user.username,
             "phone": user_profile.phone_number,
