@@ -37,8 +37,14 @@
                 </div>
 
                 <div>
+                    <label class="block font-semibold text-gray-600">Date of Birth</label>
+                    <input type="date" name="date_of_birth" id="date_of_birth" required
+                    class="w-full border rounded-lg px-4 py-2 mt-1 focus:ring-2 focus:ring-blue-400 outline-none">
+                </div>
+
+                <div>
                     <label class="block font-semibold text-gray-600">Age</label>
-                    <input type="number" name="age" required value="{{age}}"
+                    <input type="number" name="age" id="age" required value="{{age}}" readonly placeholder="Auto-calculated"
                     class="w-full border rounded-lg px-4 py-2 mt-1 focus:ring-2 focus:ring-blue-400 outline-none">
                 </div>
 
@@ -199,7 +205,30 @@ document.addEventListener("DOMContentLoaded", function(){
             fields.classList.add("hidden");
         }
 
-    });
+    const dobInput = document.getElementById("date_of_birth");
+    const ageInput = document.getElementById("age");
+
+    const calculateAge = (dob) => {
+        if (!dob) {
+            ageInput.value = "";
+            return;
+        }
+        const today = new Date();
+        const birthDate = new Date(dob);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        ageInput.value = age;
+    };
+
+    if (dobInput) {
+        dobInput.addEventListener("change", (e) => {
+            calculateAge(e.target.value);
+        });
+    }
 
 });
 </script>

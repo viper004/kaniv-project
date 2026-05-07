@@ -57,6 +57,8 @@ class memberRegistration(models.Model):
         blank=True,
         default="",
     )
+    date_of_birth = models.DateField(null=True, blank=True)
+    age = models.PositiveIntegerField(null=True, blank=True)
     duty = models.CharField(max_length=50, choices=DUTY_CHOICES, default="No Duty")
     membership_status = models.CharField(
         max_length=20,

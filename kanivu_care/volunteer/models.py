@@ -32,6 +32,7 @@ class Volunteer(models.Model):
     email = models.EmailField()
     phone = models.CharField(max_length=10)
     age = models.PositiveIntegerField()
+    date_of_birth = models.DateField(null=True, blank=True)
 
     blood_group = models.CharField(
         max_length=5,

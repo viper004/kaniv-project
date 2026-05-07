@@ -38,6 +38,8 @@ class UserProfile(models.Model):
     photo=models.ImageField(upload_to="profile_pics/",null=True,blank=True)
     blood=models.CharField(max_length=3,default="",choices=BLOOD_GROUP_CHOICES)
     is_donor = models.BooleanField(default=False)
+    date_of_birth = models.DateField(null=True, blank=True)
+    age = models.PositiveIntegerField(null=True, blank=True)
     
 
 

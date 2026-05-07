@@ -619,6 +619,16 @@
             </label>
         </div>
 
+        <div class="form-group">
+            <label for="date_of_birth" class="form-label">Date of Birth</label>
+            <input type="date" id="date_of_birth" name="date_of_birth" class="form-control" value="{% if request.user.userprofile.date_of_birth %}{{ request.user.userprofile.date_of_birth|date:'Y-m-d' }}{% endif %}">
+        </div>
+
+        <div class="form-group">
+            <label for="age" class="form-label">Age</label>
+            <input type="number" id="age" name="age" class="form-control" readonly placeholder="Auto-calculated from DOB" value="{{ request.user.userprofile.age|default_if_none:'' }}">
+        </div>
+
         {% if volunteer and volunteer.is_student %}
         <div class="form-group">
             <label for="admission_no" class="form-label">Admission Number</label>
@@ -1020,6 +1030,37 @@
         window.closeModal=closeModal;
         window.sendEmailOTP=sendEmailOTP;
         window.handleEmailOTPSubmit=handleEmailOTPSubmit;
+
+        // Age calculation from DOB
+        const dobInput = document.getElementById("date_of_birth");
+        const ageInput = document.getElementById("age");
+
+        const calculateAge = (dob) => {
+            if (!dob) {
+                ageInput.value = "";
+                return;
+            }
+            const today = new Date();
+            const birthDate = new Date(dob);
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            ageInput.value = age;
+        };
+
+        if (dobInput) {
+            dobInput.addEventListener("change", (e) => {
+                calculateAge(e.target.value);
+            });
+
+            // Calculate on page load if DOB is already set
+            if (dobInput.value) {
+                calculateAge(dobInput.value);
+            }
+        }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     

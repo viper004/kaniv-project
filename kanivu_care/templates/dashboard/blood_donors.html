@@ -323,6 +323,8 @@
                 <tr>
                     <th>Name</th>
                     <th>Phone Number</th>
+                    <th>Date of Birth</th>
+                    <th>Age</th>
                     <th>Blood Type</th>
                     <th>Type</th>
                     <th>Action</th>
@@ -341,6 +343,22 @@
                     <td>{{ donor.name }}</td>
 
                     <td>{{ donor.phone }}</td>
+
+                    <td>
+                        {% if donor.date_of_birth %}
+                            {{ donor.date_of_birth|date:"d/m/Y" }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if donor.age %}
+                            {{ donor.age }} years
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
 
                     <td>
                         <span class="blood-group">

@@ -345,6 +345,11 @@
                             <div class="info-label">Address</div>
                             <div class="info-value">{{request.user.userprofile.address}}</div>
                         </div>
+                    </div>
+                </div>
+                
+                <div class="personal-info" style="margin-top: 2rem;">
+                    <div class="info-grid">
                         <div class="info-item">
                             <div class="info-label">Member Since</div>
                             <div class="info-value">{{request.user.userprofile.created_at|date:"d M Y"}}</div>
@@ -353,13 +358,17 @@
                             <div class="info-label">Gender</div>
                             <div class="info-value">{{request.user.userprofile.gender}}</div>
                         </div>
+                        <div class="info-item">
+                            <div class="info-label">Date of Birth</div>
+                            <div class="info-value">{% if request.user.userprofile.date_of_birth %}{{ request.user.userprofile.date_of_birth|date:"d M Y" }}{% else %}Not set{% endif %}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Age</div>
+                            <div class="info-value">{{request.user.userprofile.age|default:"Not set"}}</div>
+                        </div>
                     </div>
                 </div>
-
-                
             </div>
-        </div>
-    </div>
     
     <script type="module">
         import {showAlert} from "{% static 'scripts/alert.js' %}";

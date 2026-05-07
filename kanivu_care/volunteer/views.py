@@ -113,6 +113,7 @@ def join_volunteer(request):
             email=request.POST.get("email"),
             phone=request.POST.get("phone"),
             age=request.POST.get("age"),
+            date_of_birth=request.POST.get("date_of_birth"),
             blood_group=request.POST.get("blood_group"),
             address=request.POST.get("address"),
             reason=request.POST.get("reason"),

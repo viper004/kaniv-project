@@ -122,9 +122,29 @@ class userProfileUpdateForm(forms.ModelForm):
         })
     )
 
+    date_of_birth=forms.DateField(
+        label="Date of Birth",
+        required=False,
+        widget=forms.DateInput(attrs={
+            "id":"date_of_birth",
+            "type":"date",
+            "class":"dob-input"
+        })
+    )
+
+    age=forms.IntegerField(
+        label="Age",
+        required=False,
+        widget=forms.NumberInput(attrs={
+            "id":"age",
+            "readonly": "readonly",
+            "placeholder":"Auto-calculated from DOB"
+        })
+    )
+
     class Meta:
         model=UserProfile
-        fields=["gender","photo","address","blood","is_donor"]
+        fields=["gender","photo","address","blood","is_donor","date_of_birth","age"]
 
 
 class userPasswordChangeForm(PasswordChangeForm):
