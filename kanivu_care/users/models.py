@@ -15,6 +15,9 @@ class UserProfile(models.Model):
         ("member","member"),
         ("coordinator","coordinator"),
         ("convenier","convenier"),
+        ("office_staff","office_staff"),
+        ("principal","principal"),
+        ("chairman","chairman"),
     )
 
     BLOOD_GROUP_CHOICES = [

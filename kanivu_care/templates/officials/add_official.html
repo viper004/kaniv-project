@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="hero" style="padding: 3rem 2rem;">
+    <div class="container">
+        <h1>System Administration</h1>
+        <p>Register new officials and manage administrative roles</p>
+    </div>
+</div>
+
+<div class="container" style="margin-top: -3rem;">
+    <div class="content-grid">
+        <!-- Registration Form -->
+        <div class="card">
+            <h2 class="card-title">Register New Official</h2>
+            <form method="post" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                {% csrf_token %}
+                {% for field in form %}
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label style="font-weight: 600; font-size: 0.9rem; color: var(--gray);">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div style="color: #ef4444; font-size: 0.8rem;">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                <button type="submit" class="btn-login" style="border: none; width: 100%; cursor: pointer;">
+                    Add Official Account
+                </button>
+            </form>
+        </div>
+
+        <!-- Current Officials -->
+        <div class="card">
+            <h2 class="card-title">Active Officials</h2>
+            <div class="activity-list">
+                {% for official in officials %}
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: 600; color: var(--dark);">{{ official.user.username }}</div>
+                        <div style="font-size: 0.85rem; color: var(--primary); text-transform: capitalize;">{{ official.role|replace:"_, " }}</div>
+                    </div>
+                </div>
+                {% empty %}
+                <p style="color: var(--gray); text-align: center; padding: 2rem;">No officials found.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    input, select {
+        padding: 0.8rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 1rem;
+    }
+    input:focus, select:focus {
+        outline: 2px solid var(--primary-light);
+        border-color: transparent;
+    }
+</style>
+{% endblock %}

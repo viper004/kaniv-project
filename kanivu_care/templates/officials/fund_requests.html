@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="hero" style="padding: 3rem 2rem;">
+    <div class="container">
+        <h1>Fund & Activity Approvals</h1>
+        <p>Review and authorize requests from the organizational convenors</p>
+    </div>
+</div>
+
+<div class="container" style="margin-top: -3rem;">
+    <div class="card">
+        <h2 class="card-title">Pending Requests</h2>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                <thead>
+                    <tr style="text-align: left; border-bottom: 2px solid var(--bg);">
+                        <th style="padding: 1rem;">Submitted</th>
+                        <th style="padding: 1rem;">Title</th>
+                        <th style="padding: 1rem;">Submitted By</th>
+                        <th style="padding: 1rem;">Amount</th>
+                        <th style="padding: 1rem;">Status</th>
+                        <th style="padding: 1rem;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in requests %}
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 1rem; color: var(--gray);">{{ req.submitted_at|date:"d M Y" }}</td>
+                        <td style="padding: 1rem; font-weight: 600;">{{ req.title }}</td>
+                        <td style="padding: 1rem;">{{ req.submitted_by.username }}</td>
+                        <td style="padding: 1rem; font-weight: 700;">₹{{ req.amount }}</td>
+                        <td style="padding: 1rem;">
+                            <span class="badge 
+                                {% if req.status == 'approved' %}badge-success
+                                {% elif req.status == 'rejected' %}badge-danger
+                                {% else %}badge-warning{% endif %}">
+                                {{ req.status|title }}
+                            </span>
+                        </td>
+                        <td style="padding: 1rem;">
+                            <a href="{% url 'officials:approve_fund_request' req.pk %}" class="edit-btn" style="text-decoration: none;">Review</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--gray);">No fund requests found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .badge {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .badge-success { background: #e1f3f0; color: #0d9488; }
+    .badge-warning { background: #fef3c7; color: #d97706; }
+    .badge-danger { background: #fee2e2; color: #ef4444; }
+    
+    .edit-btn {
+        background: var(--primary);
+        color: white;
+        padding: 0.4rem 1rem;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+    .edit-btn:hover { background: var(--secondary); }
+</style>
+{% endblock %}

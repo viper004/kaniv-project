@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="hero" style="padding: 3rem 2rem;">
+    <div class="container">
+        <h1>Assigned Report Requests</h1>
+        <p>Review and fulfill data requests from the Official Supervisory Panel</p>
+    </div>
+</div>
+
+<div class="container" style="margin-top: -3rem;">
+    <div class="card">
+        <h2 class="card-title">Active Requests for {{ role|title }}</h2>
+        <div class="activity-list">
+            {% for req in requests %}
+            <div class="activity-item" style="{% if req.is_completed %}opacity: 0.7;{% endif %}">
+                <div class="activity-icon">
+                    <i class="fas fa-file-contract"></i>
+                </div>
+                <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="font-weight: 600; color: var(--dark); font-size: 1.1rem;">{{ req.title }}</div>
+                        {% if req.is_completed %}
+                            <span class="badge badge-success">Completed</span>
+                        {% else %}
+                            <span class="badge badge-warning">Pending</span>
+                        {% endif %}
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--primary); margin-bottom: 0.5rem;">
+                        Requested by: {{ req.requested_by.username }} | Date: {{ req.requested_at|date:"d M Y" }}
+                    </div>
+                    <p style="color: #555; line-height: 1.5; margin-bottom: 1rem;">{{ req.description }}</p>
+                    
+                    {% if not req.is_completed %}
+                    <form action="{% url 'officials:complete_report_request' req.pk %}" method="post" enctype="multipart/form-data" style="margin-top: 1.5rem; background: #f9fafb; padding: 1rem; border-radius: 8px; border: 1px dashed #cbd5e1;">
+                        {% csrf_token %}
+                        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--gray); margin-bottom: 0.5rem;">Upload Report Document (PDF/DOCX/XLSX):</label>
+                        <div style="display: flex; gap: 1rem; align-items: center;">
+                            <input type="file" name="report_file" required style="font-size: 0.85rem; flex: 1; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; background: white;">
+                            <button type="submit" class="btn-login" style="border: none; padding: 0.6rem 1.2rem; font-size: 0.9rem; cursor: pointer;">
+                                Submit & Complete
+                            </button>
+                        </div>
+                    </form>
+                    {% else %}
+                    <div style="margin-top: 1rem; padding: 0.8rem; background: #ecfdf5; color: #065f46; border-radius: 8px; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-check-circle"></i>
+                        Submitted on {{ req.requested_at|date:"d M Y" }}
+                        {% if req.report_file %}
+                        | <a href="{{ req.report_file.url }}" target="_blank" style="color: #065f46; font-weight: 600; text-decoration: underline;">View Report</a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div style="text-align: center; padding: 4rem;">
+                <div style="font-size: 3rem; color: #eee; margin-bottom: 1rem;"><i class="fas fa-clipboard-list"></i></div>
+                <p style="color: var(--gray);">No report requests have been assigned to your role yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .badge {
+        display: inline-block;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    .badge-success { background: #e1f3f0; color: #0d9488; }
+    .badge-warning { background: #fef3c7; color: #d97706; }
+    
+    .edit-btn {
+        background: var(--primary);
+        color: white;
+        padding: 0.5rem 1.2rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: 0.3s;
+        border: none;
+        cursor: pointer;
+    }
+    .edit-btn:hover {
+        background: var(--secondary);
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}

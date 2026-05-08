@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="hero" style="padding: 3rem 2rem;">
+    <div class="container">
+        <h1>Financial Oversight</h1>
+        <p>Transparency and accountability across all operations</p>
+    </div>
+</div>
+
+<div class="container" style="margin-top: -3rem;">
+    <div class="content-grid" style="grid-template-columns: 1fr;">
+        <!-- Collections -->
+        <div class="card">
+            <h2 class="card-title">Recent Collections</h2>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                    <thead>
+                        <tr style="text-align: left; border-bottom: 2px solid var(--bg);">
+                            <th style="padding: 1rem;">Date</th>
+                            <th style="padding: 1rem;">Source/Convenor</th>
+                            <th style="padding: 1rem;">Category</th>
+                            <th style="padding: 1rem;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for collection in collections %}
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 1rem;">{{ collection.collection_date|date:"d M Y" }}</td>
+                            <td style="padding: 1rem;">{{ collection.convenor.username }}</td>
+                            <td style="padding: 1rem;"><span class="badge badge-primary">{{ collection.category }}</span></td>
+                            <td style="padding: 1rem; font-weight: 700;">₹{{ collection.total }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--gray);">No collections recorded.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Donations -->
+        <div class="card" style="margin-top: 2rem;">
+            <h2 class="card-title">Public Donations</h2>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                    <thead>
+                        <tr style="text-align: left; border-bottom: 2px solid var(--bg);">
+                            <th style="padding: 1rem;">Date</th>
+                            <th style="padding: 1rem;">Donor</th>
+                            <th style="padding: 1rem;">Campaign</th>
+                            <th style="padding: 1rem;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for donation in donations %}
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 1rem;">{{ donation.donated_date|date:"d M Y" }}</td>
+                            <td style="padding: 1rem;">{{ donation.user.first_name }}</td>
+                            <td style="padding: 1rem;">{{ donation.campaign.name }}</td>
+                            <td style="padding: 1rem; font-weight: 700; color: #2ecc71;">₹{{ donation.amount }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--gray);">No donations found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .badge {
+        display: inline-block;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        background: #e0e7ff;
+        color: var(--primary);
+    }
+</style>
+{% endblock %}

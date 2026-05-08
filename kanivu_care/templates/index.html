@@ -190,6 +190,12 @@
                         class="nav-link text-gray-700 hover:text-blue-500">Dashboard</a>
                     {% endif %}
 
+                    {% if request.user.is_superuser %}
+                    <a href="{% url 'officials:add_official' %}" class="nav-link text-gray-700 hover:text-blue-500">Add Official</a>
+                    {% endif %}
+                    {% if request.user.userprofile and request.user.userprofile.role == "office_staff" or request.user.userprofile.role == "principal" or request.user.userprofile.role == "chairman" %}
+                    <a href="{% url 'officials:dashboard' %}" class="nav-link text-gray-700 hover:text-blue-500">Official Panel</a>
+                    {% endif %}
                     <div class="ml-4">
                         {% if request.user.is_authenticated %}
                         <a href="{% url 'users:profile' %}">
@@ -231,6 +237,14 @@
                         class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">Dashboard</a>
                     {% endif %}
 
+                    {% if request.user.is_superuser %}
+                    <a href="{% url 'officials:add_official' %}"
+                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">Add Official</a>
+                    {% endif %}
+                    {% if request.user.userprofile and request.user.userprofile.role == "office_staff" or request.user.userprofile.role == "principal" or request.user.userprofile.role == "chairman" %}
+                    <a href="{% url 'officials:dashboard' %}"
+                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">Official Panel</a>
+                    {% endif %}
                     <div class="pt-4 border-t border-gray-200">
                         {% if request.user.is_authenticated %}
                         <a href="{% url 'users:profile' %}"

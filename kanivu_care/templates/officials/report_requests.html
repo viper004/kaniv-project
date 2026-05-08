@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="hero" style="padding: 3rem 2rem;">
+    <div class="container">
+        <h1>Report Requests</h1>
+        <p>Request detailed activity and financial statements from the team</p>
+    </div>
+</div>
+
+<div class="container" style="margin-top: -3rem;">
+    <div class="content-grid">
+        <!-- New Request -->
+        <div class="card">
+            <h2 class="card-title">New Request</h2>
+            <form method="post" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                {% csrf_token %}
+                {% for field in form %}
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label style="font-weight: 600; font-size: 0.9rem; color: var(--gray);">{{ field.label }}</label>
+                    {{ field }}
+                </div>
+                {% endfor %}
+                <button type="submit" class="btn-login" style="border: none; width: 100%; cursor: pointer;">
+                    Send Request
+                </button>
+            </form>
+        </div>
+
+        <!-- History -->
+        <div class="card">
+            <h2 class="card-title">Request History</h2>
+            <div class="activity-list">
+                {% for req in requests %}
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="font-weight: 600; color: var(--dark);">{{ req.title }}</div>
+                            <span class="badge {% if req.is_completed %}badge-success{% else %}badge-warning{% endif %}">
+                                {% if req.is_completed %}Completed{% else %}Pending{% endif %}
+                            </span>
+                        </div>
+                        <div style="font-size: 0.85rem; color: var(--gray);">To: {{ req.requested_to_role }}</div>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem; color: #555;">{{ req.description }}</p>
+                        {% if req.is_completed and req.report_file %}
+                        <div style="margin-top: 0.8rem;">
+                            <a href="{{ req.report_file.url }}" class="btn-login" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;" target="_blank">
+                                <i class="fas fa-download"></i> Download Report
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <p style="color: var(--gray); text-align: center; padding: 2rem;">No requests sent yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    input, textarea, select {
+        padding: 0.8rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 1rem;
+    }
+    .badge {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .badge-success { background: #e1f3f0; color: #0d9488; }
+    .badge-warning { background: #fef3c7; color: #d97706; }
+</style>
+{% endblock %}

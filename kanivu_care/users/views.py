@@ -265,10 +265,17 @@ def Login(req):
                     "redirect_url": "/users/volunteer-status/"
                 })
 
+            redirect_url = "/"
+            if user.userprofile.role in ["coordinator", "convenier"]:
+                redirect_url = "/dashboard/"
+            elif user.userprofile.role in ["office_staff", "principal", "chairman"]:
+                redirect_url = "/officials/dashboard/"
+            
             return JsonResponse({
                 "status": "success",
                 "title":"Login successful",
-                "message":"Redirecting to your dashboard"
+                "message":"Redirecting to your dashboard",
+                "redirect_url": redirect_url
             })
         else:
             return JsonResponse({

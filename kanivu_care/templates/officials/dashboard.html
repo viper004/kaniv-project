@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="hero">
+    <div class="container">
+        <h1>Official Monitoring Dashboard</h1>
+        <p>System-wide oversight, activities, and financial metrics</p>
+    </div>
+</div>
+
+<div class="container" style="margin-top: -2rem;">
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card" onclick="openModal('membersModal')" style="cursor: pointer;">
+            <div class="stat-icon text-blue"><i class="fas fa-users"></i></div>
+            <div class="stat-label">Total Members</div>
+            <div class="stat-value">{{ total_members }}</div>
+            <div style="font-size: 0.7rem; color: var(--primary); margin-top: 0.5rem;">Click to view list</div>
+        </div>
+        <div class="stat-card" onclick="openModal('volunteersModal')" style="cursor: pointer;">
+            <div class="stat-icon text-green"><i class="fas fa-user-friends"></i></div>
+            <div class="stat-label">Total Volunteers</div>
+            <div class="stat-value">{{ total_volunteers }}</div>
+            <div style="font-size: 0.7rem; color: #2ecc71; margin-top: 0.5rem;">Click to view list</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon text-orange"><i class="fas fa-bullhorn"></i></div>
+            <div class="stat-label">Active Campaigns</div>
+            <div class="stat-value">{{ active_campaigns }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon text-purple"><i class="fas fa-hand-holding-usd"></i></div>
+            <div class="stat-label">Total Funds</div>
+            <div class="stat-value">₹{{ total_donations }}</div>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <!-- Recent Activities -->
+        <div class="card">
+            <h2 class="card-title">Recent Activities</h2>
+            <div class="activity-list">
+                {% for activity in recent_activities %}
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: 600; color: var(--dark);">{{ activity.title }}</div>
+                        <div style="font-size: 0.85rem; color: var(--gray);">{{ activity.announced_date|date:"F d, Y" }}</div>
+                    </div>
+                </div>
+                {% empty %}
+                <p style="color: var(--gray); text-align: center; padding: 2rem;">No recent activities found.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Supervisory Controls -->
+        <div class="card">
+            <h2 class="card-title">Supervisory Controls</h2>
+            <div class="controls-list">
+                <a href="{% url 'officials:financial_oversight' %}" class="control-link">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="font-size: 1.5rem; color: var(--primary);"><i class="fas fa-money-bill-wave"></i></div>
+                        <div>
+                            <div style="font-weight: 600;">Financial Oversight</div>
+                            <div style="font-size: 0.8rem; color: var(--gray);">View collections and donations</div>
+                        </div>
+                    </div>
+                </a>
+                <a href="{% url 'officials:report_requests' %}" class="control-link">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="font-size: 1.5rem; color: #2ecc71;"><i class="fas fa-file-invoice"></i></div>
+                        <div>
+                            <div style="font-weight: 600;">Report Requests</div>
+                            <div style="font-size: 0.8rem; color: var(--gray);">Request data from staff</div>
+                        </div>
+                    </div>
+                </a>
+                <a href="{% url 'officials:fund_requests' %}" class="control-link">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="font-size: 1.5rem; color: #9b59b6;"><i class="fas fa-check-circle"></i></div>
+                        <div>
+                            <div style="font-weight: 600;">Approvals</div>
+                            <div style="font-size: 0.8rem; color: var(--gray);">Review fund/activity requests</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Members Modal -->
+<div id="membersModal" class="modal-overlay" onclick="closeModal('membersModal')">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="modal-close" onclick="closeModal('membersModal')">&times;</span>
+        <h2 class="card-title">Registered Members</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Department</th>
+                    <th>Joined</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in members %}
+                <tr>
+                    <td style="font-weight: 600;">
+                        {% if member.user.get_full_name %}{{ member.user.get_full_name }}{% else %}{{ member.user.username }}{% endif %}
+                    </td>
+                    <td>{{ member.user.email|default:"No Email" }}</td>
+                    <td>{{ member.user.userprofile.phone_number|default:"-" }}</td>
+                    <td>{{ member.get_department_display|default:"Not Set" }}</td>
+                    <td>{{ member.user.date_joined|date:"d M Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" style="text-align: center; padding: 2rem;">No members found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Volunteers Modal -->
+<div id="volunteersModal" class="modal-overlay" onclick="closeModal('volunteersModal')">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="modal-close" onclick="closeModal('volunteersModal')">&times;</span>
+        <h2 class="card-title">Active Volunteers</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Blood Group</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for volunteer in volunteers %}
+                <tr>
+                    <td style="font-weight: 600;">{{ volunteer.name }}</td>
+                    <td>{{ volunteer.email }}</td>
+                    <td>{{ volunteer.phone }}</td>
+                    <td>{{ volunteer.blood_group }}</td>
+                    <td>
+                        {% if volunteer.is_approved %}
+                        <span style="color: #2ecc71; font-weight: 600;">Approved</span>
+                        {% else %}
+                        <span style="color: #e67e22; font-weight: 600;">Pending</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" style="text-align: center; padding: 2rem;">No volunteers found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function openModal(id) {
+    document.getElementById(id).style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+</script>
+{% endblock %}
