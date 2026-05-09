@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .faq-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+    .card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        padding: 30px;
+        margin-bottom: 30px;
+        border: 1px solid rgba(255,255,255,0.3);
+        backdrop-filter: blur(10px);
+    }
+    .form-group { margin-bottom: 20px; }
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        margin-top: 8px;
+    }
+    .btn-primary {
+        background: linear-gradient(45deg, #6c5ce7, #a29bfe);
+        border: none;
+        padding: 12px 25px;
+        border-radius: 10px;
+        color: white;
+        cursor: pointer;
+        font-weight: 600;
+        transition: transform 0.3s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); }
+    .faq-item {
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    .faq-content h4 { color: #6c5ce7; margin-bottom: 10px; }
+    .delete-btn {
+        color: #ff7675;
+        cursor: pointer;
+        font-size: 1.2rem;
+    }
+</style>
+
+<div class="faq-container">
+    <div class="card">
+        <h2>Manage ChatBot FAQs</h2>
+        <p>Add questions and answers that will appear in the chatbot for all users.</p>
+        <hr>
+        <form id="faqForm" style="margin-top: 20px;">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Question</label>
+                <input type="text" name="question" class="form-control" placeholder="Enter question..." required>
+            </div>
+            <div class="form-group">
+                <label>Answer</label>
+                <textarea name="answer" class="form-control" rows="4" placeholder="Enter answer..." required></textarea>
+            </div>
+            <button type="submit" class="btn-primary">Add FAQ</button>
+        </form>
+    </div>
+
+    <div id="faqList">
+        {% for faq in faqs %}
+        <div class="faq-item" id="faq-{{ faq.id }}">
+            <div class="faq-content">
+                <h4>{{ faq.question }}</h4>
+                <p>{{ faq.answer }}</p>
+            </div>
+            <div class="delete-btn" onclick="deleteFaq({{ faq.id }})">
+                <i class="fas fa-trash"></i>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.getElementById('faqForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        
+        fetch("{% url 'coordinator:manage_faqs' %}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                Swal.fire('Success', data.message, 'success').then(() => location.reload());
+            } else {
+                Swal.fire('Error', data.message, 'error');
+            }
+        });
+    });
+
+    function deleteFaq(id) {
+        if (confirm('Are you sure you want to delete this FAQ?')) {
+            const formData = new FormData();
+            formData.append('faq_id', id);
+            formData.append('action', 'delete');
+            
+            fetch("{% url 'coordinator:manage_faqs' %}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('faq-' + id).remove();
+                }
+            });
+        }
+    }
+</script>
+{% endblock %}

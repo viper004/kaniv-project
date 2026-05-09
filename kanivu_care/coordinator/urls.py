@@ -13,4 +13,6 @@ urlpatterns=[
     path("manage-events/", views.manage_events, name="manage_events"),
     path("approve-event/<int:event_id>/", views.approve_event, name="approve_event"),
     path("reject-event/<int:event_id>/", views.reject_event, name="reject_event"),
+    path("faqs/", views.manage_faqs, name="manage_faqs"),
+    path("api/get-faqs/", views.get_faqs, name="get_faqs"),
 ]

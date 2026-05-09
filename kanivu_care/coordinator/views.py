@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
 from coordinator.forms import coordinatorMemberRequestForm, EventForm
-from coordinator.models import Event
+from coordinator.models import Event, FAQ
 from members.models import memberRegistration
 
 from convenier.models import pendingMemberAddRequest
@@ -228,3 +228,29 @@ def reject_event(req, event_id):
     
     event.save()
     return JsonResponse({"status": "success", "message": "Event rejected to Convener"})
+
+@login_required(login_url="users:login")
+def manage_faqs(req):
+    if not req.user.userprofile.role == "coordinator":
+        return HttpResponseRedirect("/")
+    
+    if req.method == "POST":
+        question = req.POST.get('question')
+        answer = req.POST.get('answer')
+        faq_id = req.POST.get('faq_id')
+
+        if req.POST.get('action') == 'delete':
+            FAQ.objects.filter(id=faq_id).delete()
+            return JsonResponse({"status": "success", "message": "FAQ deleted"})
+
+        if question and answer:
+            FAQ.objects.create(question=question, answer=answer)
+            return JsonResponse({"status": "success", "message": "FAQ added successfully"})
+        return JsonResponse({"status": "error", "message": "Missing fields"})
+    
+    faqs = FAQ.objects.all().order_by('-created_at')
+    return render(req, "coordinator/manage_faqs.html", {"faqs": faqs})
+
+def get_faqs(req):
+    faqs = list(FAQ.objects.all().values('id', 'question', 'answer'))
+    return JsonResponse(faqs, safe=False)

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 {% load static %}
 
@@ -623,7 +623,7 @@
                 </div>
             </div>
             <div class="border-t border-gray-700 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-400 mb-4 md:mb-0">© 2023 Helping Hands Charity. All rights reserved.</p>
+                <p class="text-gray-400 mb-4 md:mb-0">Â© 2023 Helping Hands Charity. All rights reserved.</p>
                 <div class="flex space-x-6">
                     <a href="#" class="text-gray-400 hover:text-white transition duration-300">Privacy Policy</a>
                     <a href="#" class="text-gray-400 hover:text-white transition duration-300">Terms of Service</a>
@@ -799,7 +799,7 @@
         }
 
         function closeProfileModal() {
-            document.getElementById('profileModal').classList.add('hidden');
+            document.getElementById('profileModal').classList.add('chat-hidden');
         }
 
         function openSosModal() {
@@ -814,10 +814,10 @@
             const sosModal = document.getElementById('sosModal');
             const sosFormMessage = document.getElementById('sosFormMessage');
             if (sosModal) {
-                sosModal.classList.add('hidden');
+                sosModal.classList.add('chat-hidden');
             }
             if (sosFormMessage) {
-                sosFormMessage.classList.add('hidden');
+                sosFormMessage.classList.add('chat-hidden');
                 sosFormMessage.textContent = '';
             }
         }
@@ -834,7 +834,7 @@
         function showSosList() {
             const sosFormMessage = document.getElementById('sosFormMessage');
             if (sosFormMessage) {
-                sosFormMessage.classList.add('hidden');
+                sosFormMessage.classList.add('chat-hidden');
                 sosFormMessage.textContent = '';
             }
             showSosSection('sosListView');
@@ -980,7 +980,7 @@
 
             if (mobileMenuButton && mobileMenu && menuIcon) {
                 mobileMenuButton.addEventListener('click', function () {
-                    const isHidden = mobileMenu.classList.contains('hidden');
+                    const isHidden = mobileMenu.classList.contains('chat-hidden');
 
                     if (isHidden) {
                         // Open menu
@@ -990,7 +990,7 @@
                         document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
                     } else {
                         // Close menu
-                        mobileMenu.classList.add('hidden');
+                        mobileMenu.classList.add('chat-hidden');
                         menuIcon.classList.remove('fa-times');
                         menuIcon.classList.add('fa-bars');
                         document.body.style.overflow = ''; // Restore scrolling
@@ -1002,8 +1002,8 @@
                     const isClickInsideMenu = mobileMenu.contains(event.target);
                     const isClickOnButton = mobileMenuButton.contains(event.target);
 
-                    if (!isClickInsideMenu && !isClickOnButton && !mobileMenu.classList.contains('hidden')) {
-                        mobileMenu.classList.add('hidden');
+                    if (!isClickInsideMenu && !isClickOnButton && !mobileMenu.classList.contains('chat-hidden')) {
+                        mobileMenu.classList.add('chat-hidden');
                         menuIcon.classList.remove('fa-times');
                         menuIcon.classList.add('fa-bars');
                         document.body.style.overflow = ''; // Restore scrolling
@@ -1066,6 +1066,144 @@
             }
         });
     </script>
-</body>
 
+    </body>
+
+    {% if request.user.is_authenticated %}
+    <!-- Chatbot UI - Prefix 'kj-' to avoid conflicts -->
+    <div id="kj-chatbot-container" style="position: fixed !important; bottom: 100px !important; right: 24px !important; z-index: 2147483647 !important;">
+        <button id="kj-chatbot-toggle" style="background-color: #2563eb !important; color: white !important; width: 56px !important; height: 56px !important; border-radius: 50% !important; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; border: none !important; transition: transform 0.2s !important;">
+            <i class="fas fa-comment-dots" style="font-size: 24px !important;"></i>
+        </button>
+        
+        <div id="kj-chatbot-window" style="display: none; position: absolute; bottom: 80px; right: 0; width: 320px; background-color: white; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); overflow: hidden; border: 1px solid #f3f4f6; flex-direction: column;">
+            <div style="background-color: #2563eb; padding: 16px; color: white; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-robot"></i>
+                    <span style="font-weight: bold;">Kanivu Helper</span>
+                </div>
+                <button id="kj-chatbot-close" style="background: none; border: none; color: white; cursor: pointer; font-size: 20px;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div id="kj-chat-messages" style="padding: 16px; height: 384px; overflow-y: auto; background-color: #f9fafb; display: flex; flex-direction: column; gap: 16px;">
+                <div style="background-color: #dbeafe; padding: 12px; border-radius: 8px; font-size: 14px; color: #1e3a8a; align-self: flex-start; max-width: 85%;">
+                    Hi! How can I help you today? Choose a question below.
+                </div>
+                <div id="kj-faq-options" style="display: flex; flex-direction: column; gap: 8px;">
+                    <!-- FAQs will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .kj-faq-bubble {
+            background: white !important;
+            border: 1px solid #3b82f6 !important;
+            color: #3b82f6 !important;
+            padding: 8px 12px !important;
+            border-radius: 15px !important;
+            font-size: 0.85rem !important;
+            cursor: pointer !important;
+            transition: all 0.2s !important;
+            display: block !important;
+            text-align: left !important;
+            width: 100% !important;
+            margin-bottom: 4px !important;
+        }
+        .kj-faq-bubble:hover {
+            background: #3b82f6 !important;
+            color: white !important;
+        }
+        .kj-bot-msg {
+            background: #e5e7eb !important;
+            color: #1f2937 !important;
+            padding: 10px !important;
+            border-radius: 12px !important;
+            font-size: 0.9rem !important;
+            max-width: 85% !important;
+            align-self: flex-start !important;
+        }
+        .kj-user-msg {
+            background: #3b82f6 !important;
+            color: white !important;
+            padding: 10px !important;
+            border-radius: 12px !important;
+            font-size: 0.9rem !important;
+            align-self: flex-end !important;
+            margin-left: auto !important;
+            max-width: 85% !important;
+        }
+    </style>
+
+    <script>
+        (function() {
+            document.addEventListener('DOMContentLoaded', function() {
+                const toggle = document.getElementById('kj-chatbot-toggle');
+                const windowDiv = document.getElementById('kj-chatbot-window');
+                const close = document.getElementById('kj-chatbot-close');
+                const faqContainer = document.getElementById('kj-faq-options');
+                const msgContainer = document.getElementById('kj-chat-messages');
+
+                if (toggle && windowDiv) {
+                    toggle.onclick = function() {
+                        if (windowDiv.style.display === 'none') {
+                            windowDiv.style.display = 'flex';
+                            loadFaqs();
+                        } else {
+                            windowDiv.style.display = 'none';
+                        }
+                    };
+                }
+
+                if (close) {
+                    close.onclick = function() {
+                        windowDiv.style.display = 'none';
+                    };
+                }
+
+                function loadFaqs() {
+                    fetch("{% url 'coordinator:get_faqs' %}")
+                        .then(res => res.json())
+                        .then(data => {
+                            faqContainer.innerHTML = '';
+                            if (data.length === 0) {
+                                faqContainer.innerHTML = '<p style="font-size: 12px; color: #6b7280; text-align: center;">No FAQs available.</p>';
+                            }
+                            data.forEach(faq => {
+                                const btn = document.createElement('button');
+                                btn.className = 'kj-faq-bubble';
+                                btn.innerText = faq.question;
+                                btn.onclick = function() { showAnswer(faq.question, faq.answer); };
+                                faqContainer.appendChild(btn);
+                            });
+                        });
+                }
+
+                function showAnswer(q, a) {
+                    const uDiv = document.createElement('div');
+                    uDiv.className = 'kj-user-msg';
+                    uDiv.innerText = q;
+                    msgContainer.appendChild(uDiv);
+                    msgContainer.scrollTop = msgContainer.scrollHeight;
+                    
+                    setTimeout(() => {
+                        const bDiv = document.createElement('div');
+                        bDiv.className = 'kj-bot-msg';
+                        bDiv.innerText = a;
+                        msgContainer.appendChild(bDiv);
+                        msgContainer.scrollTop = msgContainer.scrollHeight;
+                    }, 500);
+                }
+            });
+        })();
+    </script>
+    {% endif %}
 </html>
+
+
+
+
+

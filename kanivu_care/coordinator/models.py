@@ -14,6 +14,7 @@ class coordinateRegistration(models.Model):
         ("bcom_ca_and_finance", "BCom CA and Finance"),
         ("bcom_co_operation", "BCom Co-operation"),
         ("ba_literature", "BA Literature"),
+        ("ba_communicative_english", "BA Literature"),
         ("ba_communicative_english", "BA Communicative English"),
         ("ba_journalism", "BA Journalism"),
         ("electronics", "Electronics"),
@@ -26,9 +27,6 @@ class coordinateRegistration(models.Model):
         ("Third Year", "Third Year"),
         ("Fourth Year", "Fourth Year"),
     )
-
-
-    
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     adno = models.CharField(max_length=255)
@@ -57,3 +55,11 @@ class Event(models.Model):
 
     def __str__(self):
         return self.title
+
+class FAQ(models.Model):
+    question = models.CharField(max_length=255)
+    answer = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.question
