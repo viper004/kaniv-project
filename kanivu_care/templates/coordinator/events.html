@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Events</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --primary-light: #a29bfe;
+            --secondary: #fd79a8;
+            --accent: #00cec9;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --transition: all 0.3s ease;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+            padding: 2rem;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .back-btn:hover {
+            color: var(--primary);
+            transform: translateX(-5px);
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e1e4e8;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: var(--transition);
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1);
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5b4bc4;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3);
+        }
+
+        .events-list {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .event-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            border-left: 5px solid var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: var(--transition);
+        }
+
+        .event-item:hover {
+            transform: scale(1.01);
+        }
+
+        .event-info h3 {
+            margin-bottom: 0.3rem;
+        }
+
+        .event-info p {
+            color: #636e72;
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-PENDING_CONVENER { background: #ffeaa7; color: #d63031; }
+        .status-PENDING_PRINCIPAL { background: #fab1a0; color: #e17055; }
+        .status-PENDING_CHAIRMAN { background: #81ecec; color: #00b894; }
+        .status-APPROVED { background: #55efc4; color: #00b894; }
+        .status-REJECTED_TO_CONVENER { background: #ff7675; color: #d63031; }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Events Panel</h1>
+            <a href="/dashboard/" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </header>
+
+        <div class="card">
+            <h2 style="margin-bottom: 1.5rem;">Propose New Event</h2>
+            <form id="eventForm">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Title</label>
+                    {{ form.title }}
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    {{ form.description }}
+                </div>
+                <div class="form-group">
+                    <label>Event Date</label>
+                    {{ form.event_date }}
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> Submit for Approval
+                </button>
+            </form>
+        </div>
+
+        <h2 style="margin-bottom: 1.5rem;">Your Proposed Events</h2>
+        <div class="events-list">
+            {% for event in events %}
+            <div class="event-item">
+                <div class="event-info">
+                    <h3>{{ event.title }}</h3>
+                    <p><i class="fas fa-calendar-alt"></i> {{ event.event_date }}</p>
+                    <p>{{ event.description|truncatewords:20 }}</p>
+                </div>
+                <div>
+                    <span class="status-badge status-{{ event.status }}">
+                        {{ event.get_status_display }}
+                    </span>
+                </div>
+            </div>
+            {% empty %}
+            <p>No events proposed yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('eventForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            fetch("{% url 'coordinator:events_coordinator' %}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: data.title,
+                        text: data.message
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: data.title,
+                        text: data.message
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

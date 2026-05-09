@@ -1,9 +1,10 @@
-from django.shortcuts import render
-from django.http.response import JsonResponse,HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404
+from django.http.response import JsonResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
-from coordinator.forms import coordinatorMemberRequestForm
+from coordinator.forms import coordinatorMemberRequestForm, EventForm
+from coordinator.models import Event
 from members.models import memberRegistration
 
 from convenier.models import pendingMemberAddRequest
@@ -105,11 +106,6 @@ def resubmitRequestMember(req):
             })
     return render(req,"coordinator/track_member.html")
 
-
-
-    
-
-
 @login_required(login_url="users:login")
 def trackMember(req):
     if not req.user.userprofile.role == "coordinator":
@@ -120,7 +116,6 @@ def trackMember(req):
         "pending_members":pendingMembers
     }
     return render(req,"coordinator/track_member.html",context=cntx)
-
 
 def deleteRecord(req,id):
     if not req.user.userprofile.role == "coordinator":
@@ -157,7 +152,79 @@ def deleteRecord(req,id):
             "title":"Unexpected Error Occured.",
             "message":str(e)
         })
-    
 
+@login_required(login_url="users:login")
+def events_coordinator(req):
+    if not req.user.userprofile.role == "coordinator":
+        return HttpResponseRedirect("/")
     
+    if req.method == "POST":
+        form = EventForm(req.POST)
+        if form.is_valid():
+            event = form.save(commit=False)
+            event.applied_by = req.user
+            event.status = 'PENDING_CONVENER'
+            event.save()
+            return JsonResponse({
+                "status": "success",
+                "title": "Event submitted",
+                "message": "Your event has been submitted for approval."
+            })
+        else:
+            errors = form_errors(form)
+            return JsonResponse({
+                "status": "error",
+                "title": "Submission failed",
+                "message": errors
+            })
+            
+    events = Event.objects.filter(applied_by=req.user).order_by('-applied_on')
+    return render(req, "coordinator/events.html", {"form": EventForm(), "events": events})
 
+@login_required(login_url="users:login")
+def manage_events(req):
+    role = req.user.userprofile.role
+    if role not in ["convenier", "principal", "chairman"]:
+        return HttpResponseRedirect("/")
+    
+    if role == "convenier":
+        events = Event.objects.filter(status__in=['PENDING_CONVENER', 'REJECTED_TO_CONVENER']).order_by('-applied_on')
+    elif role == "principal":
+        events = Event.objects.filter(status='PENDING_PRINCIPAL').order_by('-applied_on')
+    elif role == "chairman":
+        events = Event.objects.filter(status='PENDING_CHAIRMAN').order_by('-applied_on')
+    
+    return render(req, "coordinator/manage_events.html", {"events": events, "role": role})
+
+@login_required(login_url="users:login")
+def approve_event(req, event_id):
+    role = req.user.userprofile.role
+    event = get_object_or_404(Event, id=event_id)
+    
+    if role == "convenier" and event.status in ['PENDING_CONVENER', 'REJECTED_TO_CONVENER']:
+        event.status = 'PENDING_PRINCIPAL'
+    elif role == "principal" and event.status == 'PENDING_PRINCIPAL':
+        event.status = 'PENDING_CHAIRMAN'
+    elif role == "chairman" and event.status == 'PENDING_CHAIRMAN':
+        event.status = 'APPROVED'
+    else:
+        return JsonResponse({"status": "error", "message": "Unauthorized or invalid state"})
+    
+    event.save()
+    return JsonResponse({"status": "success", "message": "Event approved successfully"})
+
+@login_required(login_url="users:login")
+def reject_event(req, event_id):
+    role = req.user.userprofile.role
+    event = get_object_or_404(Event, id=event_id)
+    
+    if role in ["principal", "chairman"]:
+        event.status = 'REJECTED_TO_CONVENER'
+    elif role == "convenier":
+        event.status = 'PENDING_CONVENER' # Or some other rejection status
+        # Instruction says: "when principal or chairman rejects, show it in conviener"
+        # So Principal/Chairman rejection goes to Convener.
+        # If Convener rejects... user didn't specify.
+    
+    event.save()
+    return JsonResponse({"status": "success", "message": "Event rejected to Convener"})

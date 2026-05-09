@@ -9,5 +9,8 @@ urlpatterns=[
     path("request/track/member/",views.trackMember,name="track_member"),
     path("delete/record/member/<int:id>/",views.deleteRecord,name="delete_record"),
     path("change_duty/",views.trackMember,name="change_duty"),
-
+    path("events/", views.events_coordinator, name="events_coordinator"),
+    path("manage-events/", views.manage_events, name="manage_events"),
+    path("approve-event/<int:event_id>/", views.approve_event, name="approve_event"),
+    path("reject-event/<int:event_id>/", views.reject_event, name="reject_event"),
 ]

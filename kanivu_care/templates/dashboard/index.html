@@ -220,7 +220,7 @@
     </header>
 
     <section id="items">
-        {% if not request.user.userprofile.role == "public_user" %}
+        {% if request.user.userprofile.role != "public_user" %}
             <div class="item" onclick="window.location.href='/dashboard/manage_members/'">
                 <div class="item-content">
                     <div class="item-icon">
@@ -277,7 +277,7 @@
                 </div>
             {% endif %}
 
-            {% if not request.user.userprofile.role == "member" %}
+            {% if request.user.userprofile.role != "member" %}
                 <div class="item" onclick="window.location.href='/dashboard/kit_receivers/'">
                     <div class="item-content">
                         <div class="item-icon">
@@ -325,7 +325,31 @@
                 </div>
             {% endif %}
 
-             {% if request.user.userprofile.role == "convenier" or request.user.userprofile.role == "coordinator" %}
+            {% if request.user.userprofile.role == "coordinator" %}
+            <div class="item" onclick="window.location.href='{% url 'coordinator:events_coordinator' %}'">
+                <div class="item-content">
+                    <div class="item-icon">
+                        <i class="fas fa-calendar-plus"></i>
+                    </div>
+                    <h3 class="item-title">EVENTS</h3>
+                    <p class="item-desc">Propose and track events for organization activities.</p>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if request.user.userprofile.role == "convenier" or request.user.userprofile.role == "principal" or request.user.userprofile.role == "chairman" %}
+            <div class="item" onclick="window.location.href='{% url 'coordinator:manage_events' %}'">
+                <div class="item-content">
+                    <div class="item-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h3 class="item-title">Event Approvals</h3>
+                    <p class="item-desc">Review and approve proposed events from coordinators.</p>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if request.user.userprofile.role == "convenier" or request.user.userprofile.role == "coordinator" %}
                 <div class="item" onclick="window.location.href='{% url "members:blood_donors" %}'">
                     <div class="item-content">
                         <div class="item-icon">

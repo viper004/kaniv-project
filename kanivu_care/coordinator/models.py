@@ -38,3 +38,22 @@ class coordinateRegistration(models.Model):
 
     def __str__(self):
         return self.user.username
+
+class Event(models.Model):
+    STATUS_CHOICES = [
+        ('PENDING_CONVENER', 'Pending Convener Approval'),
+        ('PENDING_PRINCIPAL', 'Pending Principal Approval'),
+        ('PENDING_CHAIRMAN', 'Pending Chairman Approval'),
+        ('APPROVED', 'Approved'),
+        ('REJECTED_TO_CONVENER', 'Rejected to Convener'),
+    ]
+
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    event_date = models.DateField()
+    applied_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    applied_on = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='PENDING_CONVENER')
+
+    def __str__(self):
+        return self.title
