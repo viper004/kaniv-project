@@ -188,11 +188,11 @@ def manage_events(req):
         return HttpResponseRedirect("/")
     
     if role == "convenier":
-        events = Event.objects.filter(status__in=['PENDING_CONVENER', 'REJECTED_TO_CONVENER']).order_by('-applied_on')
+        events = Event.objects.filter(status__in=['PENDING_CONVENER', 'REJECTED_TO_CONVENER']).select_related('rejected_by', 'rejected_by__userprofile', 'applied_by').order_by('-applied_on')
     elif role == "principal":
-        events = Event.objects.filter(status='PENDING_PRINCIPAL').order_by('-applied_on')
+        events = Event.objects.filter(status='PENDING_PRINCIPAL').select_related('applied_by').order_by('-applied_on')
     elif role == "chairman":
-        events = Event.objects.filter(status='PENDING_CHAIRMAN').order_by('-applied_on')
+        events = Event.objects.filter(status='PENDING_CHAIRMAN').select_related('applied_by').order_by('-applied_on')
     
     return render(req, "coordinator/manage_events.html", {"events": events, "role": role})
 
@@ -218,16 +218,21 @@ def reject_event(req, event_id):
     role = req.user.userprofile.role
     event = get_object_or_404(Event, id=event_id)
     
-    if role in ["principal", "chairman"]:
-        event.status = 'REJECTED_TO_CONVENER'
-    elif role == "convenier":
-        event.status = 'PENDING_CONVENER' # Or some other rejection status
-        # Instruction says: "when principal or chairman rejects, show it in conviener"
-        # So Principal/Chairman rejection goes to Convener.
-        # If Convener rejects... user didn't specify.
+    if req.method == "POST":
+        reason = req.POST.get('reason', '')
+        if role in ["principal", "chairman"]:
+            event.status = 'REJECTED_TO_CONVENER'
+            event.rejection_reason = reason
+            event.rejected_by = req.user
+        elif role == "convenier":
+            event.status = 'PENDING_CONVENER' # Or some other rejection status
+            event.rejection_reason = reason
+            event.rejected_by = req.user
+        
+        event.save()
+        return JsonResponse({"status": "success", "message": "Event rejected with reason"})
     
-    event.save()
-    return JsonResponse({"status": "success", "message": "Event rejected to Convener"})
+    return JsonResponse({"status": "error", "message": "Invalid request method"})
 
 @login_required(login_url="users:login")
 def manage_faqs(req):

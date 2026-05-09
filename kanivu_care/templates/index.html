@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 {% load static %}
 
@@ -276,7 +276,7 @@
                             class="bg-white text-blue-500 hover:bg-gray-100 px-6 py-3 rounded-full font-bold transition duration-300">
                             Donate Now
                         </button>
-                        {% if request.user.is_authenticated and show_volunteer_cta %}
+                        {% if request.user.is_authenticated and show_volunteer_cta and request.user.userprofile.role not in "office_staff principal chairman" %}
                         {% if is_active_volunteer %}
                         <a href="{% url 'dashboard:volunteer_dashboard' %}"
                             class="border-2 border-white text-white hover:bg-white hover:text-blue-500 px-6 py-3 rounded-full font-bold transition duration-300 inline-block">
@@ -799,7 +799,7 @@
         }
 
         function closeProfileModal() {
-            document.getElementById('profileModal').classList.add('chat-hidden');
+            document.getElementById('profileModal').classList.add('hidden');
         }
 
         function openSosModal() {
@@ -814,10 +814,10 @@
             const sosModal = document.getElementById('sosModal');
             const sosFormMessage = document.getElementById('sosFormMessage');
             if (sosModal) {
-                sosModal.classList.add('chat-hidden');
+                sosModal.classList.add('hidden');
             }
             if (sosFormMessage) {
-                sosFormMessage.classList.add('chat-hidden');
+                sosFormMessage.classList.add('hidden');
                 sosFormMessage.textContent = '';
             }
         }

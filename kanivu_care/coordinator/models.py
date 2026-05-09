@@ -52,6 +52,8 @@ class Event(models.Model):
     applied_by = models.ForeignKey(User, on_delete=models.CASCADE)
     applied_on = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='PENDING_CONVENER')
+    rejection_reason = models.TextField(null=True, blank=True)
+    rejected_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rejected_events')
 
     def __str__(self):
         return self.title

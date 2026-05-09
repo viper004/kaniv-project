@@ -1,209 +1,357 @@
 {% extends "base.html" %}
+{% block extra_css %}
+<style>
+    .volunteer-container {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #38b6ff 0%, #68e0b8 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 1rem;
+    }
+
+    .volunteer-card {
+        background: #ffffff;
+        border-radius: 1.5rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 800px;
+        color: #1f2937;
+    }
+
+    .volunteer-title {
+        font-size: 2rem;
+        font-weight: 800;
+        text-align: center;
+        color: #111827;
+        margin-bottom: 0.5rem;
+    }
+
+    .volunteer-subtitle {
+        text-align: center;
+        color: #6b7280;
+        margin-bottom: 2rem;
+        font-size: 1rem;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+        .full-width {
+            grid-column: span 2;
+        }
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #4b5563;
+        font-size: 0.9rem;
+    }
+
+    .form-input {
+        width: 100%;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s;
+        outline: none;
+    }
+
+    .form-input:focus {
+        border-color: #38b6ff;
+        box-shadow: 0 0 0 3px rgba(56, 182, 255, 0.2);
+    }
+
+    .form-input[readonly] {
+        background-color: #f3f4f6;
+        cursor: not-allowed;
+    }
+
+    .student-toggle {
+        margin-top: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: #f9fafb;
+        border-radius: 0.75rem;
+    }
+
+    .toggle-checkbox {
+        width: 1.25rem;
+        height: 1.25rem;
+        cursor: pointer;
+    }
+
+    .toggle-label {
+        font-weight: 700;
+        color: #374151;
+        cursor: pointer;
+    }
+
+    .student-fields {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+        padding: 1.5rem;
+        border: 1px dashed #d1d5db;
+        border-radius: 1rem;
+    }
+
+    @media (min-width: 768px) {
+        .student-fields {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    .submit-container {
+        text-align: center;
+        margin-top: 2.5rem;
+    }
+
+    .btn-submit {
+        background: #3b82f6;
+        color: white;
+        padding: 1rem 2.5rem;
+        border-radius: 9999px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-submit:hover {
+        background: #2563eb;
+        transform: translateY(-2px);
+        box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.4);
+    }
+
+    /* Status Modal Styles */
+    .status-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .status-modal {
+        background: white;
+        padding: 2.5rem;
+        border-radius: 1rem;
+        max-width: 450px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .status-text {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+    }
+
+    .text-yellow { color: #d97706; }
+    .text-green { color: #059669; }
+    .text-red { color: #dc2626; }
+    .text-gray { color: #4b5563; }
+
+    .btn-ok {
+        background: #3b82f6;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .btn-ok:hover { background: #2563eb; }
+
+    .btn-reapply {
+        display: inline-block;
+        background: #f59e0b;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        text-decoration: none;
+        margin-bottom: 1rem;
+        transition: background 0.3s;
+    }
+
+    .btn-reapply:hover { background: #d97706; }
+</style>
+{% endblock %}
+
 {% block content %}
-
-<div class="min-h-screen bg-gradient-to-r from-blue-400 to-teal-400 flex items-center justify-center py-16">
-
-    <div class="bg-white shadow-xl rounded-xl p-10 w-full max-w-2xl">
-
-        <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">
-            Join Kanivu as a Volunteer
-        </h2>
-
-        <p class="text-center text-gray-500 mb-8">
-            Be part of our mission to help communities and make a real difference.
-        </p>
+<div class="volunteer-container">
+    <div class="volunteer-card">
+        <h2 class="volunteer-title">Join Kanivu as a Volunteer</h2>
+        <p class="volunteer-subtitle">Be part of our mission to help communities and make a real difference.</p>
 
         <form method="POST">
             {% csrf_token %}
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                <div>
-                    <label class="block font-semibold text-gray-600">Full Name</label>
-                    <input type="text" name="name" required value="{{ request.user.first_name }}" readonly
-                    class="w-full border rounded-lg px-4 py-2 mt-1 focus:ring-2 focus:ring-blue-400 outline-none">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" name="name" required value="{{ request.user.first_name }}" readonly class="form-input">
                 </div>
 
-                <div>
-                    <label class="block font-semibold text-gray-600">Email</label>
-                    <input type="email" name="email" required value="{{ request.user.email }}" readonly
-                    class="w-full border rounded-lg px-4 py-2 mt-1 focus:ring-2 focus:ring-blue-400 outline-none">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" required value="{{ request.user.email }}" readonly class="form-input">
                 </div>
 
-                <div>
-                    <label class="block font-semibold text-gray-600">Phone Number</label>
-                    <input type="text" name="phone" required value="{{ profile.phone_number }}" readonly
-                    class="w-full border rounded-lg px-4 py-2 mt-1 focus:ring-2 focus:ring-blue-400 outline-none">
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="text" name="phone" required value="{{ profile.phone_number }}" readonly class="form-input">
                 </div>
 
-                <div>
-                    <label class="block font-semibold text-gray-600">Date of Birth</label>
-                    <input type="date" name="date_of_birth" id="date_of_birth" required
-                    class="w-full border rounded-lg px-4 py-2 mt-1 focus:ring-2 focus:ring-blue-400 outline-none">
+                <div class="form-group">
+                    <label class="form-label">Date of Birth</label>
+                    <input type="date" name="date_of_birth" id="date_of_birth" required class="form-input">
                 </div>
 
-                <div>
-                    <label class="block font-semibold text-gray-600">Age</label>
-                    <input type="number" name="age" id="age" required value="{{age}}" readonly placeholder="Auto-calculated"
-                    class="w-full border rounded-lg px-4 py-2 mt-1 focus:ring-2 focus:ring-blue-400 outline-none">
+                <div class="form-group">
+                    <label class="form-label">Age</label>
+                    <input type="number" name="age" id="age" required value="{{age}}" readonly placeholder="Auto-calculated" class="form-input">
                 </div>
 
-                <div>
-                    <label class="block font-semibold text-gray-600">Blood Group</label>
-                    <input type="text" name="blood_group" required value="{{ profile.blood }}" readonly
-                    class="w-full border rounded-lg px-4 py-2 mt-1 focus:ring-2 focus:ring-blue-400 outline-none">
+                <div class="form-group">
+                    <label class="form-label">Blood Group</label>
+                    <input type="text" name="blood_group_display" required value="{{ profile.blood }}" readonly class="form-input">
                     <input type="hidden" name="blood_group" value="{{ profile.blood }}">
                 </div>
 
-                <div class="md:col-span-2">
-                    <label class="block font-semibold text-gray-600">Address</label>
-                    <textarea name="address" rows="2"
-                    class="w-full border rounded-lg px-4 py-2 mt-1 focus:ring-2 focus:ring-blue-400 outline-none">{{ profile.address }}</textarea>
+                <div class="form-group full-width">
+                    <label class="form-label">Address</label>
+                    <textarea name="address" rows="2" class="form-input">{{ profile.address }}</textarea>
                 </div>
 
-                <div class="md:col-span-2">
-                    <label class="block font-semibold text-gray-600">
-                        Why are you interested in becoming a volunteer?
-                    </label>
-                    <textarea name="reason" rows="4"
-                    class="w-full border rounded-lg px-4 py-2 mt-1 focus:ring-2 focus:ring-blue-400 outline-none"></textarea>
+                <div class="form-group full-width">
+                    <label class="form-label">Why are you interested in becoming a volunteer?</label>
+                    <textarea name="reason" rows="4" class="form-input"></textarea>
                 </div>
-
             </div>
 
-            <!-- Student Checkbox -->
-
-            <div class="mt-6">
-                <label class="flex items-center space-x-2">
-                    <input type="checkbox" id="studentCheck"
-                    class="w-5 h-5 text-blue-500">
-                    <span class="font-semibold text-gray-700">
-                        Are you a student of CHMM College?
-                    </span>
-                </label>
+            <div class="student-toggle">
+                <input type="checkbox" id="studentCheck" class="toggle-checkbox">
+                <label for="studentCheck" class="toggle-label">Are you a student of CHMM College?</label>
             </div>
 
-            <!-- Student Fields -->
-
-            <div id="studentFields" class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 hidden">
-
-                <div>
-                    <label class="block font-semibold text-gray-600">Admission Number</label>
-                    <input type="text" name="admission_no"
-                    class="w-full border rounded-lg px-4 py-2 mt-1">
+            <div id="studentFields" class="student-fields hidden">
+                <div class="form-group">
+                    <label class="form-label">Admission Number</label>
+                    <input type="text" name="admission_no" class="form-input">
                 </div>
 
-                <div>
-                    <label class="block font-semibold text-gray-600">Period of Study</label>
-                    <input type="text" name="period"
-                    placeholder="2020-2023"
-                    class="w-full border rounded-lg px-4 py-2 mt-1">
+                <div class="form-group">
+                    <label class="form-label">Period of Study</label>
+                    <input type="text" name="period" placeholder="2020-2023" class="form-input">
                 </div>
 
-                <div>
-                    <label class="block font-semibold text-gray-600">Batch</label>
-                    <select name="batch"
-                    class="w-full border rounded-lg px-4 py-2 mt-1">
-
+                <div class="form-group">
+                    <label class="form-label">Batch</label>
+                    <select name="batch" class="form-input">
                         <option value="">Select</option>
                         <option>MCA</option>
                         <option>BCA</option>
                         <option>BSc CS</option>
                         <option>BCom</option>
-
+                        <option>BA</option>
+                        <option>BSW</option>
                     </select>
                 </div>
 
-                <div>
-                    <label class="block font-semibold text-gray-600">Current Year</label>
-                    <select name="year"
-                    class="w-full border rounded-lg px-4 py-2 mt-1">
-
+                <div class="form-group">
+                    <label class="form-label">Current Year</label>
+                    <select name="year" class="form-input">
                         <option value="">Select</option>
                         <option>1st Year</option>
                         <option>2nd Year</option>
                         <option>3rd Year</option>
                         <option>4th Year</option>
-
                     </select>
                 </div>
-
             </div>
 
-            <!-- Submit Button -->
-
-            <div class="text-center mt-8">
-                <button type="submit"
-                class="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full font-bold transition duration-300">
-                    Join as Volunteer
-                </button>
+            <div class="submit-container">
+                <button type="submit" class="btn-submit">Join as Volunteer</button>
             </div>
-
         </form>
-
     </div>
-
 </div>
 
-
-<!-- Already Applied Modal -->
-
-<div id="statusModal"
-class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-
-    <div class="bg-white px-8 py-6 rounded-lg shadow-lg text-center max-w-md">
-
+<!-- Status Modal -->
+<div id="statusModal" class="status-modal-overlay hidden">
+    <div class="status-modal">
         {% if status == "pending" %}
-            <p class="text-yellow-600 font-bold text-lg mb-4">
+            <p class="status-text text-yellow">
                 You already applied to join as Kanivu Volunteer. Please wait for the approval.
             </p>
-
         {% elif status == "approved" %}
-            <p class="text-green-600 font-bold text-lg mb-4">
+            <p class="status-text text-green">
                 You are already a Kanivu Volunteer.
             </p>
-
         {% elif status == "rejected" %}
-    <p class="text-red-600 font-bold text-lg mb-2">
-        Your application was rejected.
-    </p>
-
-    <p class="text-gray-600 mb-4">
-        Reason: {{ reason }}
-    </p>
-
-    <a href="{% url 'volunteer:join_volunteer' %}?reapply=true"
-class="inline-block bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2 rounded-lg font-semibold mb-4">
-    Re-Apply
-</a>
-{% endif %}
-        <button onclick="window.location.href='/'"
-        class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded">
-            OK
-        </button>
-
+            <p class="status-text text-red">Your application was rejected.</p>
+            <p class="text-gray" style="margin-bottom: 1.5rem;">Reason: {{ reason }}</p>
+            <a href="{% url 'volunteer:join_volunteer' %}?reapply=true" class="btn-reapply">Re-Apply</a>
+        {% endif %}
+        <br>
+        <button onclick="window.location.href='/'" class="btn-ok">OK</button>
     </div>
-
 </div>
 
 <script>
-
 document.addEventListener("DOMContentLoaded", function(){
-
-    {% if status %}
-        document.getElementById("statusModal").classList.remove("hidden");
+    {% if status == "pending" or status == "approved" or status == "rejected" %}
+        const modal = document.getElementById("statusModal");
+        if (modal) {
+            modal.classList.remove("hidden");
+        }
     {% endif %}
 
     const check = document.getElementById("studentCheck");
     const fields = document.getElementById("studentFields");
 
-    check.addEventListener("change", function(){
-
-        if(this.checked){
-            fields.classList.remove("hidden");
-        }else{
-            fields.classList.add("hidden");
-        }
+    if (check) {
+        check.addEventListener("change", function(){
+            if(this.checked){
+                fields.classList.remove("hidden");
+            }else{
+                fields.classList.add("hidden");
+            }
+        });
+    }
 
     const dobInput = document.getElementById("date_of_birth");
     const ageInput = document.getElementById("age");
@@ -228,9 +376,10 @@ document.addEventListener("DOMContentLoaded", function(){
         dobInput.addEventListener("change", (e) => {
             calculateAge(e.target.value);
         });
+        if (dobInput.value) {
+            calculateAge(dobInput.value);
+        }
     }
-
 });
 </script>
-
-{% endblock %}
+{% endblock %}

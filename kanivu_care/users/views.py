@@ -400,25 +400,52 @@ def UpdateProfile(req):
             profile_form = userProfileUpdateForm(req.POST,req.FILES, instance=profile)
 
             if user_form.is_valid() and profile_form.is_valid():
-                user_form.save()
-                profile_form.save()
+                user = user_form.save()
+                profile = profile_form.save(commit=False)
+                # Explicitly set important fields from POST data
+                profile.is_donor = req.POST.get("is_donor") == "on"
+                if "blood" in req.POST:
+                    profile.blood = req.POST.get("blood")
+                if "gender" in req.POST:
+                    profile.gender = req.POST.get("gender")
+                if "date_of_birth" in req.POST and req.POST.get("date_of_birth"):
+                    profile.date_of_birth = req.POST.get("date_of_birth")
+                if "age" in req.POST and req.POST.get("age"):
+                    profile.age = req.POST.get("age")
+                profile.save()
 
-                # Update member blood group if member
-                if member:
-                    member.blood_group = (req.POST.get("blood") or "").strip() or None
-                    member.save(update_fields=["blood_group"])
+                # Sync details to all related models if they exist
+                # 1. Sync to memberRegistration and Donor
+                member_rec = memberRegistration.objects.filter(user=user).first()
+                if member_rec:
+                    member_rec.blood_group = profile.blood
+                    member_rec.date_of_birth = profile.date_of_birth
+                    member_rec.age = profile.age
+                    member_rec.save()
+                    
+                    donor_obj, _ = Donor.objects.get_or_create(user=member_rec)
+                    donor_obj.is_a_donor = profile.is_donor
+                    donor_obj.save()
 
-                if volunteer and volunteer.is_student:
-                    volunteer.admission_no = (req.POST.get("admission_no") or "").strip() or None
-                    volunteer.batch = (req.POST.get("batch") or "").strip() or None
-                    volunteer.start_year = (req.POST.get("start_year") or "").strip()
-                    volunteer.end_year = (req.POST.get("end_year") or "").strip()
-                    volunteer.save(update_fields=["admission_no", "batch", "start_year", "end_year"])
-                
-
-                req.session.flush()
-
-                login(req,req.user)
+                # 2. Sync to Volunteer
+                volunteer_rec = Volunteer.objects.filter(user=user).first()
+                if volunteer_rec:
+                    volunteer_rec.blood_group = profile.blood
+                    volunteer_rec.date_of_birth = profile.date_of_birth
+                    volunteer_rec.age = profile.age
+                    
+                    # Update academic fields if they were provided in POST
+                    if volunteer_rec.is_student:
+                        if "admission_no" in req.POST:
+                            volunteer_rec.admission_no = req.POST.get("admission_no").strip() or None
+                        if "batch" in req.POST:
+                            volunteer_rec.batch = req.POST.get("batch").strip() or None
+                        if "start_year" in req.POST:
+                            volunteer_rec.start_year = req.POST.get("start_year").strip()
+                        if "end_year" in req.POST:
+                            volunteer_rec.end_year = req.POST.get("end_year").strip()
+                    
+                    volunteer_rec.save()
 
                 return JsonResponse({
                     "status": "success",
@@ -765,11 +792,18 @@ def forgotPassword(req):
 
 @login_required(login_url="/users/login/")
 def editAcademic(req):
-    if not (req.user.userprofile.role == "member" or req.user.userprofile.role == "coordinator"):
+    role = req.user.userprofile.role
+    if role not in ["member", "coordinator"]:
         return HttpResponseRedirect("/")
+    
     if (req.method=="POST"):
-        member,state=memberRegistration.objects.get_or_create(user=req.user)
-        form=MCUpdateForm(req.POST,instance=member)
+        if role == "member":
+            instance, _ = memberRegistration.objects.get_or_create(user=req.user)
+            form = MCUpdateForm(req.POST, instance=instance)
+        else: # coordinator
+            instance, _ = coordinateRegistration.objects.get_or_create(user=req.user)
+            form = CoordinatorAcademicUpdateForm(req.POST, instance=instance)
+            
         if form.is_valid():
             form.save()
             return JsonResponse({
@@ -785,7 +819,12 @@ def editAcademic(req):
                 "message":error
             })
     else:
-        form=MCUpdateForm(instance=req.user)
+        if role == "member":
+            instance, _ = memberRegistration.objects.get_or_create(user=req.user)
+            form = MCUpdateForm(instance=instance)
+        else: # coordinator
+            instance, _ = coordinateRegistration.objects.get_or_create(user=req.user)
+            form = CoordinatorAcademicUpdateForm(instance=instance)
 
     cntx={
         "form":form

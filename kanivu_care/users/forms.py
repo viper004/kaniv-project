@@ -213,3 +213,28 @@ class MCUpdateForm(forms.ModelForm):
     class Meta:
         model = memberRegistration
         fields = ("adno", "department", "start_year", "end_year")
+
+
+from coordinator.models import coordinateRegistration
+
+class CoordinatorAcademicUpdateForm(forms.ModelForm):
+    adno = forms.CharField(label="Admission Number", max_length=255, widget=forms.TextInput(attrs={
+        "id": "adno"
+    }))
+
+    department = forms.ChoiceField(label="Department", choices=coordinateRegistration.DEPARTMENT_CHOICES, widget=forms.Select(attrs={
+        "id": "department"
+    }))
+
+    batch = forms.CharField(label="Batch", max_length=10, widget=forms.TextInput(attrs={
+        "id": "batch",
+        "placeholder": "e.g., 2022-2025",
+    }))
+
+    current_year = forms.ChoiceField(label="Current Year", choices=coordinateRegistration.YEAR_CHOICES, widget=forms.Select(attrs={
+        "id": "current_year"
+    }))
+
+    class Meta:
+        model = coordinateRegistration
+        fields = ("adno", "department", "batch", "current_year")

@@ -76,6 +76,15 @@
                         <span><i class="fas fa-user"></i> Applied by: {{ event.applied_by.username }}</span>
                         <span><i class="fas fa-clock"></i> On: {{ event.applied_on|date:"M d, Y" }}</span>
                     </div>
+                    {% if event.rejection_reason %}
+                    <div style="margin-top: 1rem; padding: 0.8rem; background: #fff5f5; border-radius: 10px; border-left: 4px solid var(--danger);">
+                        <small style="color: var(--danger); font-weight: 700; display: block; margin-bottom: 3px;">
+                            REJECTED BY: {{ event.rejected_by.get_full_name|default:event.rejected_by.username }} 
+                            ({{ event.rejected_by.userprofile.get_role_display|default:event.rejected_by.userprofile.role|title }})
+                        </small>
+                        <p style="color: #c0392b; font-size: 0.9rem; margin: 0;">{{ event.rejection_reason }}</p>
+                    </div>
+                    {% endif %}
                 </div>
                 <div class="actions">
                     <button onclick="approveEvent({{ event.id }})" class="btn btn-approve">
@@ -117,20 +126,32 @@
 
         function rejectEvent(id) {
             Swal.fire({
-                title: 'Are you sure?',
-                text: "This event will be sent back to the Convener for review.",
+                title: 'Reject Event',
+                text: "Please provide a reason for rejecting this event:",
                 icon: 'warning',
+                input: 'textarea',
+                inputPlaceholder: 'Enter rejection reason here...',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, reject it!'
+                confirmButtonText: 'Reject',
+                preConfirm: (reason) => {
+                    if (!reason) {
+                        Swal.showValidationMessage('Rejection reason is required');
+                    }
+                    return reason;
+                }
             }).then((result) => {
                 if (result.isConfirmed) {
+                    const formData = new FormData();
+                    formData.append('reason', result.value);
+                    
                     fetch(`/coordinator/reject-event/${id}/`, {
                         method: 'POST',
                         headers: {
                             'X-CSRFToken': '{{ csrf_token }}'
-                        }
+                        },
+                        body: formData
                     })
                     .then(response => response.json())
                     .then(data => {

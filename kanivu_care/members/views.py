@@ -9,125 +9,107 @@ from django.shortcuts import render
 from .models import Donor
 
 
+import logging
+from datetime import date
+from django.shortcuts import render
+from users.models import UserProfile
+from members.models import Donor, memberRegistration
+from volunteer.models import Volunteer
+
+logger = logging.getLogger(__name__)
+
 def blood_donors(request):
-    from users.models import UserProfile
-    from coordinator.models import coordinateRegistration
-    from volunteer.models import Volunteer
-    from datetime import date
-    
-    donor_data = []
+    donor_dict = {}
 
     def calculate_age(dob):
         """Calculate age from date of birth"""
         if not dob:
             return None
         today = date.today()
-        return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+        try:
+            return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+        except Exception:
+            return None
 
-    # 1. Get member donors from Donor model
-    member_donors = (
-        Donor.objects
-        .filter(is_a_donor=True)
-        .select_related(
-            "user",
-            "user__user",
-            "user__user__userprofile"
-        )
+    def get_donor_entry(user):
+        if user.id not in donor_dict:
+            profile = getattr(user, 'userprofile', None)
+            donor_dict[user.id] = {
+                "name": user.get_full_name() or user.username,
+                "phone": profile.phone_number if profile else None,
+                "blood_type": profile.blood if profile else None,
+                "date_of_birth": profile.date_of_birth if profile else None,
+                "age": profile.age if profile else None,
+                "roles": set()
+            }
+        return donor_dict[user.id]
+
+    # 1. Process EVERY UserProfile marked as is_donor=True
+    # This includes Coordinators, Conveners, Office Staff, and Public Users
+    profiles = UserProfile.objects.filter(is_donor=True).select_related("user")
+    for p in profiles:
+        entry = get_donor_entry(p.user)
+        role_map = {
+            "coordinator": "Coordinator",
+            "convenier": "Convener",
+            "public_user": "User",
+            "office_staff": "Office Staff",
+            "principal": "Principal",
+            "chairman": "Chairman",
+            "member": "Member"
+        }
+        role_display = role_map.get(p.role, p.role.capitalize() if p.role else "User")
+        entry["roles"].add(role_display)
+
+    # 2. Process the Donor model (Member-specific donor records)
+    member_donors = Donor.objects.filter(is_a_donor=True).select_related(
+        "user", "user__user", "user__user__userprofile"
     )
-
-    for donor in member_donors:
-        member = donor.user
-        django_user = member.user
-        age = member.age if member.age else calculate_age(member.date_of_birth)
-
-        donor_data.append({
-            "name": django_user.get_full_name() if django_user.get_full_name() else django_user.username,
-            "phone": django_user.userprofile.phone_number,
-            "blood_type": member.blood_group,
-            "type": "Member",
-            "date_of_birth": member.date_of_birth,
-            "age": age,
-        })
-
-    # 2. Get coordinator donors from UserProfile
-    coordinator_donors = (
-        UserProfile.objects
-        .filter(role="coordinator", is_donor=True)
-        .select_related("user")
-    )
-
-    for user_profile in coordinator_donors:
-        age = user_profile.age if user_profile.age else calculate_age(user_profile.date_of_birth)
+    for d in member_donors:
+        member = d.user
+        if not member.user: continue
+        entry = get_donor_entry(member.user)
+        entry["roles"].add("Member")
         
-        donor_data.append({
-            "name": user_profile.user.get_full_name() if user_profile.user.get_full_name() else user_profile.user.username,
-            "phone": user_profile.phone_number,
-            "blood_type": user_profile.blood,
-            "type": "Coordinator",
-            "date_of_birth": user_profile.date_of_birth,
-            "age": age,
-        })
+        # Fill in missing data from member registration if UserProfile is incomplete
+        if not entry["blood_type"] or entry["blood_type"] == "":
+            entry["blood_type"] = member.blood_group
+        if not entry["date_of_birth"]:
+            entry["date_of_birth"] = member.date_of_birth
+        if not entry["age"]:
+            entry["age"] = member.age or calculate_age(member.date_of_birth)
 
-    # 3. Get convenier donors from UserProfile
-    convenier_donors = (
-        UserProfile.objects
-        .filter(role="convenier", is_donor=True)
-        .select_related("user")
-    )
-
-    for user_profile in convenier_donors:
-        age = user_profile.age if user_profile.age else calculate_age(user_profile.date_of_birth)
+    # 3. Process Approved Volunteers (considered donors if they have blood group set)
+    volunteers = Volunteer.objects.filter(
+        is_approved=True, 
+        declined=False
+    ).exclude(blood_group__isnull=True).exclude(blood_group="").select_related("user", "user__userprofile")
+    
+    for v in volunteers:
+        entry = get_donor_entry(v.user)
+        entry["roles"].add("Volunteer")
         
-        donor_data.append({
-            "name": user_profile.user.get_full_name() if user_profile.user.get_full_name() else user_profile.user.username,
-            "phone": user_profile.phone_number,
-            "blood_type": user_profile.blood,
-            "type": "Convenier",
-            "date_of_birth": user_profile.date_of_birth,
-            "age": age,
-        })
+        # Fill in missing data
+        if not entry["phone"]: entry["phone"] = v.phone
+        if not entry["blood_type"] or entry["blood_type"] == "":
+            entry["blood_type"] = v.blood_group
+        if not entry["date_of_birth"]:
+            entry["date_of_birth"] = v.date_of_birth
+        if not entry["age"]:
+            entry["age"] = v.age or calculate_age(v.date_of_birth)
 
-    # 4. Get volunteer donors (approved volunteers with blood_group set)
-    approved_volunteers = (
-        Volunteer.objects
-        .filter(is_approved=True, declined=False, blood_group__isnull=False)
-        .exclude(blood_group="")
-        .select_related("user", "user__userprofile")
-    )
+    # Finalize list
+    donor_list = []
+    for donor in donor_dict.values():
+        # Include even if blood type is missing for now (helps debug)
+        if not donor["blood_type"] or donor["blood_type"] == "":
+            donor["blood_type"] = "Not set"
+            
+        # Refine roles: If they have multiple specific roles, remove the generic "User" role
+        if len(donor["roles"]) > 1:
+            donor["roles"].discard("User")
+            
+        donor["type"] = ", ".join(sorted(list(donor["roles"])))
+        donor_list.append(donor)
 
-    for volunteer in approved_volunteers:
-        age = volunteer.age if volunteer.age else calculate_age(volunteer.date_of_birth)
-        
-        donor_data.append({
-            "name": volunteer.name if volunteer.name else volunteer.user.username,
-            "phone": volunteer.phone,
-            "blood_type": volunteer.blood_group,
-            "type": "Volunteer",
-            "date_of_birth": volunteer.date_of_birth,
-            "age": age,
-        })
-
-    # 5. Get public user donors from UserProfile
-    public_user_donors = (
-        UserProfile.objects
-        .filter(role="public_user", is_donor=True)
-        .select_related("user")
-    )
-
-    for user_profile in public_user_donors:
-        age = user_profile.age if user_profile.age else calculate_age(user_profile.date_of_birth)
-        
-        donor_data.append({
-            "name": user_profile.user.get_full_name() if user_profile.user.get_full_name() else user_profile.user.username,
-            "phone": user_profile.phone_number,
-            "blood_type": user_profile.blood,
-            "type": "User",
-            "date_of_birth": user_profile.date_of_birth,
-            "age": age,
-        })
-
-    context = {
-        "donors": donor_data
-    }
-
-    return render(request, "dashboard/blood_donors.html", context)
+    return render(request, "dashboard/blood_donors.html", {"donors": donor_list})
