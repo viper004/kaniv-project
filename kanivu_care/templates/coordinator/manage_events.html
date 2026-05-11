@@ -46,6 +46,7 @@
         .btn { padding: 0.6rem 1.2rem; border-radius: 10px; border: none; font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 5px; }
         .btn-approve { background: var(--success); color: white; }
         .btn-reject { background: var(--danger); color: white; }
+        .btn-reapply { background: var(--primary); color: white; }
         .btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
 
         .badge { padding: 0.3rem 0.8rem; border-radius: 10px; font-size: 0.75rem; font-weight: 700; }
@@ -87,12 +88,23 @@
                     {% endif %}
                 </div>
                 <div class="actions">
+                    {% if role == "convenier" and event.status == "REJECTED_TO_CONVENER" %}
+                    <button
+                        onclick="editAndReapplyEvent(this)"
+                        class="btn btn-reapply"
+                        data-id="{{ event.id }}"
+                        data-title="{{ event.title|escapejs }}"
+                        data-description="{{ event.description|escapejs }}"
+                        data-event-date="{{ event.event_date|date:'Y-m-d' }}"
+                    >
+                        <i class="fas fa-pen-to-square"></i> Edit &amp; Reapply
+                    </button>
+                    {% else %}
                     <button onclick="approveEvent({{ event.id }})" class="btn btn-approve">
                         <i class="fas fa-check"></i> Approve
                     </button>
-                    {% if role != 'convenier' %}
                     <button onclick="rejectEvent({{ event.id }})" class="btn btn-reject">
-                        <i class="fas fa-times"></i> Reject to Convener
+                        <i class="fas fa-times"></i> Reject
                     </button>
                     {% endif %}
                 </div>
@@ -162,6 +174,65 @@
                         }
                     });
                 }
+            });
+        }
+
+        function editAndReapplyEvent(button) {
+            const title = button.dataset.title || '';
+            const description = button.dataset.description || '';
+            const eventDate = button.dataset.eventDate || '';
+
+            Swal.fire({
+                title: 'Edit and Reapply',
+                html: `
+                    <input id="swal-event-title" class="swal2-input" placeholder="Event title" value="${title}">
+                    <textarea id="swal-event-description" class="swal2-textarea" placeholder="Event description">${description}</textarea>
+                    <input id="swal-event-date" type="date" class="swal2-input" value="${eventDate}">
+                `,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: 'Reapply',
+                preConfirm: () => {
+                    const updatedTitle = document.getElementById('swal-event-title').value.trim();
+                    const updatedDescription = document.getElementById('swal-event-description').value.trim();
+                    const updatedDate = document.getElementById('swal-event-date').value;
+
+                    if (!updatedTitle || !updatedDescription || !updatedDate) {
+                        Swal.showValidationMessage('All fields are required');
+                        return false;
+                    }
+
+                    return {
+                        title: updatedTitle,
+                        description: updatedDescription,
+                        event_date: updatedDate
+                    };
+                }
+            }).then((result) => {
+                if (!result.isConfirmed) {
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('title', result.value.title);
+                formData.append('description', result.value.description);
+                formData.append('event_date', result.value.event_date);
+
+                fetch(`/coordinator/reapply-event/${button.dataset.id}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        Swal.fire('Reapplied!', data.message, 'success').then(() => location.reload());
+                    } else {
+                        Swal.fire(data.title || 'Error', data.message, 'error');
+                    }
+                });
             });
         }
     </script>

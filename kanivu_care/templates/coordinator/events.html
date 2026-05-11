@@ -170,6 +170,7 @@
         .status-PENDING_CHAIRMAN { background: #81ecec; color: #00b894; }
         .status-APPROVED { background: #55efc4; color: #00b894; }
         .status-REJECTED_TO_CONVENER { background: #ff7675; color: #d63031; }
+        .status-REJECTED { background: #d63031; color: white; }
 
     </style>
 </head>
@@ -212,6 +213,20 @@
                     <h3>{{ event.title }}</h3>
                     <p><i class="fas fa-calendar-alt"></i> {{ event.event_date }}</p>
                     <p>{{ event.description|truncatewords:20 }}</p>
+                    {% if event.rejection_reason %}
+                    <div style="margin-top: 10px; padding: 10px; background: #fff5f5; border-radius: 8px; border-left: 3px solid #ff7675;">
+                        <p style="color: #d63031; font-weight: 600; margin-bottom: 4px;">
+                            <i class="fas fa-exclamation-circle"></i> Rejection Reason:
+                        </p>
+                        <p style="color: #2d3436; font-size: 0.85rem;">{{ event.rejection_reason }}</p>
+                        {% if event.rejected_by %}
+                        <p style="color: #636e72; font-size: 0.75rem; margin-top: 4px;">
+                            Rejected by: {{ event.rejected_by.get_full_name|default:event.rejected_by.username }} 
+                            ({{ event.rejected_by.userprofile.get_role_display }})
+                        </p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
                 </div>
                 <div>
                     <span class="status-badge status-{{ event.status }}">

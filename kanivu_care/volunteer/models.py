@@ -60,6 +60,7 @@ class Volunteer(models.Model):
     admission_no = models.CharField(max_length=50, blank=True, null=True)
     start_year = models.CharField(max_length=5, blank=True, null=True)
     end_year = models.CharField(max_length=5, blank=True, null=True)
+    year = models.CharField(max_length=20, blank=True, null=True)
     
 
     batch = models.CharField(
@@ -73,6 +74,12 @@ class Volunteer(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def period(self):
+        if self.start_year and self.end_year:
+            return f"{self.start_year}-{self.end_year}"
+        return self.start_year or ""
 
     def is_student_academic_period_over(self, on_date=None):
         if not self.is_student:

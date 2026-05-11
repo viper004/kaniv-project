@@ -107,20 +107,34 @@ def join_volunteer(request):
 
         is_student = True if request.POST.get("admission_no") else False
         
+        period = request.POST.get("period")
+        start_year = None
+        end_year = None
+        
+        if is_student and period:
+            if "-" in period:
+                years = period.split("-")
+                if len(years) == 2:
+                    start_year = years[0].strip()
+                    end_year = years[1].strip()
+            else:
+                start_year = period.strip()
+
         Volunteer.objects.create(
             user=request.user,
             name=request.POST.get("name"),
             email=request.POST.get("email"),
             phone=request.POST.get("phone"),
-            age=request.POST.get("age"),
-            date_of_birth=request.POST.get("date_of_birth"),
+            age=user_profile.age,
+            date_of_birth=user_profile.date_of_birth,
             blood_group=request.POST.get("blood_group"),
             address=request.POST.get("address"),
             reason=request.POST.get("reason"),
             admission_no=request.POST.get("admission_no") if is_student else None,
             batch=request.POST.get("batch") if is_student else None,
-            start_year=request.POST.get("start_year") if is_student else None,
-            end_year=request.POST.get("end_year") if is_student else None,
+            start_year=start_year,
+            end_year=end_year,
+            year=request.POST.get("year") if is_student else None,
             is_student=is_student
         )
 

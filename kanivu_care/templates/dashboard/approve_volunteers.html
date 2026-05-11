@@ -209,7 +209,7 @@
                         data-name="{{v.name}}" data-email="{{v.email}}" data-phone="{{v.phone}}" data-age="{{v.age}}"
                         data-blood="{{v.blood_group}}" data-address="{{v.address}}" data-reason="{{v.reason}}"
                         data-student="{{v.is_student}}" data-admission="{{v.admission_no}}" data-batch="{{v.batch}}"
-                        data-year="{{v.year}}" data-searchname="{{v.name|lower}}">
+                        data-year="{{v.year}}" data-period="{{v.period}}" data-searchname="{{v.name|lower}}">
                         <div class="card-name">{{ v.name }}</div>
                         <div class="card-info"><i class="fas fa-phone text-gray-400 mr-2"></i>{{ v.phone }}</div>
                         <div class="card-info"><i class="fas fa-envelope text-gray-400 mr-2"></i>{{ v.email }}</div>
@@ -280,6 +280,9 @@
                 <p id="yearDetails" style="display: none;">
                     <b>Year:</b> <span id="mYear"></span>
                 </p>
+                <p id="periodDetails" style="display: none;">
+                    <b>Period:</b> <span id="mPeriod"></span>
+                </p>
             </div>
 
             <div class="flex justify-end space-x-4">
@@ -339,12 +342,14 @@
             document.getElementById("mAdmission").innerText = card.dataset.admission
             document.getElementById("mBatch").innerText = card.dataset.batch
             document.getElementById("mYear").innerText = card.dataset.year
+            document.getElementById("mPeriod").innerText = card.dataset.period
 
             const isStudent = card.dataset.student === "True"
             document.getElementById("mStudent").innerText = isStudent ? "Yes" : "No"
             document.getElementById("studentDetails").style.display = isStudent ? "block" : "none"
             document.getElementById("batchDetails").style.display = isStudent ? "block" : "none"
             document.getElementById("yearDetails").style.display = isStudent ? "block" : "none"
+            document.getElementById("periodDetails").style.display = isStudent ? "block" : "none"
 
             document.getElementById("approveId").value = currentVolunteerId
             document.getElementById("rejectId").value = currentVolunteerId

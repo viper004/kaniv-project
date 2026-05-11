@@ -44,6 +44,7 @@ class Event(models.Model):
         ('PENDING_CHAIRMAN', 'Pending Chairman Approval'),
         ('APPROVED', 'Approved'),
         ('REJECTED_TO_CONVENER', 'Rejected to Convener'),
+        ('REJECTED', 'Rejected'),
     ]
 
     title = models.CharField(max_length=255)

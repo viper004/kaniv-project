@@ -201,7 +201,7 @@ def approve_event(req, event_id):
     role = req.user.userprofile.role
     event = get_object_or_404(Event, id=event_id)
     
-    if role == "convenier" and event.status in ['PENDING_CONVENER', 'REJECTED_TO_CONVENER']:
+    if role == "convenier" and event.status == 'PENDING_CONVENER':
         event.status = 'PENDING_PRINCIPAL'
     elif role == "principal" and event.status == 'PENDING_PRINCIPAL':
         event.status = 'PENDING_CHAIRMAN'
@@ -225,7 +225,7 @@ def reject_event(req, event_id):
             event.rejection_reason = reason
             event.rejected_by = req.user
         elif role == "convenier":
-            event.status = 'PENDING_CONVENER' # Or some other rejection status
+            event.status = 'REJECTED'
             event.rejection_reason = reason
             event.rejected_by = req.user
         
@@ -233,6 +233,40 @@ def reject_event(req, event_id):
         return JsonResponse({"status": "success", "message": "Event rejected with reason"})
     
     return JsonResponse({"status": "error", "message": "Invalid request method"})
+
+@login_required(login_url="users:login")
+def reapply_event(req, event_id):
+    role = req.user.userprofile.role
+    event = get_object_or_404(Event, id=event_id)
+
+    if role != "convenier":
+        return JsonResponse({"status": "error", "message": "Unauthorized"}, status=403)
+
+    if req.method != "POST":
+        return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
+
+    if event.status != "REJECTED_TO_CONVENER":
+        return JsonResponse({"status": "error", "message": "Only rejected events can be edited and reapplied."}, status=400)
+
+    form = EventForm(req.POST, instance=event)
+    if not form.is_valid():
+        return JsonResponse({
+            "status": "error",
+            "title": "Resubmission failed",
+            "message": form_errors(form),
+        }, status=400)
+
+    event = form.save(commit=False)
+    event.status = "PENDING_PRINCIPAL"
+    event.rejection_reason = ""
+    event.rejected_by = None
+    event.save()
+
+    return JsonResponse({
+        "status": "success",
+        "title": "Event reapplied",
+        "message": "The event was updated and sent back for principal approval.",
+    })
 
 @login_required(login_url="users:login")
 def manage_faqs(req):
