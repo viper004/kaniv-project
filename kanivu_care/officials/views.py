@@ -61,7 +61,8 @@ def dashboard(request):
     # System Monitoring: activities, members, campaigns
     total_members = memberRegistration.objects.count()
     total_volunteers = Volunteer.objects.count()
-    active_campaigns = Campaign.objects.filter(end_date__gte=timezone.now().date()).count()
+    active_campaigns = Campaign.objects.count()
+    campaigns = Campaign.objects.all().order_by('-created_on')
     recent_activities = AnnouncementModel.objects.order_by('-announced_date')[:10]
     
     # Financial Oversight summary
@@ -76,6 +77,8 @@ def dashboard(request):
         'total_members': total_members,
         'total_volunteers': total_volunteers,
         'active_campaigns': active_campaigns,
+        'campaigns': campaigns,
+        'today': timezone.now().date(),
         'recent_activities': recent_activities,
         'total_donations': total_donations,
         'total_collections': total_collections,

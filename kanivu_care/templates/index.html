@@ -185,11 +185,6 @@
                         <i class="fas fa-triangle-exclamation"></i>
                         SOS
                     </a>
-                    {% if request.user.is_authenticated and not request.user.userprofile.role == "public_user" %}
-                    <a href="{% url 'dashboard:dashboard' %}"
-                        class="nav-link text-gray-700 hover:text-blue-500">Dashboard</a>
-                    {% endif %}
-
                     {% if request.user.is_superuser %}
                     <a href="{% url 'officials:add_official' %}" class="nav-link text-gray-700 hover:text-blue-500">Add Official</a>
                     {% endif %}
@@ -232,11 +227,6 @@
                         <i class="fas fa-triangle-exclamation"></i>
                         SOS
                     </a>
-                    {% if not request.user.userprofile.role == "public_user" %}
-                    <a href="{% url 'dashboard:dashboard' %}"
-                        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">Dashboard</a>
-                    {% endif %}
-
                     {% if request.user.is_superuser %}
                     <a href="{% url 'officials:add_official' %}"
                         class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-500 hover:bg-gray-100">Add Official</a>

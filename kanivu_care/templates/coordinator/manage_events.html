@@ -61,7 +61,7 @@
                 <span class="badge role-badge">Acting as: {{ role|title }}</span>
                 <h1>Event Approvals</h1>
             </div>
-            <a href="/dashboard/" class="back-btn">
+            <a href="{% if role == 'office_staff' or role == 'principal' or role == 'chairman' %}{% url 'officials:dashboard' %}{% else %}/dashboard/{% endif %}" class="back-btn">
                 <i class="fas fa-arrow-left"></i> Back to Dashboard
             </a>
         </header>
@@ -99,13 +99,15 @@
                     >
                         <i class="fas fa-pen-to-square"></i> Edit &amp; Reapply
                     </button>
-                    {% else %}
+                    {% elif role == "convenier" or role == "principal" or role == "chairman" %}
                     <button onclick="approveEvent({{ event.id }})" class="btn btn-approve">
                         <i class="fas fa-check"></i> Approve
                     </button>
                     <button onclick="rejectEvent({{ event.id }})" class="btn btn-reject">
                         <i class="fas fa-times"></i> Reject
                     </button>
+                    {% else %}
+                    <span class="badge role-badge">View only</span>
                     {% endif %}
                 </div>
             </div>

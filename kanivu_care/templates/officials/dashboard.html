@@ -22,15 +22,17 @@
             <div class="stat-value">{{ total_volunteers }}</div>
             <div style="font-size: 0.7rem; color: #2ecc71; margin-top: 0.5rem;">Click to view list</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" onclick="openModal('campaignsModal')" style="cursor: pointer;">
             <div class="stat-icon text-orange"><i class="fas fa-bullhorn"></i></div>
-            <div class="stat-label">Active Campaigns</div>
+            <div class="stat-label"> Campaigns</div>
             <div class="stat-value">{{ active_campaigns }}</div>
+            <div style="font-size: 0.7rem; color: #e67e22; margin-top: 0.5rem;">Click to view list</div>
         </div>
         <div class="stat-card">
             <div class="stat-icon text-purple"><i class="fas fa-hand-holding-usd"></i></div>
-            <div class="stat-label">Total Funds</div>
+            <div class="stat-label">Donations Received</div>
             <div class="stat-value">₹{{ total_donations }}</div>
+            <div style="font-size: 0.7rem; color: #9b59b6; margin-top: 0.5rem;">Total amount received as donations</div>
         </div>
     </div>
 
@@ -59,12 +61,12 @@
         <div class="card">
             <h2 class="card-title">Supervisory Controls</h2>
             <div class="controls-list">
-                <a href="{% url 'officials:financial_oversight' %}" class="control-link">
+                <a href="{% url 'coordinator:manage_events' %}" class="control-link">
                     <div style="display: flex; align-items: center; gap: 15px;">
-                        <div style="font-size: 1.5rem; color: var(--primary);"><i class="fas fa-money-bill-wave"></i></div>
+                        <div style="font-size: 1.5rem; color: var(--primary);"><i class="fas fa-calendar-check"></i></div>
                         <div>
-                            <div style="font-weight: 600;">Financial Oversight</div>
-                            <div style="font-size: 0.8rem; color: var(--gray);">View collections and donations</div>
+                            <div style="font-weight: 600;">Events</div>
+                            <div style="font-size: 0.8rem; color: var(--gray);">Review and manage organization events</div>
                         </div>
                     </div>
                 </a>
@@ -77,7 +79,7 @@
                         </div>
                     </div>
                 </a>
-                <a href="{% url 'officials:fund_requests' %}" class="control-link">
+                <!-- <a href="{% url 'officials:fund_requests' %}" class="control-link">
                     <div style="display: flex; align-items: center; gap: 15px;">
                         <div style="font-size: 1.5rem; color: #9b59b6;"><i class="fas fa-check-circle"></i></div>
                         <div>
@@ -85,7 +87,7 @@
                             <div style="font-size: 0.8rem; color: var(--gray);">Review fund/activity requests</div>
                         </div>
                     </div>
-                </a>
+                </a> -->
             </div>
         </div>
     </div>
@@ -119,6 +121,44 @@
                 </tr>
                 {% empty %}
                 <tr><td colspan="5" style="text-align: center; padding: 2rem;">No members found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Campaigns Modal -->
+<div id="campaignsModal" class="modal-overlay" onclick="closeModal('campaignsModal')">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="modal-close" onclick="closeModal('campaignsModal')">&times;</span>
+        <h2 class="card-title">All Campaigns</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Period</th>
+                    <th>Volunteers</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for campaign in campaigns %}
+                <tr>
+                    <td style="font-weight: 600;">{{ campaign.name }}</td>
+                    <td>{{ campaign.get_type_display }}</td>
+                    <td>{{ campaign.start_date|date:"d M Y" }} - {{ campaign.end_date|date:"d M Y" }}</td>
+                    <td>{{ campaign.current_volunteers }} / {{ campaign.max_volunteers }}</td>
+                    <td>
+                        {% if campaign.end_date >= today %}
+                        <span style="color: #2ecc71; font-weight: 600;">Active</span>
+                        {% else %}
+                        <span style="color: #95a5a6; font-weight: 600;">Closed</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" style="text-align: center; padding: 2rem;">No campaigns found.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

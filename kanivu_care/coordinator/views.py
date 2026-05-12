@@ -184,11 +184,15 @@ def events_coordinator(req):
 @login_required(login_url="users:login")
 def manage_events(req):
     role = req.user.userprofile.role
-    if role not in ["convenier", "principal", "chairman"]:
+    if role not in ["convenier", "office_staff", "principal", "chairman"]:
         return HttpResponseRedirect("/")
     
     if role == "convenier":
         events = Event.objects.filter(status__in=['PENDING_CONVENER', 'REJECTED_TO_CONVENER']).select_related('rejected_by', 'rejected_by__userprofile', 'applied_by').order_by('-applied_on')
+    elif role == "office_staff":
+        events = Event.objects.filter(
+            status__in=['PENDING_CONVENER', 'PENDING_PRINCIPAL', 'PENDING_CHAIRMAN', 'REJECTED_TO_CONVENER']
+        ).select_related('rejected_by', 'rejected_by__userprofile', 'applied_by').order_by('-applied_on')
     elif role == "principal":
         events = Event.objects.filter(status='PENDING_PRINCIPAL').select_related('applied_by').order_by('-applied_on')
     elif role == "chairman":
